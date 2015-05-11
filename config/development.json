@@ -1,0 +1,31 @@
+{
+	
+	"db": {
+		"mongo": {
+			"host": "localhost",
+			"name": "cbo"
+		}
+	},
+	"api": {
+		"wepay": {
+			"client_id"     : "107622",
+		    "client_secret" : "093ed1d359",
+		    "access_token"  : "STAGE_163ce6e8b15fe1e4ef49145add7e6b34d543f1310f00f0897e17b51fbb498fe5" // used for oAuth2
+		    // "api_version": "API_VERSION"
+		}
+	},
+	"session": {
+		"secret" : "cbo-2015",
+		"saveUninitialized": true,
+		"resave": true
+	},
+  	/**
+  	 * Cross Domain Setting
+  	 */
+    "cross": {
+	  	"enable": true,
+	  	"allow_origin" : null, // default: "*",
+	  	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
+	},
+    "hash": "1f3f365ffdf4eb0777899420f0aca20a"
+}
