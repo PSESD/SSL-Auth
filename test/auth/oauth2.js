@@ -72,7 +72,7 @@ describe( 'OAuth2', function () {
     } );
 
     it( 'user should be able get authorised page', function (done) {
-        agent1.get( '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+server )
+        agent1.get( '/api/oauth2/authorize?client_id=client&response_type=code&approval_prompt=force&redirect_uri='+server )
             .auth( 'test', 'test' )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )

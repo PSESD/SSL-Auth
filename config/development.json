@@ -19,6 +19,9 @@
 		"saveUninitialized": true,
 		"resave": true
 	},
+	"security": {
+	  "tokenLife" : 3600
+	},
   	/**
   	 * Cross Domain Setting
   	 */

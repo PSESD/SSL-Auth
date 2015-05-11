@@ -4,6 +4,8 @@ var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
+var RefreshToken = require('../models/RefreshToken');
+var crypto = require('crypto');
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -48,8 +50,9 @@ server.deserializeClient(function(id, callback) {
 
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, callback) {
   // Create a new authorization code
+  var codeHash = crypto.createHash('sha1').update(uid(16)).digest('hex');
   var code = new Code({
-    value: uid(16),
+    code: codeHash,
     clientId: client._id,
     redirectUri: redirectUri,
     userId: user._id
@@ -70,33 +73,67 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, ca
 // code.
 
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, callback) {
-  Code.findOne({ value: code }, function (err, authCode) {
+
+  Code.findOne({ code: code }, function (err, authCode) {
     if (err) { return callback(err); }
-    if (authCode === undefined) { return callback(null, false); }
-    if (client._id.toString() !== authCode.clientId) { return callback(null, false); }
-    if (redirectUri !== authCode.redirectUri) { return callback(null, false); }
+    if (authCode === undefined) {  console.log("1"); return callback(null, false); }
+    if (client._id.toString() !== authCode.clientId) { console.log("2");  return callback(null, false); }
+    if (redirectUri !== authCode.redirectUri) { console.log("3");  return callback(null, false); }
 
     // Delete auth code now that it has been used
     authCode.remove(function (err) {
+      console.log("4");
       if(err) { return callback(err); }
-
+      var token = uid(256);
+      var refreshToken = uid(256);
+      var tokenHash = crypto.createHash('sha1').update(token).digest('hex');
+      var refreshTokenHash = crypto.createHash('sha1').update(refreshToken).digest('hex');
+      var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
       // Create a new access token
-      var token = new Token({
-        value: uid(256),
+      var tokenModel = new Token({
+        token: tokenHash,
+        clientId: authCode.clientId,
+        userId: authCode.userId,
+        expirationDate: expirationDate
+      });
+      //Refresh Token Code
+      var refreshTokenModel = new RefreshToken({
+        refreshToken: refreshTokenHash,
         clientId: authCode.clientId,
         userId: authCode.userId
       });
 
       // Save the access token and check for errors
-      token.save(function (err) {
+      tokenModel.save(function (err) {
         if (err) { return callback(err); }
-
-        callback(null, token);
+        refreshTokenModel.save(function (err) {
+          if (err) return callback(err);
+          callback(null, token, refreshToken, {expires_in: expirationDate});
+        });
       });
     });
   });
 }));
+//Refresh Token
+server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, callback) {
+  var refreshTokenHash = crypto.createHash('sha1').update(refreshToken).digest('hex');
 
+  RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
+    if (err) return callback(err);
+    if (!token) return callback(null, false);
+    if (client.clientId !== token.clientId) return callback(null, false);
+
+    var newAccessToken = uid(256);
+    var accessTokenHash = crypto.createHash('sha1').update(newAccessToken).digest('hex');
+
+    var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
+
+    Token.update({userId: token.userId}, {$set: {token: accessTokenHash, scope: scope, expirationDate: expirationDate}}, function (err) {
+      if (err) return callback(err);
+      callback(null, newAccessToken, refreshToken, {expires_in: expirationDate});
+    });
+  });
+}));
 // user authorization endpoint
 //
 // `authorization` middleware accepts a `validate` callback which is
@@ -125,7 +162,7 @@ exports.authorization = [
   function(req, res){
     res.render('../app/views/dialog', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
   }
-]
+];
 
 // user decision endpoint
 //
@@ -153,7 +190,7 @@ exports.token = [
 /**
  * Return a unique identifier with the given `len`.
  *
- *     utils.uid(10);
+ *     uid(10);
  *     // => "FDaS435D2z"
  *
  * @param {Number} len
@@ -171,9 +208,22 @@ function uid (len) {
 
   return buf.join('');
 };
-
 /**
- * Return a random int, used by `utils.uid()`
+ *
+ * @param secret
+ * @param salt
+ * @returns {*}
+ */
+function tokenValue(secret, salt) {
+  return crypto.pbkdf2Sync(secret, salt, 4096, 512, 'sha256', function (err, key) {
+    if (err)
+      throw err;
+    console.log(key.toString('hex'));  // 'c5e478d...1469e50'
+    return key;
+  });
+}
+/**
+ * Return a random int, used by `uid()`
  *
  * @param {Number} min
  * @param {Number} max

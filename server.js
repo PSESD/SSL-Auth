@@ -63,6 +63,7 @@ Api.prototype.configureExpress = function(db) {
     // Use the passport package in our application
     app.use(passport.initialize());
 
+
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler('e0f67e505472424ca9728934a41fc416'));
     // Use express session support since OAuth2orize requires it
@@ -93,7 +94,7 @@ Api.prototype.configureExpress = function(db) {
  * Start Server
  */
 Api.prototype.startServer = function() {
-    app.listen(3000,function(){
+    app.listen(process.env.PORT || 3000,function(){
         console.log("All right ! I am alive at Port 3000.");
     });
 };

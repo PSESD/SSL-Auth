@@ -3,8 +3,9 @@ var mongoose = require('mongoose');
 
 // Define our token schema
 var TokenSchema   = new mongoose.Schema({
-  value: { type: String, required: true },
+  token: { type: String, unique: true, required: true },
   userId: { type: String, required: true },
+  scope: { type: String },
   clientId: { type: String, required: true }
 });
 
