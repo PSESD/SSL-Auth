@@ -51,8 +51,8 @@ Run Unit Test:
 
 CBO OAuth2 accepts an object with the following valid params.
 
-* `clientID` - Required registered Client ID.
-* `clientSecret` - Required registered Client secret.
+* `client_id` - Required registered Client ID.
+* `client_secret` - Required registered Client secret.
 * `redirect_uri` - One of the redirect URIs.
 * `grant_type` - Defined in the OAuth 2.0 specification, this field must contain a value of `authorization_code`.
 
