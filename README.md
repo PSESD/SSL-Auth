@@ -126,7 +126,7 @@ for any idea that can improve the project.
 
 ## Authors
 
-[Andrea Reginato](http://twitter.com/andreareginato)
+--- 
 
 
 ## Contributors
@@ -136,7 +136,7 @@ Special thanks to the following people for submitting patches.
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/andreareginato/simple-oauth2/blob/master/CHANGELOG.md)
+See [CHANGELOG](https://github.com/PSESD/cbo-data-portal/master/CHANGELOG.md)
 
 
 ## Copyright
