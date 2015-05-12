@@ -3,6 +3,6 @@ Thumbs.db
 /.settings
 .project
 .buildpath
-.idea
+/.idea
 node_modules
 npm-debug.log
