@@ -75,6 +75,36 @@ provide specs to your contribution.
 
 [httpie](https://github.com/jkbr/httpie) - command line HTTP client
 
+## Make Requests
+
+#### Register a new user
+
+```
+$ http POST http://localhost:3000/api/users username=test password=your_password
+```
+#### User add a new client
+
+```
+$ http -a test:your_password POST http://localhost:3000/api/clients client_id=client name=client client_secret=secret
+```
+
+#### User get authorised page
+
+```
+$ http -a test:your_password GET http://localhost:3000/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000
+```
+
+#### User to authorise an access code
+
+```
+$ http -a test:your_password -f POST http://localhost:3000/api/oauth2/authorize transaction_id: <transaction_id>
+```
+
+#### User access code to get a token
+
+```
+$ http -a client:secret -f POST http://localhost:3000/api/oauth2/authorize code=<accessCode> grant_type=authorization_code redirect_uri=http://localhost:3000
+```
 
 ## Coding guidelines
 
