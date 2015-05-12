@@ -8,6 +8,7 @@ var RefreshToken = require('../models/RefreshToken');
 var crypto = require('crypto');
 var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
+var codeHash = require('../../lib/utils').codeHash;
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -52,9 +53,8 @@ server.deserializeClient(function(id, callback) {
 
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, callback) {
   // Create a new authorization code
-  var codeHash = crypto.createHash('sha1').update(uid(16)).digest('hex');
   var code = new Code({
-    code: codeHash,
+    code: codeHash(uid(16)),
     clientId: client._id,
     redirectUri: redirectUri,
     userId: user._id
@@ -78,22 +78,20 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
 
   Code.findOne({ code: code }, function (err, authCode) {
     if (err) { return callback(err); }
-    if (authCode === undefined) {  console.log("1"); return callback(null, false); }
-    if (client._id.toString() !== authCode.clientId) { console.log("2");  return callback(null, false); }
-    if (redirectUri !== authCode.redirectUri) { console.log("3");  return callback(null, false); }
+    if (authCode === undefined) {  return callback(null, false); }
+    if (client._id.toString() !== authCode.clientId) { return callback(null, false); }
+    if (redirectUri !== authCode.redirectUri) { return callback(null, false); }
 
     // Delete auth code now that it has been used
     authCode.remove(function (err) {
-      console.log("4");
       if(err) { return callback(err); }
       var token = uid(256);
       var refreshToken = uid(256);
-      var tokenHash = crypto.createHash('sha1').update(token).digest('hex');
-      var refreshTokenHash = crypto.createHash('sha1').update(refreshToken).digest('hex');
+      var refreshTokenHash = tokenHash(refreshToken);
       var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
       // Create a new access token
       var tokenModel = new Token({
-        token: tokenHash,
+        token: tokenHash(token),
         clientId: authCode.clientId,
         userId: authCode.userId,
         expirationDate: expirationDate
@@ -118,7 +116,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
 }));
 //Refresh Token
 server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, callback) {
-  var refreshTokenHash = crypto.createHash('sha1').update(refreshToken).digest('hex');
+  var refreshTokenHash = tokenHash(refreshToken);
 
   RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
     if (err) return callback(err);
@@ -126,7 +124,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     if (client.clientId !== token.clientId) return callback(null, false);
 
     var newAccessToken = uid(256);
-    var accessTokenHash = crypto.createHash('sha1').update(newAccessToken).digest('hex');
+    var accessTokenHash = tokenHash(newAccessToken);
 
     var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
 

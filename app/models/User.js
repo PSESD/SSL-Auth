@@ -1,6 +1,6 @@
 // Load required packages
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt-nodejs');
+var crypto = require('crypto');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -9,7 +9,7 @@ var UserSchema = new mongoose.Schema({
     unique: true,
     required: true
   },
-  password: {
+  hashedPassword: {
     type: String,
     required: true
   },
@@ -25,31 +25,35 @@ var UserSchema = new mongoose.Schema({
   }
 });
 
-// Execute before each user.save() call
-UserSchema.pre('save', function(callback) {
-  var user = this;
-
-  // Break out if the password hasn't changed
-  if (!user.isModified('password')) return callback();
-
-  // Password changed so we need to hash it
-  bcrypt.genSalt(5, function(err, salt) {
-    if (err) return callback(err);
-
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
-      if (err) return callback(err);
-      user.password = hash;
-      user.salt = salt;
-      callback();
+UserSchema.virtual('userId')
+    .get(function(){
+      return this.id;
     });
-  });
-});
-
+/**
+ *
+ * @param password
+ * @returns {*}
+ */
+UserSchema.methods.encryptPassword = function(password){
+  return crypto.pbkdf2Sync(password, this.salt, 4096, 512, 'sha256').toString('hex');
+};
+/**
+ *
+ */
+UserSchema.virtual('password')
+    .set(function(password) {
+      this._plainPassword = password;
+      this.salt = crypto.randomBytes(128).toString('base64');
+      this.hashedPassword = this.encryptPassword(password);
+    })
+    .get(function() { return this._plainPassword; });
+/**
+ *
+ * @param password
+ * @param cb
+ */
 UserSchema.methods.verifyPassword = function(password, cb) {
-  bcrypt.compare(password, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
+  cb(null, this.encryptPassword(password) === this.hashedPassword);
 };
 
 // Export the Mongoose model

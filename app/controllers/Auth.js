@@ -1,15 +1,13 @@
 // Load required packages
 var passport = require('passport');
-var config = require('config');
 var BasicStrategy = require('passport-http').BasicStrategy;
-var DigestStrategy = require('passport-http').DigestStrategy;
 var LocalStrategy = require('passport-local').Strategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
-var crypto = require('crypto');
+var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
   function(username, password, callback) {
@@ -87,7 +85,7 @@ passport.use('client-basic', new BasicStrategy(
 
 passport.use(new BearerStrategy(
   function(accessToken, callback) {
-    var accessTokenHash = crypto.createHash('sha1').update(accessToken).digest('hex');
+    var accessTokenHash = tokenHash(accessToken);
     Token.findOne({token: accessTokenHash }, function (err, token) {
       if (err) { return callback(err); }
 

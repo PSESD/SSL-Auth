@@ -8,8 +8,8 @@ exports.postClients = function(req, res) {
   console.log('postClients');
   // Set the client properties that came from the POST data
   client.name = req.body.name;
-  client.id = req.body.id;
-  client.secret = req.body.secret;
+  client.id = req.body.client_id;
+  client.secret = req.body.client_secret;
   client.userId = req.user._id;
 
   // Save the client and check for errors

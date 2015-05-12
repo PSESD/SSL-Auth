@@ -47,9 +47,9 @@ describe( 'OAuth2', function () {
             .auth( 'test', 'test' )
             .type( 'urlencoded' )
             .send( {
-                id    : 'client',
+                client_id    : 'client',
                 name  : 'client',
-                secret: 'secret'
+                client_secret: 'secret'
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
