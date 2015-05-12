@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/andreareginato/simple-oauth2.svg?branch=master)](https://travis-ci.org/andreareginato/simple-oauth2)
 [![Dependency Status](https://gemnasium.com/andreareginato/simple-oauth2.svg)](https://gemnasium.com/andreareginato/simple-oauth2)
 
-# Simple OAuth2
+# CBO OAuth2
 
 Node.js client library for [Oauth2](http://oauth.net/2/).
 
@@ -23,12 +23,12 @@ Node client library is tested against Node ~0.8.x
 
 Install the client library using [npm](http://npmjs.org/):
 
-    $ npm install simple-oauth2
+    $ npm install
 
 Install the client library using git:
 
-    $ git clone git://github.com/andreareginato/simple-oauth2.git
-    $ cd simple-oauth2
+    $ git clone https://github.com/PSESD/cbo-data-portal.git
+    $ cd cbo-data-portal
     $ npm install
 
 

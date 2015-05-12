@@ -3,14 +3,14 @@
 var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
-var server = 'http://localhost:3000';
+var url = 'http://localhost:3000';
 var dbURI = 'mongodb://localhost/cbo_test'
     , mongoose = require( 'mongoose' )
     , clearDB = require( 'mocha-mongoose' )( dbURI, {noClear: true} );
 
 describe( 'OAuth2', function () {
 
-    var agent1 = request.agent( server );
+    var agent1 = request.agent( url );
     /**
      * Store transaction Id to use in post request
      */
@@ -31,7 +31,7 @@ describe( 'OAuth2', function () {
     } );
 
     it( 'should create a new user', function (done) {
-        request( server ).post( '/api/users' )
+        request( url ).post( '/api/users' )
             .send( 'username=test' )
             .send( 'password=test' )
             .expect( 'Content-Type', /json/ )
@@ -43,7 +43,7 @@ describe( 'OAuth2', function () {
 
     } );
     it( 'user should add a new client', function (done) {
-        request( server ).post( '/api/clients' )
+        request( url ).post( '/api/clients' )
             .auth( 'test', 'test' )
             .type( 'urlencoded' )
             .send( {
@@ -60,7 +60,7 @@ describe( 'OAuth2', function () {
 
     } );
     it( 'user should be able to list clients', function (done) {
-        request( server ).get( '/api/clients' )
+        request( url ).get( '/api/clients' )
             .auth( 'test', 'test' )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -72,12 +72,14 @@ describe( 'OAuth2', function () {
     } );
 
     it( 'user should be able get authorised page', function (done) {
-        agent1.get( '/api/oauth2/authorize?client_id=client&response_type=code&approval_prompt=force&redirect_uri='+server )
+        var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+url;
+        agent1.get( target )
             .auth( 'test', 'test' )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
             .expect( function (res) {
+                console.log(url+target);
                 var html = cheerio.load( res.text );
                 //cookieId = req.headers['set-cookie'][0]
                 transactionId = html( 'input[type="hidden"]' ).val();
@@ -103,7 +105,7 @@ describe( 'OAuth2', function () {
     } );
 
     it( 'use access code to get a token', function (done) {
-        request( server ).post( '/api/oauth2/token' )
+        request( url ).post( '/api/oauth2/token' )
             .auth( 'client', 'secret' )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( {

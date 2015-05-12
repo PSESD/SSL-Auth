@@ -6,6 +6,8 @@ var Token = require('../models/Token');
 var Code = require('../models/Code');
 var RefreshToken = require('../models/RefreshToken');
 var crypto = require('crypto');
+var uid = require('../../lib/utils').uid;
+var tokenHash = require('../../lib/utils').tokenHash;
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -62,7 +64,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, ca
   code.save(function(err) {
     if (err) { return callback(err); }
 
-    callback(null, code.value);
+    callback(null, code.code);
   });
 }));
 
@@ -186,52 +188,4 @@ exports.token = [
   server.token(),
   server.errorHandler()
 ]
-
-/**
- * Return a unique identifier with the given `len`.
- *
- *     uid(10);
- *     // => "FDaS435D2z"
- *
- * @param {Number} len
- * @return {String}
- * @api private
- */
-function uid (len) {
-  var buf = []
-    , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    , charlen = chars.length;
-
-  for (var i = 0; i < len; ++i) {
-    buf.push(chars[getRandomInt(0, charlen - 1)]);
-  }
-
-  return buf.join('');
-};
-/**
- *
- * @param secret
- * @param salt
- * @returns {*}
- */
-function tokenValue(secret, salt) {
-  return crypto.pbkdf2Sync(secret, salt, 4096, 512, 'sha256', function (err, key) {
-    if (err)
-      throw err;
-    console.log(key.toString('hex'));  // 'c5e478d...1469e50'
-    return key;
-  });
-}
-/**
- * Return a random int, used by `uid()`
- *
- * @param {Number} min
- * @param {Number} max
- * @return {Number}
- * @api private
- */
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
