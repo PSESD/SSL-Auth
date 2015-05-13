@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Content goes here...[![Build Status](https://travis-ci.org/PSESD/cbo-data-portal.svg?branch=master)](https://travis-ci.org/PSESD/cbo-data-portal)
 [![Dependency Status](https://gemnasium.com/PSESD/cbo-data-portal.svg)](https://gemnasium.com/PSESD/cbo-data-portal)
 
@@ -145,7 +144,3 @@ See [CHANGELOG](https://github.com/PSESD/cbo-data-portal/master/CHANGELOG.md)
 Copyright (c) 2015
 
 This project is released under the [MIT License](http://opensource.org/licenses/MIT).
-=======
-# cbo-data-portal
-Secure Data Portal for community-based organizations (CBO's)
->>>>>>> abd56c2d0f65eebc44801b81cd1b58f2c687dcda
