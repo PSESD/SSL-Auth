@@ -4,6 +4,7 @@
 FROM ubuntu
 MAINTAINER Bintang <halilintar8@yahoo.com>
 
+VOLUME ["/src"]
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Install nginx
