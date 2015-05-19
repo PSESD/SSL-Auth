@@ -31,7 +31,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node server.js"
+    "start": "node app.js",
+    "test": "NODE_ENV=test node app.js"
   },
   "repository": {
     "type": "git",

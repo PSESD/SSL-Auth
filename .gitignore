@@ -4,5 +4,5 @@ Thumbs.db
 .project
 .buildpath
 /.idea
-node_modules
-npm-debug.log
+/src/node_modules
+/src/npm-debug.log

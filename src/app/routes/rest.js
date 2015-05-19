@@ -16,11 +16,6 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	var oauth2Controller = Api.controller('OAuth2');
 	var clientController = Api.controller('Client');
 
-	/**
-	 * Example "/" To Hello World
-	 */
-    router.get('/', Api.controller('HelloWorld').index);
-
 
 	// Create endpoint handlers for /users
 	router.route('/users')

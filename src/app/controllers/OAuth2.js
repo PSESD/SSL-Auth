@@ -5,7 +5,6 @@ var Client = require('../models/Client');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
 var RefreshToken = require('../models/RefreshToken');
-var crypto = require('crypto');
 var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
 var codeHash = require('../../lib/utils').codeHash;

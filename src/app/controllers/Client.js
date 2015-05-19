@@ -15,9 +15,9 @@ exports.postClients = function(req, res) {
   // Save the client and check for errors
   client.save(function(err) {
     if (err)
-      return res.send(err);
+      return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'Client already exists'}) :  res.send(err);
 
-    res.json({ message: 'Client added to the locker!', data: client });
+    res.json({ code: 0, message: 'Client added to the locker!', data: client });
   });
 };
 

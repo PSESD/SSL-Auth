@@ -13,6 +13,7 @@ function Api(){
     self.controllerDir = self.baseDir + '/app/controllers';
     self.modelDir = self.baseDir + '/app/models';
     self.routeDir = self.baseDir + '/app/routes';
+    self.libDir = self.baseDir + '/lib';
     self.config = require('config');
     //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
@@ -32,6 +33,10 @@ Api.prototype.controller = function(name){
  */
 Api.prototype.model = function(name){
     return require(this.modelDir + '/' + name);
+};
+
+Api.prototype.lib = function(name){
+    return require(this.libDir + '/' + name);
 };
 /**
  * load router

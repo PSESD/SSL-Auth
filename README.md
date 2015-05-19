@@ -1,5 +1,3 @@
-Content goes here...[![Build Status](https://travis-ci.org/PSESD/cbo-data-portal.svg?branch=master)](https://travis-ci.org/PSESD/cbo-data-portal)
-[![Dependency Status](https://gemnasium.com/PSESD/cbo-data-portal.svg)](https://gemnasium.com/PSESD/cbo-data-portal)
 
 # Secure Data Portal for community-based organizations (CBO's)
 
@@ -34,15 +32,15 @@ Install the client library using git:
 
 Run server:
 
-    $ npm start
+    $ cd src && npm start
 
 Run server with environment `test`:
 
-    $ NODE_ENV=test npm start
+    $ cd src && npm test
 
 Run Unit Test:
 
-    $ mocha test/auth/oauth2.js
+    $ cd src && mocha
 
 
 
@@ -69,7 +67,7 @@ provide specs to your contribution.
 * Fork and clone the repository (`dev` branch).
 * Run `npm install` for dependencies.
 * Run `npm start` to start server.
-* Run `NODE_ENV=test npm start` to start server with env `test`.
+* Run `npm test` to start server with env `test`.
 
 ## Tools used
 
@@ -91,13 +89,13 @@ $ http -a test:your_password POST http://localhost:3000/api/clients client_id=cl
 #### User get authorised page
 
 ```
-$ http -a test:your_password GET http://localhost:3000/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000
+$ http -a test:your_password GET http://localhost:3000/api/oauth2/authorize client_id==client response_type==code redirect_uri==http://localhost:3000
 ```
 
 #### User to authorise an access code
 
 ```
-$ http -a test:your_password -f POST http://localhost:3000/api/oauth2/authorize transaction_id: <transaction_id>
+$ http -a test:your_password -f POST http://localhost:3000/api/oauth2/authorize transaction_id=<transaction_id>
 ```
 
 #### User access code to get a token
