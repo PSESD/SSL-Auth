@@ -10,9 +10,9 @@ exports.postUsers = function(req, res) {
 
   user.save(function(err) {
     if (err)
-      return res.send(err);
+      return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'User already exists'}) :  res.send(err);
 
-    res.json({ message: 'New users added!' });
+    res.json({ code: 0, message: 'New users added!' });
   });
 };
 

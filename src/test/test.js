@@ -79,7 +79,8 @@ describe( 'OAuth2', function () {
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
             .expect( function (res) {
-                console.log(url+target);
+                //console.log(url+target);
+                console.dir(res.body);
                 var html = cheerio.load( res.text );
                 //cookieId = req.headers['set-cookie'][0]
                 transactionId = html( 'input[type="hidden"]' ).val();
