@@ -6,7 +6,14 @@ var ejs = require('ejs');
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
-
+var methodOverride = require('method-override');
+var port = process.env.PORT || 3000;
+var config = require('config');
+var rollbarAccessToken = config.get('rollbar.access_token');
+if(rollbarAccessToken) {
+    // Use the rollbar error handler to send exceptions to your rollbar account
+    app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
+}
 function Api(){
     var self = this;
     self.baseDir = __dirname;
@@ -14,13 +21,26 @@ function Api(){
     self.modelDir = self.baseDir + '/app/models';
     self.routeDir = self.baseDir + '/app/routes';
     self.libDir = self.baseDir + '/lib';
-    self.config = require('config');
+    self.config = config;
     //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
+
     self.connectDb();
 };
-
-
+/**
+ *
+ * @param type
+ * @param message
+ * @param cb
+ * send message to rollbar
+ * @link https://rollbar.com
+ */
+Api.prototype.sendMessage = function(type, message, cb){
+    rollbar.reportMessage(message, type || 'debug', function(rollbarErr) {
+        console.log('CALL ROLLBAR: ' + rollbarErr);
+        if(cb) cb(rollbarErr);
+    });
+};
 /**
  * load controller
  */
@@ -45,10 +65,31 @@ Api.prototype.route = function(name){
     return require(this.routeDir + '/' + name);
 };
 /**
+ * Scan route and register
+ */
+Api.prototype.registerRoute = function(){
+    var router = express.Router();
+    var self = this;
+    var fs = require('fs');
+    var path = require('path');
+    var routers = fs.readdirSync(self.routeDir);
+    routers.forEach(function(file){
+        var basename = path.basename(file, '.js');
+        var rest = self.route(basename);
+        if(basename === 'rest'){
+            basename = 'api';
+        }
+        app.use('/'+basename, router);
+        var rest_router = new rest(router,self);
+    });
+};
+/**
  * Connect to database
  */
 Api.prototype.connectDb = function() {
-    this.mongo.connect('mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name'));
+    var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
+    console.log("DB URI: " + dbUri);
+    this.mongo.connect(dbUri);
     this.configureExpress(this.db);
     
 };
@@ -63,20 +104,21 @@ Api.prototype.configureExpress = function(db) {
 
     app.use(bodyParser.json());
 
+    app.use(methodOverride());
+
     // Set view engine to ejs
     app.set('view engine', 'ejs');
     // Use the passport package in our application
     app.use(passport.initialize());
 
 
-    // Use the rollbar error handler to send exceptions to your rollbar account
-    app.use(rollbar.errorHandler('e0f67e505472424ca9728934a41fc416'));
     // Use express session support since OAuth2orize requires it
     app.use(session({ 
       secret: self.config.get('session.secret'),
       saveUninitialized: self.config.get('session.saveUninitialized'),
       resave: self.config.get('session.resave')
     }));
+
     var cross = self.config.get('cross');
     if(cross.enable) {
         /**
@@ -88,19 +130,21 @@ Api.prototype.configureExpress = function(db) {
             next();
         });
     }
-
-    var router = express.Router();
-    var rest = self.route('rest');
-    app.use('/api', router);
-    var rest_router = new rest(router,self);
+    /**
+     * Register Route
+     */
+    self.registerRoute();
+    /**
+     * Start Server
+     */
     self.startServer();
 };
 /**
  * Start Server
  */
 Api.prototype.startServer = function() {
-    app.listen(process.env.PORT || 3000,function(){
-        console.log("All right ! I am alive at Port 3000.");
+    app.listen(port,function(){
+        console.log("All right ! I am alive at Port "+port+".");
     });
 };
 /**
@@ -109,7 +153,15 @@ Api.prototype.startServer = function() {
  */
 Api.prototype.stop = function(err) {
     console.log("ERROR \n" + err);
+    rollbar.reportMessage("ERROR \n"+err);
     process.exit(1);
 };
 
-new Api();
+try {
+    new Api();
+} catch(e){
+    console.log(e);
+    rollbar.reportMessage(e.message, 'error', function(rollbarErr) {
+        console.log('CALL ROLLBAR: ' + rollbarErr);
+    });
+}

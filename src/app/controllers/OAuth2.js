@@ -87,7 +87,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
       var token = uid(256);
       var refreshToken = uid(256);
       var refreshTokenHash = tokenHash(refreshToken);
-      var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
+      var expirationDate = new Date(new Date().getTime() + (600 * 1000));
       // Create a new access token
       var tokenModel = new Token({
         token: tokenHash(token),

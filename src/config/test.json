@@ -1,7 +1,7 @@
 {
   "db": {
     "mongo": {
-      "host": "localhost",
+      "host": "zaenal:zendev@ds031632.mongolab.com:31632",
       "name": "cbo_test"
     }
   },
@@ -18,5 +18,8 @@
     "allow_origin" : null, // default: "*",
     "allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
   },
-  "salt": "1f3f365ffdf4eb0777899420f0aca20a_test"
+  "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
+  "rollbar": {
+    "access_token" : "e0f67e505472424ca9728934a41fc416"
+  }
 }
