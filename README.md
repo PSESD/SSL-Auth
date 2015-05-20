@@ -23,8 +23,8 @@ To install dependencies enter project folder and run following command:
 
 Install the client library using git:
 
-    $ git clone https://github.com/PSESD/cbo-data-portal.git
-    $ cd cbo-data-portal
+    $ git clone https://github.com/PSESD/CBO-Portal-Auth.git
+    $ cd CBO-Portal-Auth
     $ npm install
 
 
@@ -111,15 +111,15 @@ Follow [github](https://github.com/styleguide/) guidelines.
 
 ## Feedback
 
-Use the [issue tracker](https://github.com/PSESD/cbo-data-portal/issues) for bugs.
+Use the [issue tracker](https://github.com/PSESD/CBO-Portal-Auth/issues) for bugs.
 [Mail](mailto:support@upwardstech.com) us
 for any idea that can improve the project.
 
 
 ## Links
 
-* [GIT Repository](https://github.com/PSESD/cbo-data-portal)
-* [Documentation](https://github.com/PSESD/cbo-data-portal)
+* [GIT Repository](https://github.com/PSESD/CBO-Portal-Auth)
+* [Documentation](https://github.com/PSESD/CBO-Portal-Auth)
 
 
 ## Authors
@@ -134,7 +134,7 @@ Special thanks to the following people for submitting patches.
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/PSESD/cbo-data-portal/master/CHANGELOG.md)
+See [CHANGELOG](https://github.com/PSESD/CBO-Portal-Auth/master/CHANGELOG.md)
 
 
 ## Copyright
