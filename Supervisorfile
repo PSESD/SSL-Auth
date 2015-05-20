@@ -1,0 +1,6 @@
+[program:mongodb]
+command=/usr/bin/mongod --config /etc/mongodb.conf
+numprocs=1
+autostart=true
+autorestart=true
+
