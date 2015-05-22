@@ -10,8 +10,8 @@ ENV NODE_ENV production
 ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
-RUN apt-get update
-RUN apt-get -y install curl unzip git wget vim nginx nodejs npm
+RUN apt-get update && apt-get -y upgrade
+RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptools
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # Setup Nginx
@@ -27,10 +27,13 @@ WORKDIR /src
 RUN npm -g update npm
 RUN npm install
 
+# Run Supervisord
+RUN /usr/bin/easy_install supervisor
+RUN /usr/bin/easy_install supervisor-stdout
+ADD supervisord.conf /etc/supervisord.conf
+
 # Publish port
 EXPOSE 443
 
-# Run Supervisord
-ADD supervisord.conf /etc/supervisord.conf
-CMD ["/usr/bin/supervisord -n"]
+CMD ["/usr/local/bin/supervisord -n"]
 
