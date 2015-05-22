@@ -1,4 +1,5 @@
 {
+  "host": "cbo.upwardst.st",
   "db": {
 	"mongo": {
 //	  "host": "localhost",
