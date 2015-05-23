@@ -1,0 +1,16 @@
+# language setting
+language: node_js
+
+# version numbers, testing against two versions of node
+node_js:
+  - 0.10.25
+services:
+  - mongodb
+env:
+  - NODE_ENV=development NODE_CONFIG_DIR=/src/config
+branches:
+  only:
+    - staging
+before_install:
+  - shippable_retry sudo apt-get update
+  - shippable_retry sudo apt-get install -y curl unzip git wget vim nginx nodejs npm python-setuptools
