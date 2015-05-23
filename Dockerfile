@@ -15,14 +15,18 @@ RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptool
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # Setup Nginx
-RUN echo "server_tokens off;" >> /etc/nginx/nginx.conf
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-ADD /startup/webserver.pem /etc/ssl/webserver.pem
-ADD /startup/webserver.key /etc/ssl/webserver.key
-ADD default.conf /etc/nginx/sites-available/default
+RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
+RUN sed -i -e"s/keepalive_timeout 2/keepalive_timeout 2;\n\tclient_max_body_size 100m/" /etc/nginx/nginx.conf
+RUN sed -i -e"s/# server_tokens off;/server_tokens off;/" /etc/nginx/nginx.conf
+ADD /config/webserver.pem /etc/ssl/webserver.pem
+ADD /config/webserver.key /etc/ssl/webserver.key
+ADD /config/default.conf /etc/nginx/sites-available/default
 
 # Setup NodeJS Application
+RUN useradd -M node
 ADD /src /src
+RUN chown -R node:node /src
 WORKDIR /src
 RUN npm -g update npm
 RUN npm install
@@ -30,10 +34,11 @@ RUN npm install
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor
 RUN /usr/bin/easy_install supervisor-stdout
-ADD supervisord.conf /etc/supervisord.conf
+RUN /usr/bin/easy_install superlance
+ADD /config/supervisord.conf /etc/supervisord.conf
 
 # Publish port
 EXPOSE 443
 
-CMD ["/usr/local/bin/supervisord -n"]
+CMD ["/usr/local/bin/supervisord","-n"]
 
