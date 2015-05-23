@@ -40,5 +40,5 @@ ADD /config/supervisord.conf /etc/supervisord.conf
 # Publish port
 EXPOSE 443
 
-CMD ["/usr/local/bin/supervisord"]
+CMD ["/usr/local/bin/supervisord","-n"]
 
