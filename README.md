@@ -103,6 +103,14 @@ $ http -a test:your_password -f POST http://localhost:3000/api/oauth2/authorize 
 ```
 $ http -a client:secret -f POST http://localhost:3000/api/oauth2/authorize code=<accessCode> grant_type=authorization_code redirect_uri=http://localhost:3000
 ```
+```
+{
+    "access_token": "o1K60GNC2OiN9K67IUi9wpxj93Swr3NJ4lOgtC3N9iSJDHs14ue9dOcyzoA8tsf2aY6O11tc9ncEJItQ43ABPyunO6fDBNrPIRYz6JPCjv5l9qBiPrX9n8FIlPfzvYxED5wJRrx37jkn16ItOgK520cL0fZwShW23QsmdNA1m3wQRao8pxFDqhlVkqvcEWuqidgmD6GA7r90CjomgInREnIjVViMB6dkYVhcprKKvP8amZtGnT8st29ZtvgDH3Qh",
+    "refresh_token": "DposMi6lpOVyrZirrjGjPMRyiXeXvWy7PlrtMS5G4aUyJtCNMNzAfnCxZiNI5uxO4h7xYPGzsuf2smVMBDKvDRy9ce4Iu2X8aumhyFPf0BC8cF9WmoOJ4dBDId4ybtBOCrNj7VYMPB6kf0MAht06ZhD5wzJi9gY3B7zq01Bq4qfKonasH1ObjggNNZcptVpYJiwiwyWSsJVowR0T64rg9fkm6qAFirpoGVj5cOm0CZd2kc1QcuJqXX60lteVYk4b",
+    "expires_in": "2015-05-25T09:13:40.768Z",
+    "token_type": "Bearer"
+}
+```
 
 ## Coding guidelines
 

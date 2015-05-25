@@ -2,8 +2,8 @@
   "host": "cbo.upwardst.st",
   "db": {
 	"mongo": {
-//	  "host": "localhost",
-	  "host": "zaenal:zendev@ds037262.mongolab.com:37262",
+	  "host": "localhost",
+	  // "host": "zaenal:zendev@ds037262.mongolab.com:37262",
 	  "name": "cbo"
 	}
   },

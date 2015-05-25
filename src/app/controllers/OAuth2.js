@@ -8,6 +8,7 @@ var RefreshToken = require('../models/RefreshToken');
 var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
 var codeHash = require('../../lib/utils').codeHash;
+var calculateExp = require('../../lib/utils').calculateExp;
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -25,15 +26,17 @@ var server = oauth2orize.createServer();
 // simple matter of serializing the client's ID, and deserializing by finding
 // the client by ID from the database.
 
-server.serializeClient(function(client, callback) {
-  return callback(null, client._id);
+server.serializeClient(function (client, callback) {
+    return callback(null, client._id);
 });
 
-server.deserializeClient(function(id, callback) {
-  Client.findOne({ _id: id }, function (err, client) {
-    if (err) { return callback(err); }
-    return callback(null, client);
-  });
+server.deserializeClient(function (id, callback) {
+    Client.findOne({_id: id}, function (err, client) {
+        if (err) {
+            return callback(err);
+        }
+        return callback(null, client);
+    });
 });
 
 // Register supported grant types.
@@ -50,21 +53,23 @@ server.deserializeClient(function(id, callback) {
 // the application.  The application issues a code, which is bound to these
 // values, and will be exchanged for an access token.
 
-server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, callback) {
-  // Create a new authorization code
-  var code = new Code({
-    code: codeHash(uid(16)),
-    clientId: client._id,
-    redirectUri: redirectUri,
-    userId: user._id
-  });
+server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, callback) {
+    // Create a new authorization code
+    var code = new Code({
+        code: codeHash(uid(16)),
+        clientId: client._id,
+        redirectUri: redirectUri,
+        userId: user._id
+    });
 
-  // Save the auth code and check for errors
-  code.save(function(err) {
-    if (err) { return callback(err); }
+    // Save the auth code and check for errors
+    code.save(function (err) {
+        if (err) {
+            return callback(err);
+        }
 
-    callback(null, code.code);
-  });
+        callback(null, code.code);
+    });
 }));
 
 // Exchange authorization codes for access tokens.  The callback accepts the
@@ -73,65 +78,184 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, ca
 // application issues an access token on behalf of the user who authorized the
 // code.
 
-server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, callback) {
+server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, callback) {
 
-  Code.findOne({ code: code }, function (err, authCode) {
-    if (err) { return callback(err); }
-    if (authCode === undefined) {  return callback(null, false); }
-    if (client._id.toString() !== authCode.clientId) { return callback(null, false); }
-    if (redirectUri !== authCode.redirectUri) { return callback(null, false); }
+    Code.findOne({code: code}, function (err, authCode) {
+        if (err) {
+            return callback(err);
+        }
+        if (authCode === undefined || authCode === null) {
+            return callback(null, false);
+        }
+        if (client._id.toString() !== authCode.clientId) {
+            return callback(null, false);
+        }
+        if (redirectUri !== authCode.redirectUri) {
+            return callback(null, false);
+        }
 
-    // Delete auth code now that it has been used
-    authCode.remove(function (err) {
-      if(err) { return callback(err); }
-      var token = uid(256);
-      var refreshToken = uid(256);
-      var refreshTokenHash = tokenHash(refreshToken);
-      var expirationDate = new Date(new Date().getTime() + (600 * 1000));
-      // Create a new access token
-      var tokenModel = new Token({
-        token: tokenHash(token),
-        clientId: authCode.clientId,
-        userId: authCode.userId,
-        expirationDate: expirationDate
-      });
-      //Refresh Token Code
-      var refreshTokenModel = new RefreshToken({
-        refreshToken: refreshTokenHash,
-        clientId: authCode.clientId,
-        userId: authCode.userId
-      });
+        // Delete auth code now that it has been used
+        authCode.remove(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            var token = uid(256);
+            var refreshToken = uid(256);
+            var refreshTokenHash = tokenHash(refreshToken);
+            var expired = calculateExp();
+            // Create a new access token
+            var tokenModel = new Token({
+                token: tokenHash(token),
+                clientId: authCode.clientId,
+                userId: authCode.userId,
+                expired: expired
+            });
+            //Refresh Token Code
+            var refreshTokenModel = new RefreshToken({
+                refreshToken: refreshTokenHash,
+                clientId: authCode.clientId,
+                userId: authCode.userId
+            });
 
-      // Save the access token and check for errors
-      tokenModel.save(function (err) {
-        if (err) { return callback(err); }
-        refreshTokenModel.save(function (err) {
-          if (err) return callback(err);
-          callback(null, token, refreshToken, {expires_in: expirationDate});
+            // Save the access token and check for errors
+            tokenModel.save(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                refreshTokenModel.save(function (err) {
+                    if (err) return callback(err);
+                    callback(null, token, refreshToken, {expires_in: expired});
+                });
+            });
         });
-      });
     });
-  });
 }));
-//Refresh Token
-server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, callback) {
-  var refreshTokenHash = tokenHash(refreshToken);
+/**
+ * Exchange user id and password for access tokens.
+ *
+ * The callback accepts the `client`, which is exchanging the user's name and password
+ * from the token request for verification. If these values are validated, the
+ * application issues an access token on behalf of the user who authorized the code.
+ */
+server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
+    //Validate the user
+    User.findOne({username: username}, function (err, user) {
+        if (err) {
+            return callback(err);
+        }
 
-  RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
-    if (err) return callback(err);
-    if (!token) return callback(null, false);
-    if (client.clientId !== token.clientId) return callback(null, false);
+        // No user found with that username
+        if (!user) {
+            return callback(null, false);
+        }
 
-    var newAccessToken = uid(256);
-    var accessTokenHash = tokenHash(newAccessToken);
+        // Make sure the password is correct
+        user.verifyPassword(password, function (err, isMatch) {
+            if (err) {
+                return callback(err);
+            }
 
-    var expirationDate = new Date(new Date().getTime() + (3600 * 1000));
+            // Password did not match
+            if (!isMatch) {
+                return callback(null, false);
+            }
 
-    Token.update({userId: token.userId}, {$set: {token: accessTokenHash, scope: scope, expirationDate: expirationDate}}, function (err) {
-      if (err) return callback(err);
-      callback(null, newAccessToken, refreshToken, {expires_in: expirationDate});
+            var token = uid(256);
+            var expired = calculateExp();
+
+            // Create a new access token
+            var tokenModel = new Token({
+                token: tokenHash(token),
+                clientId: client.id,
+                userId: user.userId,
+                scope: scope,
+                expired: expired
+            });
+
+
+            // Save the access token and check for errors
+            tokenModel.save(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                var refreshToken = uid(256);
+                var refreshTokenHash = tokenHash(refreshToken);
+                //Refresh Token Code
+                var refreshTokenModel = new RefreshToken({
+                    refreshToken: refreshTokenHash,
+                    clientId: client.id,
+                    userId: user.userId
+                });
+                if (scope && scope.indexOf("offline_access") === 0) {
+                    refreshTokenModel.save(function (err) {
+                        if (err) return callback(err);
+                        callback(null, token, refreshToken, {expires_in: expired});
+                    });
+                } else {
+                    refreshToken = null;
+                    callback(null, token, refreshToken, {expires_in: expired});
+                }
+            });
+        });
     });
-  });
+}));
+
+/**
+ * Exchange the client id and password/secret for an access token.
+ *
+ * The callback accepts the `client`, which is exchanging the client's id and
+ * password/secret from the token request for verification. If these values are validated, the
+ * application issues an access token on behalf of the client who authorized the code.
+ */
+server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, callback) {
+    var token = uid(256);
+    var expired = calculateExp();
+    var tokenModel = new Token({
+        token: tokenHash(token),
+        clientId: client.id,
+        userId: client.userId,
+        scope: scope,
+        expired: expired
+    });
+    //Pass in a null for user id since there is no user when using this grant type
+    tokenModel.save(function (err) {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, token, null, {expires_in: expired});
+    });
+}));
+/**
+ * Exchange the refresh token for an access token.
+ *
+ * The callback accepts the `client`, which is exchanging the client's id from the token
+ * request for verification.  If this value is validated, the application issues an access
+ * token on behalf of the client who authorized the code
+ */
+server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, callback) {
+    var refreshTokenHash = tokenHash(refreshToken);
+
+    RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
+        if (err) return callback(err);
+        if (!token) return callback(null, false);
+        if (client.clientId !== token.clientId) return callback(null, false);
+
+        var newAccessToken = uid(256);
+        var accessTokenHash = tokenHash(newAccessToken);
+
+        var expired = new Date(new Date().getTime() + (3600 * 1000));
+
+        Token.update({userId: token.userId}, {
+            $set: {
+                token: accessTokenHash,
+                scope: scope,
+                expired: expired
+            }
+        }, function (err) {
+            if (err) return callback(err);
+            callback(null, newAccessToken, refreshToken, {expires_in: expired});
+        });
+    });
 }));
 // user authorization endpoint
 //
@@ -150,17 +274,29 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 // first, and rendering the `dialog` view. 
 
 exports.authorization = [
-  server.authorization(function(clientId, redirectUri, callback) {
+    server.authorization(function (clientId, redirectUri, callback) {
 
-    Client.findOne({ id: clientId }, function (err, client) {
-      if (err) { return callback(err); }
-
-      return callback(null, client, redirectUri);
-    });
-  }),
-  function(req, res){
-    res.render('../app/views/dialog', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
-  }
+        Client.findOne({id: clientId}, function (err, client) {
+            if (err) {
+                return callback(err);
+            }
+            //if (client) {
+            //    client.scope = scope;
+            //}
+            // WARNING: For security purposes, it is highly advisable to check that
+            //          redirectURI provided by the client matches one registered with
+            //          the server.  For simplicity, this example does not.  You have
+            //          been warned.
+            return callback(null, client, redirectUri);
+        });
+    }),
+    function (req, res) {
+        res.render('../app/views/dialog', {
+            transactionID: req.oauth2.transactionID,
+            user: req.user,
+            client: req.oauth2.client
+        });
+    }
 ];
 
 // user decision endpoint
@@ -171,8 +307,8 @@ exports.authorization = [
 // a response.
 
 module.exports.decision = [
-  server.decision()
-]
+    server.decision()
+];
 
 // token endpoint
 //
@@ -182,7 +318,7 @@ module.exports.decision = [
 // authenticate when making requests to this endpoint.
 
 exports.token = [
-  server.token(),
-  server.errorHandler()
-]
+    server.token(),
+    server.errorHandler()
+];
 

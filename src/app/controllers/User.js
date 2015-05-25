@@ -5,7 +5,8 @@ var User = require('../models/User');
 exports.postUsers = function(req, res) {
   var user = new User({
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
+    last_name: req.body.last_name
   });
 
   user.save(function(err) {
