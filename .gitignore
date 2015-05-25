@@ -6,3 +6,4 @@ Thumbs.db
 /.idea
 /src/node_modules
 /src/npm-debug.log
+*.log
