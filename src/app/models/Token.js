@@ -6,7 +6,9 @@ var TokenSchema   = new mongoose.Schema({
   token: { type: String, unique: true, required: true },
   userId: { type: String, required: true },
   scope: { type: String },
-  clientId: { type: String, required: true }
+  clientId: { type: String, required: true },
+  created: { type: Date, required: true, default: Date.now },
+  expired: { type: Date, required: true }
 });
 
 // Export the Mongoose model

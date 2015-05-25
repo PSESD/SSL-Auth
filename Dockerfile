@@ -3,6 +3,8 @@
 FROM ubuntu
 MAINTAINER M Bintang <halilintar8@yahoo.com>
 
+VOLUME ["/config"]
+
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 #Set Environment Variable
@@ -19,8 +21,6 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
 RUN sed -i -e"s/keepalive_timeout 2/keepalive_timeout 2;\n\tclient_max_body_size 100m/" /etc/nginx/nginx.conf
 RUN sed -i -e"s/# server_tokens off;/server_tokens off;/" /etc/nginx/nginx.conf
-ADD /config/webserver.pem /etc/ssl/webserver.pem
-ADD /config/webserver.key /etc/ssl/webserver.key
 ADD /config/default.conf /etc/nginx/sites-available/default
 
 # Setup NodeJS Application
