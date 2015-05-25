@@ -6,7 +6,7 @@ var CodeSchema   = new mongoose.Schema({
   code: { type: String, unique: true, required: true },
   redirectUri: { type: String, required: true },
   userId: { type: String, required: true },
-  clientId: { type: String, required: true },
+  clientId: { type: String, required: true }
 
 });
 
