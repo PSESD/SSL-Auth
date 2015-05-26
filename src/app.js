@@ -37,7 +37,6 @@ function Api(){
  */
 Api.prototype.sendMessage = function(type, message, cb){
     rollbar.reportMessage(message, type || 'debug', function(rollbarErr) {
-        console.log('CALL ROLLBAR: ' + rollbarErr);
         if(cb) cb(rollbarErr);
     });
 };

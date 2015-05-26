@@ -5,13 +5,12 @@ var Client = require('../models/Client');
 exports.postClients = function(req, res) {
   // Create a new instance of the Client model
   var client = new Client();
-  console.log('postClients');
   // Set the client properties that came from the POST data
   client.name = req.body.name;
   client.id = req.body.client_id;
   client.secret = req.body.client_secret;
   client.userId = req.user._id;
-
+  client.redirectUri = req.body.redirect_uri;
   // Save the client and check for errors
   client.save(function(err) {
     if (err)
