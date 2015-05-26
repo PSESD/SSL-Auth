@@ -81,6 +81,9 @@ Api.prototype.registerRoute = function(){
         app.use('/'+basename, router);
         var rest_router = new rest(router,self);
     });
+    app.get('/heatbeat', function(req, res) {
+        res.send('OK');
+    });
 };
 /**
  * Connect to database
