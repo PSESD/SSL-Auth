@@ -243,7 +243,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
         var newAccessToken = uid(256);
         var accessTokenHash = tokenHash(newAccessToken);
 
-        var expired = new Date(new Date().getTime() + (3600 * 1000));
+        var expired = calculateExp();
 
         Token.update({userId: token.userId}, {
             $set: {
@@ -280,13 +280,8 @@ exports.authorization = [
             if (err) {
                 return callback(err);
             }
-            //if (client) {
-            //    client.scope = scope;
-            //}
-            // WARNING: For security purposes, it is highly advisable to check that
-            //          redirectURI provided by the client matches one registered with
-            //          the server.  For simplicity, this example does not.  You have
-            //          been warned.
+            //get host setting
+            
             return callback(null, client, redirectUri);
         });
     }),

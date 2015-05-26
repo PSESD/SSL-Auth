@@ -7,7 +7,7 @@ var ClientSchema = new mongoose.Schema({
   id: { type: String, required: true },
   secret: { type: String, required: true },
   userId: { type: String, required: true },
-  redirectUri: { type: String }
+  redirectUri: { type: String, required: true }
 });
 
 // Export the Mongoose model
