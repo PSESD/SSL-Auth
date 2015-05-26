@@ -1,8 +1,12 @@
 {
+  "host": "cbo.upwardst.st",
+  "token": {
+    "expires_in": 3600
+  },
   "db": {
     "mongo": {
       "host": "localhost",
-      // "host": "zaenal:zendev@ds031632.mongolab.com:31632",
+//      "host": "zaenal:zendev@ds031632.mongolab.com:31632",
       "name": "cbo_test"
     }
   },

@@ -10,13 +10,13 @@ function Rest(router, Api) {
  * @param Api
  */
 Rest.prototype.handleRoutes= function(router, Api) {
-	// var beerController = require('./controllers/beer');
+	var indexController = Api.controller('Index');
 	var userController = Api.controller('User');
 	var authController = Api.controller('Auth');
 	var oauth2Controller = Api.controller('OAuth2');
 	var clientController = Api.controller('Client');
 
-
+	router.get('/', indexController.index);
 	// Create endpoint handlers for /users
 	router.route('/users')
 	  .post(userController.postUsers)

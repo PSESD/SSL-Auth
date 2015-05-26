@@ -58,7 +58,7 @@ var utils = {
      * @returns {Date}
      */
     calculateExp: function(){
-        return new Date(new Date().getTime() + (600 * 1000));
+        return new Date(new Date().getTime() + (require('config').get('token.expires_in') * 1000));
     }
 };
 
