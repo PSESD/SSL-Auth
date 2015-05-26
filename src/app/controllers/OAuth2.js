@@ -9,6 +9,7 @@ var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
 var codeHash = require('../../lib/utils').codeHash;
 var calculateExp = require('../../lib/utils').calculateExp;
+var expiresIn = require('config').get('token.expires_in');
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -124,7 +125,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
                 }
                 refreshTokenModel.save(function (err) {
                     if (err) return callback(err);
-                    callback(null, token, refreshToken, {expires_in: expired});
+                    callback(null, token, refreshToken, {expires_in: expiresIn});
                 });
             });
         });
@@ -189,11 +190,11 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
                 if (scope && scope.indexOf("offline_access") === 0) {
                     refreshTokenModel.save(function (err) {
                         if (err) return callback(err);
-                        callback(null, token, refreshToken, {expires_in: expired});
+                        callback(null, token, refreshToken, {expires_in: expiresIn});
                     });
                 } else {
                     refreshToken = null;
-                    callback(null, token, refreshToken, {expires_in: expired});
+                    callback(null, token, refreshToken, {expires_in: expiresIn});
                 }
             });
         });
@@ -222,7 +223,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, 
         if (err) {
             return callback(err);
         }
-        callback(null, token, null, {expires_in: expired});
+        callback(null, token, null, {expires_in: expiresIn});
     });
 }));
 /**
@@ -236,9 +237,11 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     var refreshTokenHash = tokenHash(refreshToken);
 
     RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
+        
         if (err) return callback(err);
         if (!token) return callback(null, false);
-        if (client.clientId !== token.clientId) return callback(null, false);
+
+        if (''+client.clientId !== ''+token.clientId) return callback(null, false);
 
         var newAccessToken = uid(256);
         var accessTokenHash = tokenHash(newAccessToken);
@@ -253,7 +256,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
             }
         }, function (err) {
             if (err) return callback(err);
-            callback(null, newAccessToken, refreshToken, {expires_in: expired});
+            callback(null, newAccessToken, refreshToken, {expires_in: expiresIn});
         });
     });
 }));
@@ -280,7 +283,6 @@ exports.authorization = [
             if (err) {
                 return callback(err);
             }
-            //get host setting
             
             return callback(null, client, redirectUri);
         });
