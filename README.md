@@ -50,7 +50,6 @@ Run Unit Test:
 CBO OAuth2 accepts an object with the following valid params.
 
 * `client_id` - Required registered Client ID.
-* `client_secret` - Required registered Client secret.
 * `redirect_uri` - One of the redirect URIs.
 * `grant_type` - Defined in the OAuth 2.0 specification, this field must contain a value of `authorization_code`.
 
@@ -83,7 +82,7 @@ $ http POST http://localhost:3000/api/users username=test password=your_password
 #### User add a new client
 
 ```
-$ http -a test:your_password POST http://localhost:3000/api/clients client_id=client name=client client_secret=secret redirect_uri=http://localhost:3000
+$ http -a test:your_password POST http://localhost:3000/api/clients client_id=client name=client redirect_uri=http://localhost:3000
 ```
 
 #### User get authorised page
