@@ -30,7 +30,7 @@ describe( 'OAuth2', function () {
     var secretCode;
     var userId;
 
-    var username = 'test', password = 'test';
+    var email = 'test@test.com', password = 'test';
 
     before( function (done) {
         if (mongoose.connection.db) return done();
@@ -43,8 +43,8 @@ describe( 'OAuth2', function () {
 
     it( 'should create a new user', function (done) {
         request( url ).post( '/api/users' )
-            .send( 'username=test' )
-            .send( 'password=test' )
+            .send( 'email='+email )
+            .send( 'password='+password )
             .send( 'last_name=test' )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -57,7 +57,7 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should add a new client', function (done) {
         request( url ).post( '/api/clients' )
-            .auth( 'test', 'test' )
+            .auth( email, password )
             .type( 'urlencoded' )
             .send( {
                 client_id    : 'client',
@@ -76,8 +76,7 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
-            //.auth( 'test', 'test' )
-            .auth( username, password )
+            .auth( email, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
@@ -89,11 +88,12 @@ describe( 'OAuth2', function () {
 
     it( 'use access code to get a token', function (done) {
         request( url ).post( '/api/oauth2/token' )
-            .auth( username, password )
+            // .auth( email, password )
+            .auth( 'client', secretCode )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( {
                 grant_type  : 'password',
-                username: username,
+                username: email,
                 password: password
             } )
             .type( 'urlencoded' )

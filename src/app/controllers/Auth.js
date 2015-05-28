@@ -34,7 +34,7 @@ passport.use(new BasicStrategy(
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
-    passwordField: 'pass'
+    passwordField: 'password'
   },
   function(username, password, callback) {
     User.findOne({ email: username }, function (err, user) {
