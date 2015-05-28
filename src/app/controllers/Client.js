@@ -47,7 +47,16 @@ exports.getClients = function (req, res) {
     Client.find({userId: req.user._id}, function (err, clients) {
         if (err)
             return res.send(err);
-
-        res.json(clients);
+        var response = [];
+        clients.forEach(function(client){
+            response.push({
+                userId: client.userId,
+                client_id: client.id,
+                client_secret: client.secret,
+                name: client.name,
+                redirect_uri: client.redirectUri
+            });
+        });
+        res.json(response);
     });
 };

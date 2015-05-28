@@ -10,9 +10,14 @@ exports.postUsers = function(req, res) {
   });
 
   user.save(function(err) {
-    console.log(err);
+    
     if (err)
-      return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'User already exists'}) :  res.send(err);
+      return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'User already exists', data: {
+      id: user.userId,
+      email: user.email,
+      password: user.password,
+      last_name: user.last_name
+    } }) :  res.send(err);
     
     res.json({
       id: user.userId,
