@@ -69,5 +69,7 @@ UserSchema.methods.verifyPassword = function(password, cb) {
   }
 };
 
+UserSchema.set('toJSON', { hide: 'hashedPassword' });
+
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);

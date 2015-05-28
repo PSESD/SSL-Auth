@@ -56,21 +56,35 @@ server.deserializeClient(function (id, callback) {
 
 server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, callback) {
     // Create a new authorization code
-    var code = new Code({
-        code: codeHash(uid(16)),
-        clientId: client._id,
-        redirectUri: redirectUri,
-        userId: user._id
-    });
 
-    // Save the auth code and check for errors
-    code.save(function (err) {
-        if (err) {
+
+
+    Client.findOne({_id: ''+client._id}, function(err, cln){
+        if(err){
             return callback(err);
         }
+        if(!cln) return callback('Url not match!');
+        var regex = new RegExp(cln.redirectUri, 'gi');
 
-        callback(null, code.code);
+        if(!redirectUri.match(regex)){
+            return callback('Url not match!');
+        }
+        var code = new Code({
+            code: codeHash(uid(16)),
+            clientId: client._id,
+            redirectUri: redirectUri,
+            userId: user._id
+        });
+        // Save the auth code and check for errors
+        code.save(function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, code.code);
+        });
     });
+
 }));
 
 // Exchange authorization codes for access tokens.  The callback accepts the

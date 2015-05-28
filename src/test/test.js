@@ -4,9 +4,13 @@ var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
 var url = 'http://localhost:3000';
-var dbURI = 'mongodb://localhost/cbo_test'
-    , mongoose = require( 'mongoose' )
-    , clearDB = require( 'mocha-mongoose' )( dbURI, {noClear: true} );
+//var url = 'https://auth.cbo.upward.st';
+var api_endpoint = 'http://localhost:4000';
+var config = require('config');
+var dbUri = 'mongodb://'+config.get('db.mongo.host')+'/'+config.get('db.mongo.name');
+console.log(dbUri);
+var mongoose = require( 'mongoose' )
+    , clearDB = require( 'mocha-mongoose' )( dbUri, {noClear: true} );
 
 describe( 'OAuth2', function () {
 
@@ -20,10 +24,14 @@ describe( 'OAuth2', function () {
      */
     var accessCode;
     var token;
+    var refreshToken;
+    var tokenType;
+
+    var username = 'test', password = 'test';
 
     before( function (done) {
         if (mongoose.connection.db) return done();
-        mongoose.connect( dbURI, done );
+        mongoose.connect( dbUri, done );
     } );
 
     before( function (done) {
@@ -34,6 +42,7 @@ describe( 'OAuth2', function () {
         request( url ).post( '/api/users' )
             .send( 'username=test' )
             .send( 'password=test' )
+            .send( 'last_name=test' )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
@@ -49,7 +58,8 @@ describe( 'OAuth2', function () {
             .send( {
                 client_id    : 'client',
                 name  : 'client',
-                client_secret: 'secret'
+                client_secret: 'secret',
+                redirect_uri: api_endpoint
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -61,26 +71,26 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
-            .auth( 'test', 'test' )
+            //.auth( 'test', 'test' )
+            .auth( username, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
-                console.dir( res.body );
+                //console.dir( res.body );
             } )
             .end( done );
 
     } );
 
     it( 'user should be able get authorised page', function (done) {
-        var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+url;
+        var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+api_endpoint;
+        console.log(url+target);
         agent1.get( target )
-            .auth( 'test', 'test' )
+            .auth( username, password )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
             .expect( function (res) {
-                //console.log(url+target);
-                console.dir(res.body);
                 var html = cheerio.load( res.text );
                 //cookieId = req.headers['set-cookie'][0]
                 transactionId = html( 'input[type="hidden"]' ).val();
@@ -92,7 +102,7 @@ describe( 'OAuth2', function () {
 
     it( 'user should be able to authorise an access code', function (done) {
         agent1.post( '/api/oauth2/authorize' )
-            .auth( 'test', 'test' )
+            .auth( username, password )
             .type( 'form' )
             .send( {
                 transaction_id: transactionId
@@ -100,6 +110,7 @@ describe( 'OAuth2', function () {
             .expect( 302 )
             .expect( function (res) {
                 accessCode = res.text.split( 'code=' )[1];
+                console.log('Code: ' + accessCode);
             } )
             .end( done );
 
@@ -112,12 +123,54 @@ describe( 'OAuth2', function () {
             .send( {
                 code        : accessCode,
                 grant_type  : 'authorization_code',
-                redirect_uri: 'http://localhost:3000'
+                redirect_uri: api_endpoint
             } )
             .type( 'urlencoded' )
             .expect( 200 )
             .expect( function (res) {
-                token = res.body.access_token.value;
+                token = res.body.access_token;
+                refreshToken = res.body.refresh_token;
+                tokenType = res.body.token_type;
+                console.log('Url: ' + api_endpoint + '/user', 'authorization: ' + tokenType + ' ' + token);
+            } )
+            .end( done );
+
+    } );
+
+    it( 'use token to get a user api end point', function (done) {
+        request(api_endpoint)
+            .get('/user')
+            .set('authorization', tokenType + ' ' + token)
+            .expect( function (res) {
+                console.dir(res.body);
+            } )
+            .expect( 200 )
+            .end( done );
+
+    } );
+    it( 'use refresh token to get a token', function (done) {
+
+        var rfParam = {
+            grant_type  : 'refresh_token',
+            refresh_token: refreshToken,
+            //client_id: 'client',
+            //client_secret: 'secret'
+        };
+
+        var out = [];
+        Object.keys(rfParam).forEach(function(key) {
+            out.push(key+'='+encodeURIComponent(rfParam[key]));
+        });
+        console.log(url+'/api/oauth2/token', out.join("&"));
+
+        request( url ).post( '/api/oauth2/token' )
+            .auth( 'client', 'secret' )
+            .expect( 'Content-Type', /json/ ).type( 'form' )
+            .send( rfParam )
+            .type( 'urlencoded' )
+            .expect( 200 )
+            .expect( function (res) {
+                console.dir(res.body);
             } )
             .end( done );
 

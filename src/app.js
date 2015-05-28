@@ -90,7 +90,7 @@ Api.prototype.registerRoute = function(){
  */
 Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
-    console.log("DB URI: " + dbUri);
+    console.log("[%s] DB URI: " + dbUri, app.get('env'));
     this.mongo.connect(dbUri);
     this.configureExpress(this.db);
     
@@ -158,12 +158,23 @@ Api.prototype.stop = function(err) {
     rollbar.reportMessage("ERROR \n"+err);
     process.exit(1);
 };
+/**
+ *
+ * @param ex
+ */
+Api.errorStack = function(ex){
+
+    var err = ex.stack.split("\n");
+    console.log(err);
+    rollbar.reportMessage(err, 'error', function(err){
+        process.exit(1);
+    });
+
+}
 
 try {
     new Api();
 } catch(e){
-    console.log(e);
-    rollbar.reportMessage(e.message, 'error', function(rollbarErr) {
-        console.log('CALL ROLLBAR: ' + rollbarErr);
-    });
+    Api.errorStack(e);
+
 }
