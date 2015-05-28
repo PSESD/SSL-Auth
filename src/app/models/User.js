@@ -5,11 +5,7 @@ var UserPermission = require('./schema/UserPermission');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    unique: true,
-    required: true
-  },
+  
   hashedPassword: {
     type: String,
     required: true
@@ -23,7 +19,7 @@ var UserSchema = new mongoose.Schema({
   first_name: { type: String, trim: true },
   middle_name: { type: String, trim: true },
   last_name: { type: String, trim: true, required: true },
-  email: { type: String, trim: true, unique: true, index: true, minlength: 6 },
+  email: { type: String, trim: true, unique: true, required: true, index: true, minlength: 6 },
   permissions: [ UserPermission ], // Store a permission a user has, by each organization.
   created: {
     type: Date,
