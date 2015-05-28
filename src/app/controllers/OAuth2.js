@@ -154,7 +154,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  */
 server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
     //Validate the user
-    User.findOne({username: username}, function (err, user) {
+    User.findOne({email: username}, function (err, user) {
         if (err) {
             return callback(err);
         }

@@ -77,7 +77,7 @@ provide specs to your contribution.
 #### Register a new user
 
 ```
-$ http POST http://localhost:3000/api/users username=test password=your_password last_name=your_last_name
+$ http POST http://localhost:3000/api/users email=test password=your_password last_name=your_last_name
 ```
 #### User add a new client
 
@@ -136,7 +136,7 @@ $ http POST http://localhost:4000/user authorization:"Bearer <access_token>" gra
 ```
 ###### Response:
 ```
-{ username: 'test',
+{ email: 'test',
     last_name: 'test',
   _id: '5564657e1afd13446cc4871c',
   __v: 0,
