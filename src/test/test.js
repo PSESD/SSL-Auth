@@ -26,8 +26,9 @@ describe( 'OAuth2', function () {
     var token;
     var refreshToken;
     var tokenType;
+    var secretCode;
 
-    var username = 'test', password = 'test';
+    var email = 'test@test.com', password = 'test';
 
     before( function (done) {
         if (mongoose.connection.db) return done();
@@ -40,7 +41,7 @@ describe( 'OAuth2', function () {
 
     it( 'should create a new user', function (done) {
         request( url ).post( '/api/users' )
-            .send( 'username=test' )
+            .send( 'email=test@test.com' )
             .send( 'password=test' )
             .send( 'last_name=test' )
             .expect( 'Content-Type', /json/ )
@@ -53,18 +54,19 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should add a new client', function (done) {
         request( url ).post( '/api/clients' )
-            .auth( 'test', 'test' )
+            .auth( email, password )
             .type( 'urlencoded' )
             .send( {
                 client_id    : 'client',
                 name  : 'client',
-                client_secret: 'secret',
-                redirect_uri: api_endpoint
+                redirect_uri: '^localhost:4000$'
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
+                secretCode = res.body.client_secret;
                 console.dir( res.body );
+                console.log('SECRET: ', secretCode);
             } )
             .end( done );
 
@@ -72,7 +74,7 @@ describe( 'OAuth2', function () {
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
             //.auth( 'test', 'test' )
-            .auth( username, password )
+            .auth( email, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
@@ -86,7 +88,7 @@ describe( 'OAuth2', function () {
         var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+api_endpoint;
         console.log(url+target);
         agent1.get( target )
-            .auth( username, password )
+            .auth( email, password )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
@@ -102,7 +104,7 @@ describe( 'OAuth2', function () {
 
     it( 'user should be able to authorise an access code', function (done) {
         agent1.post( '/api/oauth2/authorize' )
-            .auth( username, password )
+            .auth( email, password )
             .type( 'form' )
             .send( {
                 transaction_id: transactionId
@@ -118,7 +120,7 @@ describe( 'OAuth2', function () {
 
     it( 'use access code to get a token', function (done) {
         request( url ).post( '/api/oauth2/token' )
-            .auth( 'client', 'secret' )
+            .auth( 'client', secretCode )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( {
                 code        : accessCode,
@@ -164,7 +166,7 @@ describe( 'OAuth2', function () {
         console.log(url+'/api/oauth2/token', out.join("&"));
 
         request( url ).post( '/api/oauth2/token' )
-            .auth( 'client', 'secret' )
+            .auth( 'client', secretCode )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( rfParam )
             .type( 'urlencoded' )
