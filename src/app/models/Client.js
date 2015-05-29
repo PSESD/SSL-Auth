@@ -1,6 +1,5 @@
 // Load required packages
 var mongoose = require('mongoose');
-var preg_quote = require('../../lib/utils').preg_quote;
 
 // Define our Client schema
 var ClientSchema = new mongoose.Schema({
@@ -20,12 +19,14 @@ ClientSchema.virtual('clientId')
       return this.secret;
  });
 
+ClientSchema.path('redirectUri').validate(function (value) {
+    try{
+      return require('util').isRegExp(new RegExp(value));
+    } catch(e){
+      return false;
+    }
 
-// middleware
-ClientSchema.pre('save', function (next) {
-    this.redirectUri = preg_quote(this.redirectUri);
-    next();
-});
+}, 'Invalid regular expression');
 
 
 // Export the Mongoose model

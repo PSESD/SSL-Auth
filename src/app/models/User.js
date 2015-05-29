@@ -5,7 +5,7 @@ var UserPermission = require('./schema/UserPermission');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
-  
+
   hashedPassword: {
     type: String,
     required: true
