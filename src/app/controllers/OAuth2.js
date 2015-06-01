@@ -309,10 +309,25 @@ exports.authorization = [
             if (err) {
                 return callback(err);
             }
-            
+
             return callback(null, client, redirectUri);
         });
-    }),
+    })/*,
+    function (client, user, done) {
+
+        Code.find({
+            clientId: client.clientId,
+            userId: user.userId
+        }, function (err, codes) {
+            console.log('FIND: ', codes);
+            if (err) { return done(err); }
+            if (codes.length > 0) {
+                return done(null, true);
+            } else {
+                return done(null,false);
+            }
+        });
+    })*/,
     function (req, res) {
         res.render('../app/views/dialog', {
             transactionID: req.oauth2.transactionID,
