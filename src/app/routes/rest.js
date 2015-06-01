@@ -35,6 +35,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	// Create endpoint handlers for oauth2 token
 	router.route('/oauth2/token')
 	  .post(authController.isClientAuthenticated, oauth2Controller.token);
+
+	router.post('/logout', authController.logout);
 };
 
 module.exports = Rest;

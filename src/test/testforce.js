@@ -1,3 +1,6 @@
+/**
+ * Created by zaenal on 01/06/15.
+ */
 'use strict';
 process.env.NODE_ENV = 'test';
 var expect = require( 'chai' ).expect;
@@ -36,8 +39,7 @@ describe( 'OAuth2', function () {
     } );
 
     before( function (done) {
-        done();
-        //clearDB( done );
+        clearDB( done );
     } );
 
     it( 'should create a new user', function (done) {
@@ -86,7 +88,7 @@ describe( 'OAuth2', function () {
     } );
 
     it( 'user should be able get authorised page', function (done) {
-        var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+api_endpoint;
+        var target = '/api/oauth2/authorize?client_id=client&force=true&response_type=code&redirect_uri='+api_endpoint;
         console.log(url+target);
         agent1.get( target )
             .auth( email, password )
@@ -94,30 +96,31 @@ describe( 'OAuth2', function () {
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
             .expect( function (res) {
-                var html = cheerio.load( res.text );
-                //cookieId = req.headers['set-cookie'][0]
-                transactionId = html( 'input[type="hidden"]' ).val();
+                console.log('RESPONSE', res);
+                //var html = cheerio.load( res.text );
+                ////cookieId = req.headers['set-cookie'][0]
+                //transactionId = html( 'input[type="hidden"]' ).val();
             } )
             .expect( 200 )
             .end( done );
 
     } );
 
-    it( 'user should be able to authorise an access code', function (done) {
-        agent1.post( '/api/oauth2/authorize' )
-            .auth( email, password )
-            .type( 'form' )
-            .send( {
-                transaction_id: transactionId
-            } )
-            .expect( 302 )
-            .expect( function (res) {
-                accessCode = res.text.split( 'code=' )[1];
-                console.log('Code: ' + accessCode);
-            } )
-            .end( done );
-
-    } );
+    //it( 'user should be able to authorise an access code', function (done) {
+    //    agent1.post( '/api/oauth2/authorize' )
+    //        .auth( email, password )
+    //        .type( 'form' )
+    //        .send( {
+    //            transaction_id: transactionId
+    //        } )
+    //        .expect( 302 )
+    //        .expect( function (res) {
+    //            accessCode = res.text.split( 'code=' )[1];
+    //            console.log('Code: ' + accessCode);
+    //        } )
+    //        .end( done );
+    //
+    //} );
 
     it( 'use access code to get a token', function (done) {
         request( url ).post( '/api/oauth2/token' )
@@ -179,16 +182,6 @@ describe( 'OAuth2', function () {
 
     } );
 
-    //it( 'use logout', function (done) {
-    //    request(url).post('/api/logout')
-    //        .send({ token: token })
-    //        .expect( function (res) {
-    //            console.dir(res.body);
-    //        } )
-    //        .expect( 302 )
-    //        .end( done );
-    //
-    //} );
 
     after( function (done) {
         done();
