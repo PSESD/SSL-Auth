@@ -123,8 +123,9 @@ function (req, res) {
    * Remove token, refresh_token and auth code
    */
   var accessToken = req.query.token || req.body.token;
-  var accessTokenHash = tokenHash(accessToken);
-  if(accessTokenHash){
+ 
+  if(accessToken){
+     var accessTokenHash = tokenHash(accessToken);
     Token.findOne({ token: accessTokenHash }, function(err, token){
       if(err){ return req.logout(); }
       if(token){
