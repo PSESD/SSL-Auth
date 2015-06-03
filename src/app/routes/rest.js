@@ -22,6 +22,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	  .post(userController.postUsers)
 	  .get(authController.isAuthenticated, userController.getUsers);
 
+	router.route('/user/invite')
+		.post(userController.sendInvite);
+
 	// Create endpoint handlers for /clients
 	router.route('/clients')
 	  .post(authController.isAuthenticated, clientController.postClients)
@@ -37,6 +40,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	  .post(authController.isClientAuthenticated, oauth2Controller.token);
 
 	router.post('/logout', authController.logout);
+	router.post('/user/activate', userController.activate);
 };
 
 module.exports = Rest;

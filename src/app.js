@@ -9,7 +9,9 @@ var rollbar = require('rollbar');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 3000;
 var config = require('config');
+
 var rollbarAccessToken = config.get('rollbar.access_token');
+
 if(rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));

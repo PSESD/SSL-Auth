@@ -140,17 +140,34 @@ describe( 'OAuth2', function () {
 
     } );
 
-    it( 'use token to get a user api end point', function (done) {
-        request(api_endpoint)
-            .get('/user')
-            .set('authorization', tokenType + ' ' + token)
+    it( 'use send invitation', function (done) {
+        request( url ).post( '/api/user/invite' )
+            .auth( 'client', secretCode )
+            .send( 'email=zaenal@upwardstech.com' )
+            .send( 'password=test' )
+            .send( 'last_name=test' )
+            .send( 'redirect_url=http://helpinghand.cbo.upward.st' )
+            .expect( 'Content-Type', /json/ )
+            .expect( 200 )
             .expect( function (res) {
+
                 console.dir(res.body);
             } )
-            .expect( 200 )
             .end( done );
 
     } );
+
+    //it( 'use token to get a user api end point', function (done) {
+    //    request(api_endpoint)
+    //        .get('/user')
+    //        .set('authorization', tokenType + ' ' + token)
+    //        .expect( function (res) {
+    //            console.dir(res.body);
+    //        } )
+    //        .expect( 200 )
+    //        .end( done );
+    //
+    //} );
     it( 'use refresh token to get a token', function (done) {
 
         var rfParam = {

@@ -21,6 +21,7 @@
     "mongodb": "^1.4.37",
     "mongoose": "^4.0.2",
     "morgan": "^1.5.2",
+    "node-mandrill": "^1.0.1",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",
