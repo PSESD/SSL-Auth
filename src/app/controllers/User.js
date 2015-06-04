@@ -1,6 +1,7 @@
 // Load required packages
 var User = require('../models/User');
-var mandrill = require('node-mandrill')('LtGcuu3JRPmav8Itt85rfQ');
+var mandrill = require('mandrill-api/mandrill');
+var mandrill_client = new mandrill.Mandrill('Hg8CvPdPtFMrwHVDbhTTEw');
 var crypto = require('crypto');
 // Create endpoint /api/users for POST
 exports.postUsers = function(req, res) {
@@ -46,34 +47,46 @@ exports.sendInvite = function(req, res){
     email: req.body.email,
     password: req.body.password,
     last_name: req.body.last_name,
-    code: crypto.randomBytes(16).toString('base64')
+    authCode: crypto.randomBytes(16).toString('base64')
   });
 
   user.save(function(err) {
 
-    if (err)
-      return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'User already exists', data: {
-        id: user.userId,
-        email: user.email,
-        password: user.password,
-        last_name: user.last_name
-      } }) :  res.send(err);
+    //if (err)
+    //  return (err.code && err.code === 11000) ? res.send({ code: err.code, message: 'User already exists', data: {
+    //    id: user.userId,
+    //    email: user.email,
+    //    password: user.password,
+    //    last_name: user.last_name
+    //  } }) :  res.send(err);
 
-    mandrill('/messages/send', {
-      message: {
-        to: [{email: user.email, name: user.last_name}],
-        from: 'hendra@upwardstech.com',
-        subject: "Hey, what's up?",
-        text: "Hallo http://auth.cbo.upward.st/activate?email="+user.email+"&authCode="+user.authCode+"&redirectTo="+req.body.redirect_url
-      }
-    }, function(error, response)
-    {
-      //uh oh, there was an error
-      if (error) res.send( JSON.stringify(error) );
+      var message = {
+          "html": "<p>"+"Invite members here: http://auth.cbo.upward.st/api/user/activate?email="+encodeURIComponent(user.email)+"&authCode="+encodeURIComponent(user.authCode)+"&redirectTo="+encodeURIComponent(req.body.redirect_url)+"</p>",
+          "subject": "example subject",
+          "from_email": "no-replay@cbo.upward.st",
+          "from_name": "Example Name",
+          "to": [{email: user.email, name: user.last_name, type: "to"}],
+          "headers": {
+              "Reply-To": "no-replay@cbo.upward.st"
+          }
 
-      //everything's good, lets see what mandrill said
-      else res.send(response);
-    });
+      };
+      var async = false;
+      var ip_pool = "Main Pool";
+      var send_at = new Date();
+      mandrill_client.messages.send({"message": message}, function(result) {
+
+          if(result[0].status == 'sent'){
+              return res.json({status: true, message: "Email was sent"});
+          } else {
+              return res.json({error: true, message: result[0].reject_reason});
+          }
+      }, function(e) {
+          // Mandrill returns the error as an object with name and message keys
+          console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+          return res.json({error: true, message: "Email not sent"});
+          // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+      });
   });
 
 };

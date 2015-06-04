@@ -40,7 +40,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	  .post(authController.isClientAuthenticated, oauth2Controller.token);
 
 	router.post('/logout', authController.logout);
-	router.post('/user/activate', userController.activate);
+	router.get('/user/activate', userController.activate);
 };
 
 module.exports = Rest;
