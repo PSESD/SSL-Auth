@@ -1,7 +1,7 @@
 // Load required packages
 var User = require('../models/User');
 var mandrill = require('mandrill-api/mandrill');
-var mandrill_client = new mandrill.Mandrill('Hg8CvPdPtFMrwHVDbhTTEw');
+var mandrill_client = new mandrill.Mandrill();
 var crypto = require('crypto');
 // Create endpoint /api/users for POST
 exports.postUsers = function(req, res) {

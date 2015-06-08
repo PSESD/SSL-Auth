@@ -59,7 +59,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 
 
 
-    Client.findOne({_id: ''+client._id}, function(err, cln){
+    Client.findOne({_id: client._id.toString()}, function(err, cln){
         if(err){
             return callback(err);
         }
@@ -106,6 +106,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 // code.
 
 server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, callback) {
+
 
     Code.findOne({code: code}, function (err, authCode) {
         if (err) {
