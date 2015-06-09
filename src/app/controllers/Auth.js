@@ -7,6 +7,7 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
+var Code = require('../models/Code');
 var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
@@ -111,7 +112,40 @@ passport.use(new BearerStrategy(
     });
   }
 ));
+/**
+ * Logout
+ * @param req
+ * @param res
+ */
+exports.logout =
+function (req, res) {
+  /**
+   * Remove token, refresh_token and auth code
+   */
+  var accessToken = req.query.token || req.body.token;
+ 
+  if(accessToken){
+     var accessTokenHash = tokenHash(accessToken);
+    Token.findOne({ token: accessTokenHash }, function(err, token){
+      if(err){ return req.logout(); }
+      if(token){
+        var crit = { clientId: token.clientId, userId: token.userId };
+        Code.remove(crit, function(err){
+          Token.remove(crit, function(err){
+            RefreshToken.remove(crit, function(err){
+              req.logout();
+            });
+          });
+        });
+      }
+    });
+  } else {
+    req.logout();
+  }
 
+
+  res.redirect('/');
+};
 
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
 exports.isClientAuthenticated = passport.authenticate('client-basic', { session : false });

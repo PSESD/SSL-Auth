@@ -15,6 +15,7 @@
     "ejs": "^2.3.1",
     "express": "^4.12.3",
     "express-session": "^1.11.1",
+    "mandrill-api": "^1.0.45",
     "method-override": "^2.3.3",
     "mocha": "^2.2.4",
     "mocha-mongoose": "^1.0.4",

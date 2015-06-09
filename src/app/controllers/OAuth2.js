@@ -59,7 +59,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 
 
 
-    Client.findOne({_id: ''+client._id}, function(err, cln){
+    Client.findOne({_id: client._id.toString()}, function(err, cln){
         if(err){
             return callback(err);
         }
@@ -106,6 +106,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 // code.
 
 server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, callback) {
+
 
     Code.findOne({code: code}, function (err, authCode) {
         if (err) {
@@ -309,10 +310,25 @@ exports.authorization = [
             if (err) {
                 return callback(err);
             }
-            
+
             return callback(null, client, redirectUri);
         });
-    }),
+    })/*,
+    function (client, user, done) {
+
+        Code.find({
+            clientId: client.clientId,
+            userId: user.userId
+        }, function (err, codes) {
+            console.log('FIND: ', codes);
+            if (err) { return done(err); }
+            if (codes.length > 0) {
+                return done(null, true);
+            } else {
+                return done(null,false);
+            }
+        });
+    })*/,
     function (req, res) {
         res.render('../app/views/dialog', {
             transactionID: req.oauth2.transactionID,
