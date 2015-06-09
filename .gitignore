@@ -34,3 +34,4 @@ node_modules
 src/node_modules
 *.log
 config
+src/config

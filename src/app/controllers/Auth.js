@@ -7,11 +7,12 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
+var Code = require('../models/Code');
 var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
   function(username, password, callback) {
-    User.findOne({ username: username }, function (err, user) {
+    User.findOne({ email: username }, function (err, user) {
       if (err) { return callback(err); }
 
       // No user found with that username
@@ -34,10 +35,10 @@ passport.use(new BasicStrategy(
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
-    passwordField: 'pass'
+    passwordField: 'password'
   },
   function(username, password, callback) {
-    User.findOne({ username: username }, function (err, user) {
+    User.findOne({ email: username }, function (err, user) {
       if (err) { return callback(err); }
 
       // No user found with that username
@@ -86,13 +87,14 @@ passport.use('client-basic', new BasicStrategy(
 passport.use(new BearerStrategy(
   function(accessToken, callback) {
     var accessTokenHash = tokenHash(accessToken);
-    Token.findOne({token: accessTokenHash }, function (err, token) {
+    Token.findOne({ token: accessTokenHash }, function (err, token) {
+
       if (err) { return callback(err); }
 
       // No token found
       if (!token) { return callback(null, false); }
       //check for expired token
-      if (new Date() > token.expirationDate) {
+      if (new Date() > token.expired) {
         Token.remove({token: accessTokenHash}, function (err) { done(err) });
         callback(null, false, { message: 'Token expired' });
       } else {
@@ -110,7 +112,40 @@ passport.use(new BearerStrategy(
     });
   }
 ));
+/**
+ * Logout
+ * @param req
+ * @param res
+ */
+exports.logout =
+function (req, res) {
+  /**
+   * Remove token, refresh_token and auth code
+   */
+  var accessToken = req.query.token || req.body.token;
+ 
+  if(accessToken){
+     var accessTokenHash = tokenHash(accessToken);
+    Token.findOne({ token: accessTokenHash }, function(err, token){
+      if(err){ return req.logout(); }
+      if(token){
+        var crit = { clientId: token.clientId, userId: token.userId };
+        Code.remove(crit, function(err){
+          Token.remove(crit, function(err){
+            RefreshToken.remove(crit, function(err){
+              req.logout();
+            });
+          });
+        });
+      }
+    });
+  } else {
+    req.logout();
+  }
 
+
+  res.redirect('/');
+};
 
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
 exports.isClientAuthenticated = passport.authenticate('client-basic', { session : false });

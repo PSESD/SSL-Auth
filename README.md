@@ -30,6 +30,101 @@ Install the client library using git:
 
 ## Getting started
 
+The following examples configuration in JSON format.
+
+**Install in your app `src` directory, and add/edit the default config file.**
+
+    $ mkdir src/config
+    $ vi src/config/development.json
+
+    {
+      "host": "<domain>",
+      "token": {
+        "expires_in": 3600
+      },
+      "db": {
+    	"mongo": {
+    	  "host": "<mongodb host>",
+    	  "name": "<mongodb name>"
+    	}
+      },
+      "session": {
+    	"secret" : "<secret>",
+    	"saveUninitialized": true,
+    	"resave": true
+      },
+      /**
+       * Cross Domain Setting
+       */
+      "cross": {
+    	"enable": true,
+    	"allow_origin" : null, // default: "*",
+    	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
+      },
+      "salt": "<salt>",
+      /**
+       * Logger
+       */
+      "rollbar": {
+    	"access_token" : "<rollbar token>"
+      }
+    }
+
+**Edit config overrides for production deployment:**
+
+    $ vi src/config/production.json
+
+    {
+          "host": "<domain>",
+          "token": {
+            "expires_in": 3600
+          },
+          "db": {
+        	"mongo": {
+        	  "host": "<mongodb host>",
+        	  "name": "<mongodb name>"
+        	}
+          },
+          "session": {
+        	"secret" : "<secret>",
+        	"saveUninitialized": true,
+        	"resave": true
+          },
+          /**
+           * Cross Domain Setting
+           */
+          "cross": {
+        	"enable": true,
+        	"allow_origin" : null, // default: "*",
+        	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
+          },
+          "salt": "<salt>",
+          /**
+           * Logger
+           */
+          "rollbar": {
+        	"access_token" : "<rollbar token>"
+          }
+        }
+
+**Use configs in your code:**
+
+    var config = require('config');
+    ...
+    var dbConfig = config.get('db.mongo.host');
+    db.connect(dbConfig, ...);
+
+    if (config.has('salt')) {
+      var salt = config.get('salt');
+      ...
+    }
+
+`config.get()` will throw an exception for undefined keys to help catch typos and missing values.
+Use `config.has()` to test if a configuration value is defined.
+
+
+**Start your app server:**
+
 Run server:
 
     $ cd src && npm start
@@ -50,7 +145,6 @@ Run Unit Test:
 CBO OAuth2 accepts an object with the following valid params.
 
 * `client_id` - Required registered Client ID.
-* `client_secret` - Required registered Client secret.
 * `redirect_uri` - One of the redirect URIs.
 * `grant_type` - Defined in the OAuth 2.0 specification, this field must contain a value of `authorization_code`.
 
@@ -78,12 +172,12 @@ provide specs to your contribution.
 #### Register a new user
 
 ```
-$ http POST http://localhost:3000/api/users username=test password=your_password last_name=your_last_name
+$ http POST http://localhost:3000/api/users email=test password=your_password last_name=your_last_name
 ```
 #### User add a new client
 
 ```
-$ http -a test:your_password POST http://localhost:3000/api/clients client_id=client name=client client_secret=secret redirect_uri=http://localhost:3000
+$ http -a test:your_password POST http://localhost:3000/api/clients client_id=client name=client redirect_uri=http://localhost:3000
 ```
 
 #### User get authorised page
@@ -137,7 +231,7 @@ $ http POST http://localhost:4000/user authorization:"Bearer <access_token>" gra
 ```
 ###### Response:
 ```
-{ username: 'test',
+{ email: 'test',
     last_name: 'test',
   _id: '5564657e1afd13446cc4871c',
   __v: 0,

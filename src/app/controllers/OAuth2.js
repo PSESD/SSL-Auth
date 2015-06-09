@@ -56,21 +56,47 @@ server.deserializeClient(function (id, callback) {
 
 server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, callback) {
     // Create a new authorization code
-    var code = new Code({
-        code: codeHash(uid(16)),
-        clientId: client._id,
-        redirectUri: redirectUri,
-        userId: user._id
-    });
 
-    // Save the auth code and check for errors
-    code.save(function (err) {
-        if (err) {
+
+
+    Client.findOne({_id: client._id.toString()}, function(err, cln){
+        if(err){
             return callback(err);
         }
+        if(!cln) return callback('Url not match!');
+        try{
+            var uri = require('url');
+            var parser = uri.parse(redirectUri);
+            var uriRegex = (''+cln.redirectUri);
+                
+            var regex = new RegExp(uriRegex, 'i');
 
-        callback(null, code.code);
+            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));  
+
+
+            if(!parser.host.match(regex)){
+                return callback('Url not match!');
+            }
+        } catch(e){
+            console.log(e);
+            return callback('Url not match!');
+        }
+        var code = new Code({
+            code: codeHash(uid(16)),
+            clientId: client._id,
+            redirectUri: redirectUri,
+            userId: user._id
+        });
+        // Save the auth code and check for errors
+        code.save(function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, code.code);
+        });
     });
+
 }));
 
 // Exchange authorization codes for access tokens.  The callback accepts the
@@ -80,6 +106,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 // code.
 
 server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, callback) {
+
 
     Code.findOne({code: code}, function (err, authCode) {
         if (err) {
@@ -140,7 +167,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  */
 server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
     //Validate the user
-    User.findOne({username: username}, function (err, user) {
+    User.findOne({email: username}, function (err, user) {
         if (err) {
             return callback(err);
         }
@@ -283,10 +310,25 @@ exports.authorization = [
             if (err) {
                 return callback(err);
             }
-            
+
             return callback(null, client, redirectUri);
         });
-    }),
+    })/*,
+    function (client, user, done) {
+
+        Code.find({
+            clientId: client.clientId,
+            userId: user.userId
+        }, function (err, codes) {
+            console.log('FIND: ', codes);
+            if (err) { return done(err); }
+            if (codes.length > 0) {
+                return done(null, true);
+            } else {
+                return done(null,false);
+            }
+        });
+    })*/,
     function (req, res) {
         res.render('../app/views/dialog', {
             transactionID: req.oauth2.transactionID,
