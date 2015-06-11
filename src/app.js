@@ -6,6 +6,7 @@ var ejs = require('ejs');
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
+var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 3000;
 var config = require('config');
@@ -53,9 +54,13 @@ Api.prototype.sendMessage = function(type, message, cb){
 /**
  * load controller
  */
-Api.prototype.controller = function(name){
+Api.prototype.controller = function(name, newInstance){
     var self = this;
-    return require(self.controllerDir + '/' + name);
+    var obj = require(self.controllerDir + '/' + name);
+    if(newInstance){
+        return new obj();
+    }
+    return obj;
 };
 /**
  * load controller
@@ -76,7 +81,7 @@ Api.prototype.route = function(name){
 /**
  * Scan route and register
  */
-Api.prototype.registerRoute = function(){
+Api.prototype.registerRoute = function(cb){
     var router = express.Router();
     var self = this;
     var fs = require('fs');
@@ -91,6 +96,7 @@ Api.prototype.registerRoute = function(){
         app.use('/'+basename, router);
         var rest_router = new rest(router,self);
     });
+    if(cb) cb();
     app.get('/heartbeat', function(req, res) {
         res.send('OK');
     });
@@ -102,6 +108,7 @@ Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
     console.log("[%s] DB URI: " + dbUri, app.get('env'));
     this.mongo.connect(dbUri);
+    //this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     
 };
@@ -130,6 +137,38 @@ Api.prototype.configureExpress = function(db) {
       saveUninitialized: self.config.get('session.saveUninitialized'),
       resave: self.config.get('session.resave')
     }));
+
+    app.use(function(req, res, next){
+        res.okJson = function (message, data) {
+            /**
+             * If message is object will direct return
+             */
+            if(_.isObject(message)){
+                return res.json(message);
+            }
+            /**
+             * populate response
+             * @type {{success: boolean}}
+             */
+            var response = { success: true };
+            if(message){
+                response.message = message;
+            }
+            if(data){
+                if(_.isArray(data)) {
+                    response.total = data.length;
+                    response.data = data;
+                } else {
+                    response.info = data;
+                }
+            }
+            return res.json(response);
+        };
+        res.errJson = function (err) {
+            return res.json({success: false, error: err});
+        };
+        next();
+    });
 
     var cross = self.config.get('cross');
     if(cross.enable) {
@@ -182,6 +221,7 @@ Api.errorStack = function(ex){
             process.exit(1);
         });
     }
+
 }
 
 try {
