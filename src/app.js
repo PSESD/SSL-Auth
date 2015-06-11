@@ -16,6 +16,11 @@ if(rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 }
+
+/**
+ *
+ * @constructor
+ */
 function Api(){
     var self = this;
     self.baseDir = __dirname;
