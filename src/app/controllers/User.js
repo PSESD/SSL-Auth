@@ -62,7 +62,7 @@ exports.sendInvite = function(req, res){
     //  } }) :  res.send(err);
 
       var message = {
-          "html": "<p>"+"Invite members here: http://auth.cbo.upward.st/api/user/activate?email="+encodeURIComponent(user.email)+"&authCode="+encodeURIComponent(user.authCode)+"&redirectTo="+encodeURIComponent(req.body.redirect_url)+"</p>",
+          "html": "<p>"+"Invite members here: https://auth.cbo.upward.st/api/user/activate?email="+encodeURIComponent(user.email)+"&authCode="+encodeURIComponent(user.authCode)+"&redirectTo="+encodeURIComponent(req.body.redirect_url)+"</p>",
           "subject": "example subject",
           "from_email": "no-replay@cbo.upward.st",
           "from_name": "Example Name",
