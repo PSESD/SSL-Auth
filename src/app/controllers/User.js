@@ -1,9 +1,11 @@
 // Load required packages
 var User = require('../models/User');
+var Organization = require('../models/Organization');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 var crypto = require('crypto');
+var php = require('phpjs');
 // Create endpoint /api/users for POST
 exports.postUsers = function(req, res) {
   var user = new User({
@@ -51,6 +53,8 @@ exports.sendInvite = function(req, res){
     authCode: crypto.randomBytes(16).toString('base64')
   });
 
+  if(!req.body.redirect_url) return res.errJson('Redirect Url is empty');
+
   user.save(function(err) {
 
     //if (err)
@@ -78,14 +82,14 @@ exports.sendInvite = function(req, res){
       mandrill_client.messages.send({"message": message}, function(result) {
 
           if(result[0].status == 'sent'){
-              return res.json({status: true, message: "Email was sent"});
+              return res.errJson("Email was sent");
           } else {
-              return res.json({error: true, message: result[0].reject_reason});
+              return res.errJson(result[0].reject_reason);
           }
       }, function(e) {
           // Mandrill returns the error as an object with name and message keys
           console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-          return res.json({error: true, message: "Email not sent"});
+          return res.errJson("Email not sent");
           // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
       });
   });
@@ -98,9 +102,10 @@ exports.activate = function(req, res){
   var redirectTo = req.query.redirectTo;
   var callback = function(err, user){
     if(err){
-      return res.json(err);
+      return res.errJson(err);
     }
-    res.redirect(redirectTo);
+    if(redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+    return res.redirect(redirectTo);
   };
 
   User.findOne({ email: email }, function (err, user) {
@@ -116,8 +121,18 @@ exports.activate = function(req, res){
       // Password did not match
       if (!isMatch) { return callback(null, false); }
 
-      // Success
-      return callback(null, user);
+      var url = php.parse_url(redirectTo)['host'];
+
+      Organization.findOne({ url: url }, function(err, organization){
+        if (err) { return callback(err); }
+        // Success
+        User.where({_id: user._id}).update({ $set: { authCode: "" }, $push: { permissions: { organization: organization._id, permissions: [], students: [] } } }, function(err, updated){
+              if(err) return res.errJson(err);
+
+              callback(null, updated[0]);
+        });
+      })
+      
     });
   });
 };
