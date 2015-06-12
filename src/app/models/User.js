@@ -63,6 +63,7 @@ UserSchema.virtual('password')
 
 UserSchema.virtual('authCode')
     .set(function (code) {
+        console.log("WAS SETL ", code);
         var password = crypto.randomBytes(12).toString('base64');
         this._plainAuthCode = code;
         this._plainPassword = password;
