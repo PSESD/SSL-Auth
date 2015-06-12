@@ -63,8 +63,7 @@ exports.sendInvite = function(req, res){
         user.authCode = crypto.randomBytes(16).toString('base64');
         user.save(function(err){
           if(err) return res.errJson(err);
-          //var base = 'https://auth.cbo.upward.st/api';
-          var base = 'http://localhost:3000/api';
+          var base = 'https://auth.cbo.upward.st/api';
           var message = {
             "html": "<p>"+"Invite members here: "+base+"/user/activate?email="+encodeURIComponent(user.email)+"&authCode="+encodeURIComponent(user.authCode)+"&redirectTo="+encodeURIComponent(req.body.redirect_url)+"</p>",
             "subject": "example subject",
