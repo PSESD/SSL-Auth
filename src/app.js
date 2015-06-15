@@ -1,6 +1,11 @@
 var express = require("express");
 var mongoose = require('mongoose');
 var bodyParser  = require("body-parser");
+var cookieParser = require('cookie-parser');
+var csrf = require('csurf');
+var csrfProtection = csrf({ cookie: true });
+var parseForm = bodyParser.urlencoded({ extended: false });
+
 var app  = express();
 var ejs = require('ejs');
 var session = require('express-session');
@@ -32,6 +37,8 @@ function Api(){
     self.config = config;
     //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
+    self.csrfProtection = csrfProtection;
+    self.parseForm = parseForm;
 
     self.connectDb();
 };
@@ -119,7 +126,10 @@ Api.prototype.connectDb = function() {
 Api.prototype.configureExpress = function(db) {
     var self = this;
     app.set('api', self);
+
     app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use(cookieParser());
 
     app.use(bodyParser.json());
 
@@ -127,6 +137,8 @@ Api.prototype.configureExpress = function(db) {
 
     // Set view engine to ejs
     app.set('view engine', 'ejs');
+    // Use static public
+    app.use(express.static(__dirname + '/public'));
     // Use the passport package in our application
     app.use(passport.initialize());
 
