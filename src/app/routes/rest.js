@@ -25,6 +25,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	router.route('/user/invite')
 		.post(userController.sendInvite);
 
+	router.get('/user/changepassword', Api.csrfProtection, userController.changePassword);
+	router.post('/user/changepassword', Api.parseForm, Api.csrfProtection, userController.processChangePassword);
+
 	// Create endpoint handlers for /clients
 	router.route('/clients')
 	  .post(authController.isAuthenticated, clientController.postClients)
