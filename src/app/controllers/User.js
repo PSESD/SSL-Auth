@@ -65,7 +65,7 @@ exports.sendInvite = function (req, res) {
         var authCode = crypto.randomBytes(16).toString('base64');
         var activateUrl = base + "/api/user/activate?email=" + encodeURIComponent(user.email) + "&authCode=" + encodeURIComponent(authCode) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
 
-        var isNew = raw.updatedExisting;
+        var isNew = raw.upserted ? true : false;
 
         if(isNew){
             activateUrl += '&__n=1';
@@ -121,7 +121,7 @@ exports.activate = function (req, res) {
             return res.errJson(err);
         }
 
-        if(!isNew){
+        if(isNew){
             var sessionData = {
                 email: email,
                 authCode: authCode,
