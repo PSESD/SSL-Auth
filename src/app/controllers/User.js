@@ -206,6 +206,7 @@ exports.changePassword = function(req, res){
 exports.processChangePassword = function(req, res){
     var password = req.body.password;
     var confirmPassword = req.body.confirm_password;
+    var last_name = req.body.last_name;
     var authCode = req.body.authCode;
     var email = req.body.email;
     var redirectTo = req.body.redirectTo;
@@ -233,6 +234,10 @@ exports.processChangePassword = function(req, res){
             errors.push("Password doesn't match!");
             return false;
         }
+        if(!last_name){
+            errors.push('Last Name is required');
+            return false;
+        }
         var where = {
             email: email
         };
@@ -242,6 +247,7 @@ exports.processChangePassword = function(req, res){
                 return renderError();
             }
             user.password = password;
+            user.last_name = last_name;
             user.save(function(err){
                 if(err){
                     errors.push(err.message);
