@@ -18,7 +18,7 @@ var UserSchema = new mongoose.Schema({
     },
     first_name: { type: String, trim: true },
     middle_name: { type: String, trim: true },
-    last_name: { type: String, trim: true, required: true },
+    last_name: { type: String, trim: true },
     email: { type: String, trim: true, unique: true, required: true, index: true, minlength: 6 },
     permissions: [ UserPermission ], // Store a permission a user has, by each organization.
     created: {
