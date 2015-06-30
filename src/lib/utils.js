@@ -2,7 +2,9 @@
  * Created by zaenal on 12/05/15.
  */
 var crypto = require('crypto');
-var saltStatic = require('config').get('salt');
+var config = require('config');
+var rollbar = require('rollbar');
+var saltStatic = config.get('salt');
 var utils = {
 
     /**
@@ -87,6 +89,19 @@ var utils = {
 
         return String(str)
             .replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+    },
+    /**
+     * Logging to API
+     */
+    log: function(message, type, callback){
+        var rollbarAccessToken = config.get('rollbar.access_token');
+        if(message instanceof Error){
+            message = message.stack.split("\n");
+        }
+        if(rollbarAccessToken){
+            rollbar.reportMessage(message, type || 'info', callback);
+        }
+        console.log(message);
     }
 
 };
