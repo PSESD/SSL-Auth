@@ -22,6 +22,7 @@ var rollbarAccessToken = config.get('rollbar.access_token');
 if(rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
 }
 
 /**
@@ -36,13 +37,13 @@ function Api(){
     self.routeDir = self.baseDir + '/app/routes';
     self.libDir = self.baseDir + '/lib';
     self.config = config;
-    //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
     self.csrfProtection = csrfProtection;
     self.parseForm = parseForm;
 
+    self.env = app.get('env');
     self.connectDb();
-};
+}
 /**
  *
  * @param type
@@ -114,8 +115,12 @@ Api.prototype.registerRoute = function(cb){
  */
 Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
-    console.log("[%s] DB URI: " + dbUri, app.get('env'));
+
     this.mongo.connect(dbUri);
+
+    this.mongo.connection.once('open', function (callback) {
+        console.log("[%s] DB URI: " + dbUri, app.get('env'));
+    });
     //this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     
@@ -127,6 +132,8 @@ Api.prototype.connectDb = function() {
 Api.prototype.configureExpress = function(db) {
     var self = this;
     app.set('api', self);
+
+    app.set('log', require('./lib/utils').log);
 
     app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -248,19 +255,14 @@ Api.prototype.stop = function(err) {
  */
 Api.errorStack = function(ex){
 
-    var err = ex.stack.split("\n");
-    console.log(err);
     if(rollbarAccessToken) {
-        rollbar.reportMessage(err, 'error', function (err) {
-            process.exit(1);
-        });
+        rollbar.handleError(ex);
     }
 
-}
+};
 
 try {
     new Api();
 } catch(e){
     Api.errorStack(e);
-
 }

@@ -3,6 +3,11 @@ var mongoose = require('mongoose');
 var crypto = require('crypto');
 var UserPermission = require('./schema/UserPermission');
 var Organization = require('./Organization');
+var Code = require('./Code');
+var Client = require('./Client');
+var Student = require('./Student');
+var Program = require('./Program');
+var ObjectId = mongoose.Types.ObjectId;
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -25,6 +30,7 @@ var UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    role: { type: String, default: 'case-worker' },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -44,8 +50,8 @@ UserSchema.methods.encryptPassword = function (password) {
 };
 /**
  *
- * @param password
- * @returns {String|string|*}
+ * @param code
+ * @returns {*}
  */
 UserSchema.methods.encryptAuthCode = function (code) {
     return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');
@@ -63,7 +69,6 @@ UserSchema.virtual('password')
 
 UserSchema.virtual('authCode')
     .set(function (code) {
-        console.log("WAS SETL ", code);
         var password = crypto.randomBytes(12).toString('base64');
         this._plainAuthCode = code;
         this._plainPassword = password;
@@ -88,6 +93,58 @@ UserSchema.virtual('organizationId').get(function(){
   }
   return _id;
 });
+
+UserSchema.virtual('allPermissions').get(function(){
+    var _permissions = [];
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            _permissions.push(perm.permissions);
+        });
+    }
+    return _permissions;
+});
+
+UserSchema.virtual('allPermissionsByOrganization').get(function(){
+    var _permissions = {};
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            if(!_permissions.hasOwnProperty(perm.organization)){
+                _permissions[perm.organization] = [];
+            }
+            _permissions[perm.organization].push(perm.permissions);
+        });
+    }
+    return _permissions;
+});
+
+UserSchema.virtual('allStudents').get(function(){
+    var _students = [];
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            _students.push(perm._students);
+        });
+    }
+    return _students;
+});
+
+UserSchema.virtual('allStudentsByOrganization').get(function(){
+    var _students = {};
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            if(!_students.hasOwnProperty(perm.organization)){
+                _students[perm.organization] = [];
+            }
+            _students[perm.organization].push(perm.students);
+        });
+    }
+    return _students;
+});
+
+
 /**
  *
  * @param password
@@ -109,7 +166,22 @@ UserSchema.methods.verifyAuthCode = function (code, cb) {
     }
 };
 
-UserSchema.set('toJSON', { hide: 'hashedPassword' });
+/**
+ *
+ */
+UserSchema.statics.removeDeep = function(userId, done){
+    Client.remove({ userId: userId }, done);
+    Code.remove({ userId: userId }, done);
+    Program.remove({ creator: userId }, done);
+    Student.remove({ creator: userId }, done);
+    Organization.remove({ creator: userId }, done);
+    this.model('User').remove({_id: userId}, done);
+    console.log('REMOVE CALL');
+};
+
+
+UserSchema.set('toJSON', { hide: 'hashedPassword', virtuals: true });
+UserSchema.set('toObject', { hide: 'hashedPassword', virtuals: true });
 
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);

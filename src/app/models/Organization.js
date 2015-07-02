@@ -12,6 +12,9 @@ var OrganizationSchema = new mongoose.Schema({
     website: { type: String }, // The CBO Main Website, not related with the app
     description: { type: String },
     addresses: [ Address ],
+    externalServiceId: { type: Number, required: true },
+    personnelId: { type: Number, required: true },
+    authorizedEntityId: { type: Number, required: true },
     created: { type: Date, required: true, default: Date.now },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },

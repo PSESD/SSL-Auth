@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 
 // Define our StudentProgram schema
 var StudentProgramSchema = new mongoose.Schema({
-    program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program' },
+    program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program', required: true },
     active: { type: Boolean, required: true, default: true }, // Whether the student is currently active in the program or not.
     participation_start_date: { type: Date },
     participation_end_date: { type: Date },

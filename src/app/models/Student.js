@@ -22,7 +22,7 @@ var Address = require('./schema/Address');
 // TODO: On read, need to pull Student backpack data from HZB/Elasticache for serving.
 var StudentSchema = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
-    first_name: { type: String },
+    first_name: { type: String, component: 'settings' },
     last_name: { type: String, required: true, index: true },
     middle_name: { type: String },
     district_student_id: { type: String },
@@ -34,6 +34,54 @@ var StudentSchema = new mongoose.Schema({
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
-
+StudentSchema.plugin(require('../../lib/protector'));
 // Export the Mongoose model
-module.exports = mongoose.model('Student', StudentSchema);
+var Student = mongoose.model('Student', StudentSchema);
+Student.setRules([
+    {
+        role: {
+            name: 'admin',
+            allow: {
+                "*": "*"
+            }
+        }
+    },
+    {
+        role: {
+            name: 'case-worker',
+            allow: {
+                read: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                update: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                delete: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+]);
+module.exports = Student;
