@@ -6,8 +6,11 @@ var mandrill_client = new mandrill.Mandrill();
 
 
 function Mail(){
+
     this.mandrill = mandrill;
+
     this.client = mandrill_client;
+
 }
 
 module.exports = Mail;

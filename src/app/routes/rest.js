@@ -10,13 +10,19 @@ function Rest(router, Api) {
  * @param Api
  */
 Rest.prototype.handleRoutes= function(router, Api) {
+
 	var indexController = Api.controller('Index');
+
 	var userController = Api.controller('User');
+
 	var authController = Api.controller('Auth');
+
 	var oauth2Controller = Api.controller('OAuth2');
+
 	var clientController = Api.controller('Client');
 
 	router.get('/', indexController.index);
+
 	// Create endpoint handlers for /users
 	router.route('/users')
 	  .post(userController.postUsers)
@@ -26,6 +32,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 		.post(userController.sendInvite);
 
 	router.get('/user/changepassword', Api.csrfProtection, userController.changePassword);
+
 	router.post('/user/changepassword', Api.parseForm, Api.csrfProtection, userController.processChangePassword);
 
 	// Create endpoint handlers for /clients
@@ -44,6 +51,10 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
 	router.post('/logout', authController.logout);
 	router.get('/user/activate', userController.activate);
-};
 
+};
+/**
+ *
+ * @type {Rest}
+ */
 module.exports = Rest;

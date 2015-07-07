@@ -57,6 +57,20 @@ UserSchema.methods.encryptAuthCode = function (code) {
     return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');
 };
 /**
+ * If current user is admin
+ * @returns {boolean}
+ */
+UserSchema.methods.isAdmin = function(){
+  return 'admin' === this.role;
+};
+/**
+ * If current user is case worker
+ * @returns {boolean}
+ */
+UserSchema.methods.isCaseWorker = function(){
+    return 'case-worker' === this.role;
+};
+/**
  *
  */
 UserSchema.virtual('password')

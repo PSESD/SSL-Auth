@@ -10,7 +10,6 @@ var collection;
 var context;
 var currentRole;
 var protectFilter;
-
 var _permissions;
 var _acl;
 var _errorMessage = 'Access Denied';
@@ -22,29 +21,43 @@ module.exports = function protector(schema, options) {
      * @param collection
      */
     function setUser(user, collection) {
+
         _permissions = [];
+
         _acl = [];
+
         var _collectionName = collection;
 
         if(user && _.isArray(user.permissions)) {
+
             user.permissions.forEach(function (permission) {
+
                 var is = false;
+
                 if (permission.permissions.length > 0) {
+
                     permission.permissions.forEach(function (perm) {
+
                         if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
+
                             _acl.push(perm);
+
                             is = true;
+
                         }
-                        //console.log(_collectionName, perm.model.toLowerCase());
+
                     });
+
                 }
-                if(is){
-                    _permissions = permission;
-                }
+
+                if(is) _permissions = permission;
+
             });
+
         }
 
         console.log('ROLE (', currentRole, ') Permissions: ', JSON.stringify(_acl));
+
     }
 
     /**
@@ -55,8 +68,8 @@ module.exports = function protector(schema, options) {
     schema.methods.protect = function protect(req) {
 
         currentRole = req;
-        collection = this.collection.name;
 
+        collection = this.collection.name;
 
         var caller = this;
 
@@ -71,13 +84,15 @@ module.exports = function protector(schema, options) {
              * @param args
              */
             save: function (args) {
+
                 var gotRules = null, inRules = null, role = null, localRules = null;
                 // this is a new document, does the user have create permission?
                 if (caller.isNew) {
-                    if(checkAcl('create').denied){
-                        return _denied();
-                    }
+
+                    if(checkAcl('create').denied) return _denied();
+
                     gotRules = getRules(collection);
+
                     inRules = (typeof gotRules !== "undefined") ? gotRules : [];
 
                     role = (typeof currentRole !== "undefined") ? currentRole : "";
@@ -89,20 +104,26 @@ module.exports = function protector(schema, options) {
                         caller.save(args);
 
                     } else {
+
                         if ("function" == typeof args) {
+
                             args("Unauthorized");
+
                         } else {
+
                             throw new mongoose.Error("Unauthorized");
+
                         }
                     }
 
                 }
                 // this document is being updated, does the user have update permission?
                 else {
-                    if(checkAcl('update').denied){
-                        return _denied();
-                    }
+
+                    if(checkAcl('update').denied) return _denied();
+
                     gotRules = getRules(collection);
+
                     inRules = (typeof gotRules !== "undefined") ? gotRules : [];
 
                     role = (typeof currentRole !== "undefined") ? currentRole : "";
@@ -116,9 +137,13 @@ module.exports = function protector(schema, options) {
                     } else {
 
                         if ("function" == typeof args) {
+
                             args("Unauthorized");
+
                         } else {
+
                             _denied();
+
                         }
 
                     }
@@ -141,36 +166,82 @@ module.exports = function protector(schema, options) {
     schema.statics.protect = function (req, _protectFilter, user) {
 
         context = this;
+
         currentRole = req;
+
         collection = this.collection.name;
+
         protectFilter = _protectFilter || {};
+
         setUser(user, collection);
 
         return {
-
+            /**
+             *
+             * @param args
+             * @param callback
+             * @returns {{populate, exec}}
+             */
             find: function (args, callback) {
+
                 try {
+
                     return _find(args, callback);
+
                 } catch(e){
+
                     callback(e);
+
                 }
+
             },
+            /**
+             *
+             * @param args
+             * @param callback
+             * @returns {{populate, exec}}
+             */
             findOne: function (args, callback) {
+
                 try{
+
                     return _findOne(args, callback);
+
                 } catch(e){
+
                     callback(e);
+
                 }
+
             },
+            /**
+             * ]
+             * @param fn
+             * @returns {boolean}
+             */
             save: function (fn) {
+
                 console.log('here');
+
                 return true;
+
             },
+            /**
+             *
+             * @param args
+             * @param callback
+             * @returns {{exec}}
+             */
             remove: function (args, callback) {
+
                 try {
+
                     return _delete(args, callback);
+
                 } catch(e){
+
                     callback(e);
+
                 }
             }
 
@@ -205,9 +276,11 @@ module.exports = function protector(schema, options) {
     function checkDynamic(val) {
 
         if (typeof val === "string") {
+
             var spli = val.split('.');
 
             if (spli[0] === "$dynamic") {
+
                 return [spli[1]];
 
             }
@@ -248,18 +321,26 @@ module.exports = function protector(schema, options) {
          * Skipped checked acl if admin user
          */
         if('admin' === currentRole){
+
             console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
+
             return {fields: localRules.properties, crit: crit};
+
         }
 
         var acl = checkAcl(allowName);
+
         console.log("DENIED ACL (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
+
         if(acl.denied) return _denied();
 
 
         if (!localRules) {
+
             console.log("DENIED ACL => ", "NOT RULES");
+
             return false;
+
         }
 
         if (typeof localRules.where !== "undefined") {
@@ -271,81 +352,107 @@ module.exports = function protector(schema, options) {
                     break;
                 case 'own':
                 case 'owner':
+
                     console.log('CHECK PERMISSION INDEX OF >> ', collection, ' is ', collection in _permissions);
+
                     if(collection in _permissions){
 
                         if(!_.isEmpty(protectFilter) && collection in protectFilter && _permissions[collection].indexOf(protectFilter[collection]) === -1){
+
                             console.log('DENIED ACL COMPARE USING LIST OF >> ', collection);
+
                             _denied();
+
                         }
 
                         var tmp = _permissions[collection];
 
                         if('_id' in crit){
+
                             if(crit._id.hasOwnProperty('$in')){
 
                                 crit._id['$in'].forEach(function(id){
+
                                     tmp.push(id);
+
                                 });
 
                             } else {
+
                                 tmp.push(crit._id);
+
                             }
 
                             delete crit._id;
                         }
+
                         crit._id = { $in: tmp };
 
                     } else {
+
                         console.log('DENIED ACL LIST OWN NOT SET >> ', collection, ' ', JSON.stringify(_permissions));
                         _denied();
+
                     }
+
                     break;
 
                 case 'none':
                 default:
+
                     console.log("DENIED ACL => ", "PERMISSION NONE => ", acl.allow);
+
                     _denied();
+
                     break;
             }
 
             for (var attrn in localRules.where) {
 
                 if (localRules.where[attrn].hasOwnProperty('$in')) {
+
                     var inArray = localRules.where[attrn]['$in'];
+
                     var projectionArray = [];
+
                     inArray.forEach(function (val) {
 
-
                         var theKey = checkDynamic(val);
-                        if (theKey && protectFilter.hasOwnProperty(theKey)) {
-                            projectionArray.push(protectFilter[theKey]);
-                        }
 
+                        if (theKey && protectFilter.hasOwnProperty(theKey)) {
+
+                            projectionArray.push(protectFilter[theKey]);
+
+                        }
 
                     });
 
                     if (projectionArray.length > 0) {
+
                         localRules.where[attrn]['$in'] = projectionArray;
+
                     }
+
                 } else {
 
                     var key = checkDynamic(localRules.where[attrn]);
+
                     if (key && protectFilter.hasOwnProperty(key)) {
+
                         localRules.where[attrn] = protectFilter[key];
 
                     }
-
 
                 }
 
                 crit[attrn] = localRules.where[attrn];
 
-
             }
         }
         if (localRules.properties.hasOwnProperty('*')) {
+
             localRules.properties = {};
+
         }
 
         var criteria = {fields: localRules.properties, crit: crit};
@@ -353,6 +460,7 @@ module.exports = function protector(schema, options) {
         console.log('ACL CRITERIA => ', JSON.stringify(criteria), ' RULES: ', JSON.stringify(localRules));
 
         return criteria;
+
     };
 
     /**
@@ -387,20 +495,38 @@ module.exports = function protector(schema, options) {
             } else {
                 // this is pretty hacky
                 return {
+                    /**
+                     *
+                     * @param args
+                     * @returns {{exec: Function}}
+                     */
                     populate: function (args) {
+
                         return {
+
                             exec: function (callback) {
+
                                 callback(_errorMessage);
+
                             }
+
                         }
+
                     },
+                    /**
+                     *
+                     * @param callback
+                     */
                     exec: function (callback) {
 
                         callback(_errorMessage);
+
                     }
+
                 }
 
             }
+
         }
 
     };
@@ -437,21 +563,41 @@ module.exports = function protector(schema, options) {
             } else {
                 // this is pretty hacky
                 return {
+                    /**
+                     *
+                     * @param args
+                     * @returns {{exec: Function}}
+                     */
                     populate: function (args) {
+
                         return {
+                            /**
+                             *
+                             * @param callback
+                             */
                             exec: function (callback) {
+
                                 callback(_errorMessage);
+
                             }
                         }
                     },
+                    /**
+                     *
+                     * @param callback
+                     */
                     exec: function (callback) {
 
                         callback(_errorMessage);
+
                     }
+
                 }
 
             }
+
         }
+
     };
     /**
      * Delete or remove
@@ -469,12 +615,14 @@ module.exports = function protector(schema, options) {
 
             if (typeof callback === "function") {
 
-
                 context.remove(args).where().exec(callback);
-            }
-            else {
+
+            } else {
+
                 return context.remove(args);
+
             }
+
         } else {
 
             if (typeof callback === "function") {
@@ -484,14 +632,22 @@ module.exports = function protector(schema, options) {
             } else {
                 // this is pretty hacky
                 return {
+                    /**
+                     *
+                     * @param callback
+                     */
                     exec: function (callback) {
 
                         callback(_errorMessage);
+
                     }
+
                 }
 
             }
+
         }
+
     };
 
 }; //end export
@@ -500,7 +656,9 @@ module.exports = function protector(schema, options) {
  * @private
  */
 function _denied () {
+
     throw new mongoose.Error(_errorMessage);
+
 }
 /**
  *
@@ -509,13 +667,13 @@ function _denied () {
  */
 function checkAcl(method){
 
-
     if(!_acl) return {
         denied: true,
         permission: null
     };
 
     if(currentRole === 'admin'){
+
         return {
             denied: false,
             permission: {
@@ -523,6 +681,7 @@ function checkAcl(method){
                 operation: '*'
             }
         };
+
     }
 
     var operation = [ '*', method ];
@@ -530,7 +689,9 @@ function checkAcl(method){
     var i = 0, acl = null;
 
     do {
+
         acl = _acl[i];
+
         if(operation.indexOf(acl.operation) !== -1){
 
             return {
@@ -539,13 +700,16 @@ function checkAcl(method){
             };
 
         }
+
         i++;
+
     } while(i < _acl.length);
 
     return {
         denied: true,
         permission: null
     };
+
 }
 /**
  *
