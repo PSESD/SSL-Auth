@@ -31,9 +31,16 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	router.route('/user/invite')
 		.post(userController.sendInvite);
 
+	router.route('/user/send/forgotpassword')
+		.post(userController.sendForgotPassword);
+
 	router.get('/user/changepassword', Api.csrfProtection, userController.changePassword);
 
 	router.post('/user/changepassword', Api.parseForm, Api.csrfProtection, userController.processChangePassword);
+
+	router.get('/user/forgotpassword', Api.csrfProtection, userController.formForgotPassword);
+
+	router.post('/user/forgotpassword', Api.parseForm, Api.csrfProtection, userController.processForgotPassword);
 
 	// Create endpoint handlers for /clients
 	router.route('/clients')

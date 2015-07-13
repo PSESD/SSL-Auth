@@ -15,6 +15,8 @@ var UserSchema = new mongoose.Schema({
     hashedPassword: {
         type: String
     },
+    hashedForgotPassword: String,
+    hashedForgotPasswordExpire: { type: Date, default: Date.now },
     /**
     * Store salt as plain text
     */
@@ -57,6 +59,14 @@ UserSchema.methods.encryptAuthCode = function (code) {
     return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');
 };
 /**
+ *
+ * @param code
+ * @returns {*}
+ */
+UserSchema.methods.encryptForgotPassword = function (code) {
+    return crypto.pbkdf2Sync(''+code, this.salt, 4096, 32, 'sha256').toString('hex');
+};
+/**
  * If current user is admin
  * @returns {boolean}
  */
@@ -94,6 +104,16 @@ UserSchema.virtual('authCode')
         return this._plainAuthCode;
     });
 
+UserSchema.virtual('forgotPassword')
+    .set(function (code) {
+        this._plainForgotPassword = code;
+        this.hashedForgotPassword = this.encryptForgotPassword(code);
+        this.hashedForgotPasswordExpire = new Date(new Date().getTime() + (86400 * 1000)); // set to 24 hour
+    })
+    .get(function () {
+        return this._plainForgotPassword;
+    });
+
 /**
  * User organization id
  */
@@ -102,7 +122,7 @@ UserSchema.virtual('organizationId').get(function(){
   if(this.permissions.length > 0){
       
       this.permissions.forEach(function(organization){
-          _id.push(organization.organization);
+          _id.push(organization.organization.toString());
       });
   }
   return _id;
@@ -177,6 +197,14 @@ UserSchema.methods.verifyAuthCode = function (code, cb) {
         cb(null, false);
     } else {
         cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
+    }
+};
+
+UserSchema.methods.verifyForgotPassword = function (code, cb) {
+    if (!this.salt) {
+        cb(null, false);
+    } else {
+        cb(null, (this.encryptForgotPassword(code) === this.hashedForgotPassword && new Date() < this.hashedForgotPasswordExpire));
     }
 };
 
