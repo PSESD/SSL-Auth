@@ -105,17 +105,6 @@ exports.sendInvite = function (req, res) {
 
                 if (err) return res.errJson(err);
 
-                var message = {
-                    "html": "<p>" + "Invite members here: " + activateUrl + "</p>",
-                    "subject": "example subject",
-                    "from_email": "no-replay@cbo.upward.st",
-                    "from_name": "Example Name",
-                    "to": [{email: user.email, name: user.last_name, type: "to"}],
-                    "headers": {
-                        "Reply-To": "no-replay@cbo.upward.st"
-                    }
-
-                };
 
                 var async = false;
 
@@ -123,23 +112,44 @@ exports.sendInvite = function (req, res) {
 
                 var send_at = new Date();
 
-                mandrill_client.messages.send({"message": message}, function (result) {
+                mandrill_client.templates.info({ name: 'cbo_invite_user'}, function(result) {
 
-                    if (result[0].status == 'sent') {
+                    var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                    var message = {
+                        "html": html,
+                        "subject": result.subject,
+                        "from_email": result.publish_from_email,
+                        "from_name": result.publish_from_name,
+                        "to": [{email: user.email, name: user.last_name, type: "to"}],
+                        "headers": {
+                            "Reply-To": "no-replay@studentsuccesslink.org"
+                        }
 
-                        return res.okJson("Email was sent");
+                    };
+                    mandrill_client.messages.send({"message": message}, function (result) {
 
-                    } else {
+                        if (result[0].status == 'sent') {
 
-                        return res.errJson(result[0].reject_reason);
+                            return res.okJson("Email was sent");
 
-                    }
-                }, function (e) {
+                        } else {
+
+                            return res.errJson(result[0].reject_reason);
+
+                        }
+                    }, function (e) {
+                        // Mandrill returns the error as an object with name and message keys
+                        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+
+                        return res.errJson("Email not sent");
+                        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                    });
+
+                }, function(e) {
                     // Mandrill returns the error as an object with name and message keys
                     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                    // A mandrill error occurred: Invalid_Key - Invalid API key
                     return res.errJson("Email not sent");
-                    // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                 });
 
             });
@@ -177,41 +187,50 @@ exports.sendForgotPassword = function (req, res) {
 
             if (err) return res.errJson(err);
 
-            var message = {
-                "html": "<p>" + "Your Membership ID is " + user._id + " <br><br>Click here to reset your password " + forgotPasswordUrl + "</p>",
-                "subject": "Forgot password",
-                "from_email": "no-replay@cbo.upward.st",
-                "from_name": "CBO",
-                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                "headers": {
-                    "Reply-To": "no-replay@cbo.upward.st"
-                }
-
-            };
-
             var async = false;
 
             var ip_pool = "Main Pool";
 
             var send_at = new Date();
 
-            mandrill_client.messages.send({"message": message}, function (result) {
+            mandrill_client.templates.info({ name: 'cbo_forgot_password'}, function(result) {
 
-                if (result[0].status == 'sent') {
+                var html = php.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
+                var message = {
+                    "html": html,
+                    "subject": result.subject,
+                    "from_email": result.publish_from_email,
+                    "from_name": result.publish_from_name,
+                    "to": [{email: user.email, name: user.last_name, type: "to"}],
+                    "headers": {
+                        "Reply-To": "no-replay@studentsuccesslink.org"
+                    }
 
-                    return res.okJson("Email was sent");
+                };
+                mandrill_client.messages.send({"message": message}, function (result) {
 
-                } else {
+                    if (result[0].status == 'sent') {
 
-                    return res.errJson(result[0].reject_reason);
+                        return res.okJson("Email was sent");
 
-                }
-            }, function (e) {
+                    } else {
+
+                        return res.errJson(result[0].reject_reason);
+
+                    }
+                }, function (e) {
+                    // Mandrill returns the error as an object with name and message keys
+                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+
+                    return res.errJson("Email not sent");
+                    // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                });
+
+            }, function(e) {
                 // Mandrill returns the error as an object with name and message keys
                 console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                // A mandrill error occurred: Invalid_Key - Invalid API key
                 return res.errJson("Email not sent");
-                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
             });
 
         });
@@ -401,6 +420,10 @@ exports.processChangePassword = function(req, res){
 
     var confirmPassword = req.body.confirm_password;
 
+    var first_name = req.body.first_name;
+
+    var middle_name = req.body.middle_name;
+
     var last_name = req.body.last_name;
 
     var authCode = req.body.authCode;
@@ -466,6 +489,10 @@ exports.processChangePassword = function(req, res){
             }
 
             user.password = password;
+
+            user.first_name = first_name;
+
+            user.middle_name = middle_name;
 
             user.last_name = last_name;
 

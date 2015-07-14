@@ -1,0 +1,608 @@
+/*
+===============================================
+==================== INDEX ====================
+===============================================
+I ALL
+1.Body
+2.Header
+  2a.Menu
+3.Container
+  3a.Login/Forget Form
+4.Footer
+5.Utility
+6.Form
+
+II MEDIA
+@media (max-width:767px)
+1.Header
+
+@media (min-width:768px)
+1.Header
+
+*/
+
+/*
+===============================================
+==================== 1.Body ===================
+===============================================
+*/
+html
+{
+
+}
+body
+{
+    padding-bottom: 50px;
+    background: #DADFDC;
+}
+li{
+    list-style:none;
+}
+a,
+a:focus,
+a:hover
+{
+    color: #000;
+}
+/*- Typography -*/
+*{
+    font-family:quicksand;
+    font-weight: 400;
+}
+
+h1{
+    font-size: 1.6em;
+    letter-spacing: .2em;
+    color: #555;
+    text-transform: uppercase;
+    font-family:quicksand;
+    font-weight: 400;
+}
+
+p{
+    font-size: 1em;
+    color: #555;
+    font-family:quicksand;
+    font-weight: 400;
+    max-width:400px;
+}
+
+
+/*
+===============================================
+================== 2.Header ===================
+===============================================
+*/
+.navbar
+{
+    position: fixed;
+    margin-bottom: 0;
+    height: 100%;
+    left: 0;
+    overflow: auto;
+}
+
+/*
+===============================================
+=================== 2a.Menu ===================
+===============================================
+*/
+.navbar-nav .dropdown-menu > li > a,
+.navbar-right .dropdown-menu > li > a
+{
+    color: #9d9d9d;
+}
+.navbar-nav .dropdown-menu > li > a:hover,
+.navbar-right .dropdown-menu > li > a:hover
+{
+    background: transparent;
+    background-image: none;
+    color: #FFFFFF;
+}
+.navbar-inverse .navbar-nav>.active>a,
+.navbar-inverse .navbar-nav>.active>a:focus,
+.navbar-inverse .navbar-nav>.active>a:hover,
+.navbar-inverse .navbar-nav>.open>a,
+.navbar-inverse .navbar-nav>.open>a:focus,
+.navbar-inverse .navbar-nav>.open>a:hover
+{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+
+a:hover
+{
+	text-decoration:none;
+	color:#3572b0;
+	cursor:pointer;
+}
+
+/*
+===============================================
+================= 3.Container =================
+===============================================
+*/
+.container-fluid
+{
+
+}
+/*- Cards -*/
+.card{
+    background:#fff;
+    padding: 24px 50px;
+    border-bottom: solid 5px rgba(0,0,0,0.1);
+    border-radius:2px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    margin: 10px 0;
+}
+
+.col-md-3 .card{
+    min-height: 300px;
+}
+
+.col-md-6 .card{
+    min-height: 620px;
+}
+
+.card .title hr{
+    width:30px;
+    border-top: solid 2px #555;
+    margin: 10px 0;
+}
+
+.flexible-card{
+  background: #fff;
+  padding: 24px 50px;
+  border-bottom: solid 5px rgba(0,0,0,0.1);
+  border-radius: 2px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+  margin: 10px 0;
+  margin-left: 100px;
+}
+
+table h1
+{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/*
+===============================================
+============= 3a.Login/Forget Form ============
+===============================================
+*/
+#login-container,
+#forget-container
+{
+    position: absolute;
+    top: 30%;
+}
+#login-container,
+#login-container .card,
+#forget-container,
+#forget-container .card
+{
+    background-color: #404040;
+    color: #FFFFFF;
+}
+#login-container .card h1,
+#forget-container .card h1,
+#login-container .card p,
+#forget-container .card p
+{
+    color: #FFFFFF;
+}
+#login-container .card .title hr,
+#forget-container .card .title hr
+{
+    border-top: solid 2px #FFFFFF;
+}
+
+select{
+-webkit-appearance: none;
+}
+
+/*
+===============================================
+=================== 4.Footer ==================
+===============================================
+*/
+
+
+/*
+===============================================
+================== 5.Utility ==================
+===============================================
+*/
+
+div[contentEditable] {
+  cursor: pointer;
+  background-color: white;
+    padding: .2em;
+}
+div[contentEditable]:focus {
+  cursor: pointer;
+  background-color: #D0D0D0;
+    border: 1px solid red;
+  padding: .2em;
+}
+
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
+
+.btn-expand
+{
+    position: absolute;
+    bottom: 30px;
+    right: 45px;
+}
+.help-block
+{
+    font-weight: normal; font-size: 10px; vertical-align: middle;
+}
+.small
+{
+    font-size: 50%;
+}
+.bold{
+    font-weight: 700;
+}
+.font16
+{
+    font-size: 16px;
+}
+.subhead{
+    text-transform:uppercase;
+}
+
+/*- Flags -*/
+
+.flag{
+    background: #E75051;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.flag .title h1, .flag .content p, .flag .button, .flag .button:hover, .flag .button:active{
+    color: #fff;
+}
+
+.flag .title hr{
+    border-top: solid 2px #fff;
+}
+
+/*- View/Read Icons -*/
+
+.lock{
+    background-image: url(../img/icon-lock.png);
+    background-repeat: no-repeat;
+    background-position: right 10px top 10px;
+    background-size: 18px;
+}
+
+.pencil{
+    background-image: url(../img/icon-pencil.png);
+    background-repeat: no-repeat;
+    background-position: right 10px top 10px;
+    background-size: 18px;
+}
+
+
+
+.colour{
+    width: 100%;
+    height: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+}
+.label-checkbox
+{
+    display: inline-block;
+}
+.ng-hide
+{
+    display: none;
+}
+.glyphicon-spin
+{
+    -webkit-animation: glyphicon-spin 2s infinite linear;
+    animation: glyphicon-spin 2s infinite linear;
+}
+@-webkit-keyframes glyphicon-spin
+{
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes glyphicon-spin
+{
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+/*- Sidebar Collapse Icon -*/
+
+.collapse-icon{
+color:white;
+}
+
+.collapse-icon:hover{
+cursor:pointer;
+}
+
+/*
+===============================================
+=================== 6.Form ====================
+===============================================
+*/
+.form-control
+{
+    border: 0 !important;
+    box-shadow: none !important;
+    border-bottom: 1px #000 solid !important;
+    border-radius: 0 !important;
+}
+.form-inline
+{
+    padding-bottom: 40px;
+}
+
+
+/*- Buttons -*/
+.button{
+    font-family:'quicksand';
+    font-weight: 700;
+    background:transparent;
+    font-size:1em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #555;
+    border: solid 2px;
+    padding: 3px 25px;
+    border-radius: 3px;
+    margin: 10px 0;
+    outline:0px !important;
+    -webkit-appearance:none;
+    min-height: 30px;
+}
+a.button
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.button:hover{
+    /*
+    border-bottom:solid 3px;
+    */
+    color: #555;
+    text-decoration: none;
+}
+
+.button:active{
+    /*
+    border-bottom:solid 2px rgba(0,0,0,0.0);
+    background: rgba(0,0,0,0.1);
+    color: #555;
+    text-decoration: none;
+    */
+}
+
+.button:visted{
+    box-shadow: none;
+}
+
+#login-container input,
+#forget-container input
+{
+    background: transparent;
+    border-bottom: 1px #FFFFFF solid !important;
+    color: #FFFFFF;
+}
+#login-container input::-webkit-input-placeholder, /* WebKit browsers */
+#forget-container input::-webkit-input-placeholder,
+#login-container input:-moz-placeholder, /* Mozilla Firefox 4 to 18 */
+#forget-container input:-moz-placeholder,
+#login-container input::-moz-placeholder, /* Mozilla Firefox 19+ */
+#forget-container input::-moz-placeholder,
+#login-container input:-ms-input-placeholder, /* Internet Explorer 10+ */
+#forget-container input:-ms-input-placeholder
+{
+    color: #FFFFFF;
+}
+#login-container .card .help-block.label-checkbox
+{
+    color: #FFFFFF;
+}
+#login-container .button,
+#forget-container .button
+{
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+
+/*
+===============================================
+=========== media (max-width:767px) ===========
+===============================================
+*/
+@media (max-width:767px) {
+
+    /*
+    ===============================================
+    =================== 2.Header ==================
+    ===============================================
+    */
+    .navbar
+    {
+        width: 75px;
+    }
+
+    /*
+    ===============================================
+    =================== 2a.Menu ===================
+    ===============================================
+    */
+    #navbar-height-col {
+        position: fixed;
+        top: 0;
+        height: 100%;
+        bottom:0;
+        width: 80%;
+        left: -80%;
+        background-image: -webkit-linear-gradient(top,#3c3c3c 0,#222 100%);
+        background-image: -o-linear-gradient(top,#3c3c3c 0,#222 100%);
+        background-image: -webkit-gradient(linear,left top,left bottom,from(#3c3c3c),to(#222));
+        background-image: linear-gradient(to bottom,#3c3c3c 0,#222 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        background-repeat: repeat-x;
+        z-index: -1;
+    }
+    #navbar #slidemenu
+    {
+        left: -100%;
+        width: 80%;
+        min-width: 0;
+        position: absolute;
+        padding-left: 0;
+        z-index: 1;
+        margin: 0;
+    }
+    .navbar.slide-active
+    {
+        width: 80%;
+        z-index: 2;
+    }
+    #navbar .navbar-toggle.slide-active .icon-bar {
+        background: orange;
+    }
+    #navbar .navbar-brand
+    {
+        display: none;
+    }
+    #navbar .navbar-header.slide-active .navbar-brand
+    {
+        display: block;
+    }
+    #navbar #slidemenu.slide-active .navbar-nav
+    {
+        margin: 7.5px 10px;
+    }
+
+    /*
+    ===============================================
+    ================= 3.Container =================
+    ===============================================
+    */
+    .container-with-menu
+      {
+        width: calc(100% - 75px);
+        margin-left: 75px;
+    }
+
+
+}
+
+
+/*
+===============================================
+=========== media (min-width:768px) ===========
+===============================================
+*/
+@media (min-width:768px) {
+
+    /*
+    ===============================================
+    =================== 2.Header ==================
+    ===============================================
+    */
+    .navbar
+    {
+        width: 15%;
+    }
+
+    /*
+    ===============================================
+    =================== 2a.Menu ===================
+    ===============================================
+    */
+    #navbar
+    {
+        padding: 35px 10px 10px 10px;
+        border-radius: 0;
+        overflow-x: hidden;
+    }
+    .navbar-header
+    {
+        float: none;
+    }
+    .navbar-nav
+    {
+        float: none;
+    }
+    .navbar-right
+    {
+        float: none !important;
+    }
+    .navbar-nav li,
+    .navbar-right li
+    {
+        float: none;
+    }
+    .navbar-nav .dropdown-menu,
+    .navbar-right .dropdown-menu
+    {
+        position: relative;
+        float: none;
+        background-color: transparent;
+        box-shadow: none;
+        border: 0;
+    }
+
+    /*
+    ===============================================
+    ================= 3.Container =================
+    ===============================================
+    */
+    .container-with-menu
+    {
+        width: 85%;
+        margin-left: 15%;
+    }
+
+
+    /*
+    ===============================================
+    ================== 5.Utility ==================
+    ===============================================
+    */
+
+}
+
+
+@media (max-height:600px) {
+
+    #login-container,
+    #forget-container
+    {
+        position: absolute;
+        top: 10%;
+    }
+
+}
