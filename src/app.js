@@ -66,13 +66,13 @@ function Api(){
  * send message to rollbar
  * @link https://rollbar.com
  */
-Api.prototype.sendMessage = function(type, message, cb){
+Api.prototype.sendMessage = function (type, message, cb) {
 
-    if(!rollbarAccessToken) return;
+    if (!rollbarAccessToken) return;
 
-    rollbar.reportMessage(message, type || 'debug', function(rollbarErr) {
+    rollbar.reportMessage(message, type || 'debug', function (rollbarErr) {
 
-        if(cb) cb(rollbarErr);
+        if (cb) cb(rollbarErr);
 
     });
 
@@ -80,13 +80,13 @@ Api.prototype.sendMessage = function(type, message, cb){
 /**
  * load controller
  */
-Api.prototype.controller = function(name, newInstance){
+Api.prototype.controller = function (name, newInstance) {
 
     var self = this;
 
     var obj = require(self.controllerDir + '/' + name);
 
-    if(newInstance){
+    if (newInstance) {
 
         return new obj();
 
@@ -98,13 +98,13 @@ Api.prototype.controller = function(name, newInstance){
 /**
  * load controller
  */
-Api.prototype.model = function(name){
+Api.prototype.model = function (name) {
 
     return require(this.modelDir + '/' + name);
 
 };
 
-Api.prototype.lib = function(name){
+Api.prototype.lib = function (name) {
 
     return require(this.libDir + '/' + name);
 
@@ -112,7 +112,7 @@ Api.prototype.lib = function(name){
 /**
  * load router
  */
-Api.prototype.route = function(name){
+Api.prototype.route = function (name) {
 
     return require(this.routeDir + '/' + name);
 
@@ -120,7 +120,7 @@ Api.prototype.route = function(name){
 /**
  * Scan route and register
  */
-Api.prototype.registerRoute = function(cb){
+Api.prototype.registerRoute = function (cb) {
 
     var router = express.Router();
 
@@ -132,25 +132,25 @@ Api.prototype.registerRoute = function(cb){
 
     var routers = fs.readdirSync(self.routeDir);
 
-    routers.forEach(function(file){
+    routers.forEach(function (file) {
 
         var basename = path.basename(file, '.js');
 
         var rest = self.route(basename);
 
-        if(basename === 'rest'){
+        if (basename === 'rest') {
 
             basename = 'api';
 
         }
 
-        app.use('/'+basename, router);
+        app.use('/' + basename, router);
 
-        var rest_router = new rest(router,self);
+        var rest_router = new rest(router, self);
 
     });
 
-    if(cb) cb();
+    if (cb) cb();
 
     app.get('/heartbeat', function(req, res) {
 
@@ -162,9 +162,10 @@ Api.prototype.registerRoute = function(cb){
 /**
  * Connect to database
  */
-Api.prototype.connectDb = function() {
+Api.prototype.connectDb = function () {
 
-    var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
+
+    var dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
 
     this.mongo.connect(dbUri);
 
@@ -175,6 +176,7 @@ Api.prototype.connectDb = function() {
     });
 
     //this.mongo.set('debug', app.get('env') === 'test');
+
     this.configureExpress(this.db);
     
 };
@@ -182,7 +184,7 @@ Api.prototype.connectDb = function() {
  * Config Express and Register Route
  * @param db
  */
-Api.prototype.configureExpress = function(db) {
+Api.prototype.configureExpress = function (db) {
 
     var self = this;
 
@@ -209,23 +211,31 @@ Api.prototype.configureExpress = function(db) {
 
 
     // Use express session support since OAuth2orize requires it
-    app.use(session({ 
-      secret: self.config.get('session.secret'),
-      saveUninitialized: self.config.get('session.saveUninitialized'),
-      resave: self.config.get('session.resave')
+    app.use(session({
+        secret: self.config.get('session.secret'),
+        saveUninitialized: self.config.get('session.saveUninitialized'),
+        resave: self.config.get('session.resave')
     }));
 
-    app.use(function(req, res, next){
+    app.use(function (req, res, next) {
 
         var resource = null;
+        /**
+         *
+         * @param rstatus
+         */
+        res.errUnauthorized = function(rstatus){
+            res.statusCode = rstatus || 403;
+            return res.end('Unauthorized');
+        };
 
         res.okJson = function (message, data, key, collection) {
             /**
              * If message is object will direct return
              */
-            if(_.isObject(message)){
+            if (_.isObject(message)) {
 
-                if(typeof message.toJSON === 'function') {
+                if (typeof message.toJSON === 'function') {
 
                     message = message.toJSON();
 
@@ -236,25 +246,26 @@ Api.prototype.configureExpress = function(db) {
                 return res.json(resource.toJSON());
 
             }
+
             /**
              * populate response
              * @type {{success: boolean}}
              */
             var response = { success: true };
 
-            if(message){
+            if (message) {
 
                 response.message = message;
 
             }
 
-            if(data){
+            if (data) {
 
-                if(_.isArray(data)) {
+                if (_.isArray(data)) {
 
                     response.total = data.length;
 
-                    if(key){
+                    if (key) {
 
                         response[key] = data;
 
@@ -266,7 +277,7 @@ Api.prototype.configureExpress = function(db) {
 
                 } else {
 
-                    if(key) {
+                    if (key) {
 
                         response[key] = data;
 
@@ -282,7 +293,7 @@ Api.prototype.configureExpress = function(db) {
 
             resource = new hal.Resource(response, req.originalUrl);
 
-            if(typeof collection === 'function'){
+            if (typeof collection === 'function') {
 
                 resource = collection(resource);
 
@@ -294,7 +305,9 @@ Api.prototype.configureExpress = function(db) {
 
         res.errJson = function (err) {
 
-            var response = {success: false, error: err};
+            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
+
+            var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);
 
@@ -308,13 +321,14 @@ Api.prototype.configureExpress = function(db) {
 
     var cross = self.config.get('cross');
 
-    if(cross.enable) {
+    if (cross.enable) {
+
         /**
          * Enable Cross Domain
          */
         app.use(function (req, res, next) {
 
-            res.header("Access-Control-Allow-Origin", cross.allow_origin ||  "*");
+            res.header("Access-Control-Allow-Origin", cross.allow_origin || "*");
 
             res.header("Access-Control-Allow-Headers", cross.allow_headers || "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -329,6 +343,7 @@ Api.prototype.configureExpress = function(db) {
      * Register Route
      */
     self.registerRoute();
+
     /**
      * Start Server
      */
@@ -338,11 +353,11 @@ Api.prototype.configureExpress = function(db) {
 /**
  * Start Server
  */
-Api.prototype.startServer = function() {
+Api.prototype.startServer = function () {
 
-    app.listen(port,function(){
+    app.listen(port, function () {
 
-        console.log("All right ! I am alive at Port "+port+".");
+        console.log("All right ! I am alive at Port " + port + ".");
 
     });
 
@@ -351,11 +366,11 @@ Api.prototype.startServer = function() {
  * Stop Server
  * @param err
  */
-Api.prototype.stop = function(err) {
+Api.prototype.stop = function (err) {
 
     console.log("ERROR \n" + err);
 
-    if(rollbarAccessToken) rollbar.reportMessage("ERROR \n"+err);
+    if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
 
     process.exit(1);
 
@@ -364,9 +379,9 @@ Api.prototype.stop = function(err) {
  *
  * @param ex
  */
-Api.errorStack = function(ex){
+Api.errorStack = function (ex) {
 
-    if(rollbarAccessToken) {
+    if (rollbarAccessToken) {
 
         rollbar.handleError(ex);
 
@@ -378,7 +393,7 @@ try {
 
     new Api();
 
-} catch(e){
+} catch (e) {
 
     Api.errorStack(e);
 

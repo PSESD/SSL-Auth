@@ -86,10 +86,22 @@ module.exports = function protector(schema, options) {
             save: function (args) {
 
                 var gotRules = null, inRules = null, role = null, localRules = null;
+
+                var _localDenied = function(){
+                    if ("function" === typeof args) {
+
+                        args(_errorMessage);
+
+                    } else {
+
+                        _denied();
+
+                    }
+                };
                 // this is a new document, does the user have create permission?
                 if (caller.isNew) {
 
-                    if(checkAcl('create').denied) return _denied();
+                    if(checkAcl('create').denied) return _localDenied();
 
                     gotRules = getRules(collection);
 
@@ -105,22 +117,14 @@ module.exports = function protector(schema, options) {
 
                     } else {
 
-                        if ("function" == typeof args) {
-
-                            args("Unauthorized");
-
-                        } else {
-
-                            throw new mongoose.Error("Unauthorized");
-
-                        }
+                        _localDenied();
                     }
 
                 }
                 // this document is being updated, does the user have update permission?
                 else {
 
-                    if(checkAcl('update').denied) return _denied();
+                    if(checkAcl('update').denied) return _localDenied();
 
                     gotRules = getRules(collection);
 
@@ -136,15 +140,7 @@ module.exports = function protector(schema, options) {
 
                     } else {
 
-                        if ("function" == typeof args) {
-
-                            args("Unauthorized");
-
-                        } else {
-
-                            _denied();
-
-                        }
+                        _localDenied();
 
                     }
 
@@ -330,14 +326,20 @@ module.exports = function protector(schema, options) {
 
         var acl = checkAcl(allowName);
 
-        console.log("DENIED ACL (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
+        console.log("DATA ACL (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
 
-        if(acl.denied) return _denied();
+        if(acl.denied){
+
+            console.log("ACCESS-DENIED => ", "ACL-DENIED");
+
+            return _denied();
+
+        }
 
 
         if (!localRules) {
 
-            console.log("DENIED ACL => ", "NOT RULES");
+            console.log("ACCESS-DENIED => ", "NOT RULES");
 
             return false;
 
@@ -359,7 +361,7 @@ module.exports = function protector(schema, options) {
 
                         if(!_.isEmpty(protectFilter) && collection in protectFilter && _permissions[collection].indexOf(protectFilter[collection]) === -1){
 
-                            console.log('DENIED ACL COMPARE USING LIST OF >> ', collection);
+                            console.log('ACCESS-DENIED COMPARE USING LIST OF >> ', collection);
 
                             _denied();
 
@@ -390,7 +392,8 @@ module.exports = function protector(schema, options) {
 
                     } else {
 
-                        console.log('DENIED ACL LIST OWN NOT SET >> ', collection, ' ', JSON.stringify(_permissions));
+                        console.log('ACCESS-DENIED LIST OWN NOT SET >> ', collection, ' ', JSON.stringify(_permissions));
+
                         _denied();
 
                     }
@@ -400,7 +403,7 @@ module.exports = function protector(schema, options) {
                 case 'none':
                 default:
 
-                    console.log("DENIED ACL => ", "PERMISSION NONE => ", acl.allow);
+                    console.log("ACCESS-DENIED => ", "PERMISSION NONE => ", acl.allow);
 
                     _denied();
 
@@ -657,7 +660,7 @@ module.exports = function protector(schema, options) {
  */
 function _denied () {
 
-    throw new mongoose.Error(_errorMessage);
+    throw new Error(_errorMessage);
 
 }
 /**
@@ -672,7 +675,7 @@ function checkAcl(method){
         permission: null
     };
 
-    if(currentRole === 'admin'){
+    if(currentRole === 'admin' || currentRole === 'superadmin'){
 
         return {
             denied: false,

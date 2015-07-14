@@ -33,10 +33,62 @@ var UserSchema = new mongoose.Schema({
         default: Date.now
     },
     role: { type: String, default: 'case-worker' },
+    is_special_case_worker: { type: Boolean, default: false, index: true },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
+/**
+ *
+ * @param values
+ * @param exclude
+ * @returns {{}}
+ */
+UserSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    ['first_name', 'middle_name', 'last_name', 'email', 'role'].forEach(function(iterator){
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+            criteria[iterator] = values[iterator];
+        }
+    });
+
+    /**
+     * Find Match Element
+     */
+
+    ['organizationId', 'studentId'].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            switch (iterator){
+
+                case 'organizationId':
+
+                    criteria.permissions.$elemMatch.organization = values[iterator];
+                    break;
+
+                case 'studentId':
+
+                    criteria.permissions.$elemMatch.students = { $in: values[iterator] };
+                    break;
+
+                default :
+
+                    criteria[iterator] = { $in : values[iterator] };
+                    break;
+            }
+
+        }
+
+    });
+
+    return criteria;
+
+};
 
 UserSchema.virtual('userId')
     .get(function(){
@@ -71,7 +123,21 @@ UserSchema.methods.encryptForgotPassword = function (code) {
  * @returns {boolean}
  */
 UserSchema.methods.isAdmin = function(){
-  return 'admin' === this.role;
+  return 'admin' === this.role || this.isSuperAdmin();
+};
+/**
+ *
+ * @returns {boolean}
+ */
+UserSchema.methods.isSuperAdmin = function(){
+    return 'superadmin' === this.role;
+};
+/**
+ *
+ * @returns {UserSchema.is_special_case_worker|{type, default, index}}
+ */
+UserSchema.methods.isSpecialCaseWorker = function(){
+    return this.is_special_case_worker;
 };
 /**
  * If current user is case worker

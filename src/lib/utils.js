@@ -5,9 +5,61 @@ var crypto = require('crypto');
 var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
-
+var cacheManager = require('cache-manager');
+/**
+ *
+ * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
+ */
 var utils = {
+    /**
+     *
+     * @returns cache-manager
+     */
+    cache: function(){
 
+        var cache = config.get('cache');
+
+        var caches = [];
+
+        var options = {};
+
+        var getCache = function(name) {
+
+            switch (name) {
+
+                case 'redis':
+
+                    var redisStore = require('cache-manager-redis');
+                    options = {
+                        store: redisStore,
+                        host: cache.redis.host,
+                        port: cache.redis.port,
+                        ttl: cache.redis.ttl
+                    };
+
+                    return cacheManager.caching(options);
+
+                case 'memory':
+                case 'memcache':
+
+                    options = {};
+
+                    options = cache[name];
+
+                    options.store = name;
+
+                    return cacheManager.caching(options);
+
+            }
+        };
+
+        caches.push(getCache(cache.adapter));
+
+        caches.push(getCache(cache.backup));
+
+        return cacheManager.multiCaching(caches);
+
+    },
     /**
      * Return a unique identifier with the given `len`.
      *

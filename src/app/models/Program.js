@@ -14,5 +14,27 @@ var ProgramSchema = new mongoose.Schema({
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
+ProgramSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    [
+        '_id', 'name', 'organization'
+    ].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            criteria[iterator] = values[iterator];
+
+        }
+    });
+
+    return criteria;
+
+};
+
+
 // Export the Mongoose model
 module.exports = mongoose.model('Program', ProgramSchema);

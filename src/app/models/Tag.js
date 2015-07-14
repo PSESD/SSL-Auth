@@ -21,6 +21,27 @@ var TagSchema = new mongoose.Schema({
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
+
+TagSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    [
+        '_id', 'name', 'organization'
+    ].forEach(function(iterator){
+
+            if(iterator in values && exclude.indexOf(iterator) === -1){
+
+                criteria[iterator] = values[iterator];
+
+            }
+        });
+
+    return criteria;
+
+};
 /**
  *
  * @param organizationId
