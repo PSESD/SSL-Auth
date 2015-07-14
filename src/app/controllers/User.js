@@ -291,42 +291,44 @@ exports.activate = function (req, res) {
 
     };
 
-    User.findOne({email: email}, function (err, user) {
+    var parse_url = php.parse_url(redirectTo), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+    Organization.findOne({url: curl}, function (err, organization) {
 
         if (err) return callback(err);
 
-        // No user found with that username
-        if (!user) return callback('User not found', false);
+        if (!organization) return callback('Organization not found!');
 
-        // Make sure the password is correct
-        user.verifyAuthCode(authCode, function (err, isMatch) {
+
+        User.findOne({email: email}, function (err, user) {
 
             if (err) return callback(err);
 
-            // Password did not match
-            if (!isMatch) {
+            // No user found with that username
+            if (!user) return callback('User not found', false);
 
-                return callback('Invalid token', false);
+            if(user.organizationId.indexOf(organization._id.toString())) return callback('You have already used this link to activate your user.', false);
 
-            }
-
-            var parse_url = php.parse_url(redirectTo), url = null;
-
-            if (parse_url['host']) {
-
-                url = parse_url['host'];
-
-            } else {
-
-                url = parse_url['path'];
-
-            }
-
-            Organization.findOne({url: url}, function (err, organization) {
+            // Make sure the password is correct
+            user.verifyAuthCode(authCode, function (err, isMatch) {
 
                 if (err) return callback(err);
 
-                if (!organization) return callback(err);
+                // Password did not match
+                if (!isMatch) {
+
+                    return callback('Invalid token', false);
+
+                }
 
                 // Success
                 User.where({_id: user._id}).update({
