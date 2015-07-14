@@ -78,7 +78,20 @@ exports.sendInvite = function (req, res) {
 
     if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
 
-    Organization.findOne({url: url.parse(req.body.redirect_url).hostname}, function(err, organization) {
+
+    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+
+    Organization.findOne({url: curl}, function(err, organization) {
 
         if (err) return res.errJson(err);
 
@@ -174,6 +187,17 @@ exports.sendForgotPassword = function (req, res) {
 
     if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
 
+    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
 
     var base = config.get('auth.url');
 
@@ -181,7 +205,7 @@ exports.sendForgotPassword = function (req, res) {
 
     var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
 
-    Organization.findOne({url: url.parse(req.body.redirect_url).hostname}, function(err, organization){
+    Organization.findOne({url: curl}, function(err, organization){
 
         if(err) return res.errJson(err);
 
@@ -302,6 +326,7 @@ exports.activate = function (req, res) {
         curl = parse_url['path'];
 
     }
+
     Organization.findOne({url: curl}, function (err, organization) {
 
         if (err) return callback(err);
@@ -316,7 +341,7 @@ exports.activate = function (req, res) {
             // No user found with that username
             if (!user) return callback('User not found', false);
 
-            if(user.organizationId.indexOf(organization._id.toString())) return callback('You have already used this link to activate your user.', false);
+            if(user.organizationId.indexOf(organization._id.toString()) !== -1) return callback('You have already used this link to activate your user.', false);
 
             // Make sure the password is correct
             user.verifyAuthCode(authCode, function (err, isMatch) {
@@ -372,45 +397,52 @@ exports.formForgotPassword = function (req, res) {
         });
 
     };
+    var parse_url = php.parse_url(redirectTo), curl = null;
 
-    User.findOne({email: email}, function (err, user) {
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+
+    Organization.findOne({url: curl}, function (err, organization) {
 
         if (err) return callback(err);
 
-        // No user found with that username
-        if (!user) return callback('User not found', false);
+        if (!organization) return callback('Organization not found!');
 
-        // Make sure the password is correct
-        user.verifyForgotPassword(code, function (err, isMatch) {
+        User.findOne({email: email}, function (err, user) {
 
             if (err) return callback(err);
 
-            // Password did not match
-            if (!isMatch) {
+            // No user found with that username
+            if (!user) return callback('User not found', false);
 
-                return callback('Invalid token', false);
+            // Make sure the password is correct
+            user.verifyForgotPassword(code, function (err, isMatch) {
 
-            }
+                if (err) return callback(err);
 
-            var parse_url = php.parse_url(redirectTo), url = null;
+                // Password did not match
+                if (!isMatch) {
 
-            if (parse_url['host']) {
+                    return callback('Invalid token', false);
 
-                url = parse_url['host'];
+                }
 
-            } else {
+                User.where({_id: user._id}).update({
+                    $unset: {hashedForgotPassword: ""}
+                }, function (err, updated) {
 
-                url = parse_url['path'];
+                    if (err) return res.errJson(err);
 
-            }
+                    callback(null, updated[0]);
 
-            User.where({_id: user._id}).update({
-                $unset: { hashedForgotPassword: "" }
-            }, function (err, updated) {
-
-                if (err) return res.errJson(err);
-
-                callback(null, updated[0]);
+                });
 
             });
 
