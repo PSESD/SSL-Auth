@@ -5,8 +5,61 @@ var crypto = require('crypto');
 var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
+var cacheManager = require('cache-manager');
+/**
+ *
+ * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
+ */
 var utils = {
+    /**
+     *
+     * @returns cache-manager
+     */
+    cache: function(){
 
+        var cache = config.get('cache');
+
+        var caches = [];
+
+        var options = {};
+
+        var getCache = function(name) {
+
+            switch (name) {
+
+                case 'redis':
+
+                    var redisStore = require('cache-manager-redis');
+                    options = {
+                        store: redisStore,
+                        host: cache.redis.host,
+                        port: cache.redis.port,
+                        ttl: cache.redis.ttl
+                    };
+
+                    return cacheManager.caching(options);
+
+                case 'memory':
+                case 'memcache':
+
+                    options = {};
+
+                    options = cache[name];
+
+                    options.store = name;
+
+                    return cacheManager.caching(options);
+
+            }
+        };
+
+        caches.push(getCache(cache.adapter));
+
+        caches.push(getCache(cache.backup));
+
+        return cacheManager.multiCaching(caches);
+
+    },
     /**
      * Return a unique identifier with the given `len`.
      *
@@ -18,9 +71,11 @@ var utils = {
      * @api private
      */
     uid: function (len) {
+
         var buf = []
             , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             , charlen = chars.length;
+
         /**
          * Return a random int, used by `uid()`
          *
@@ -30,22 +85,29 @@ var utils = {
          * @api private
          */
         var getRandomInt = function (min, max) {
+
             return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+
+        };
+
         for (var i = 0; i < len; ++i) {
+
             buf.push(chars[getRandomInt(0, charlen - 1)]);
+
         }
 
         return buf.join('');
+
     },
     /**
      *
-     * @param secret
-     * @param salt
+     * @param token
      * @returns {*}
      */
     tokenHash: function (token) {
+
         return crypto.pbkdf2Sync(token, saltStatic, 4096, 100, 'sha256').toString('hex');
+
     },
     /**
      *
@@ -53,7 +115,9 @@ var utils = {
      * @returns {String|string|*}
      */
     secretHash: function (secret) {
+
         return crypto.pbkdf2Sync(secret, saltStatic, 4096, 30, 'sha256').toString('hex');
+
     },
     /**
      *
@@ -61,19 +125,24 @@ var utils = {
      * @returns {*}
      */
     codeHash: function (code) {
+
         return crypto.pbkdf2Sync(code, saltStatic, 4096, 60, 'sha256').toString('hex');
+
     },
     /**
      *
      * @returns {Date}
      */
     calculateExp: function(){
+
         return new Date(new Date().getTime() + (require('config').get('token.expires_in') * 1000));
+
     },
     /**
      *
      */
     preg_quote: function(str, delimiter) {
+
         //  discuss at: http://phpjs.org/functions/preg_quote/
         // original by: booeyOH
         // improved by: Ates Goral (http://magnetiq.com)
@@ -94,16 +163,28 @@ var utils = {
      * Logging to API
      */
     log: function(message, type, callback){
+
         var rollbarAccessToken = config.get('rollbar.access_token');
+
         if(message instanceof Error){
+
             message = message.stack.split("\n");
+
         }
+
         if(rollbarAccessToken){
+
             rollbar.reportMessage(message, type || 'info', callback);
+
         }
+
         console.log(message);
+
     }
 
 };
-
+/**
+ *
+ * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
+ */
 module.exports = utils;

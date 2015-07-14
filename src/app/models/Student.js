@@ -12,6 +12,7 @@
  */
 // Load required packages
 var mongoose = require('mongoose');
+var moment = require('moment');
 var StudentProgram = require('./schema/StudentProgram');
 var Address = require('./schema/Address');
 
@@ -22,18 +23,173 @@ var Address = require('./schema/Address');
 // TODO: On read, need to pull Student backpack data from HZB/Elasticache for serving.
 var StudentSchema = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
-    first_name: { type: String },
+    first_name: { type: String, component: 'settings' },
     last_name: { type: String, required: true, index: true },
     middle_name: { type: String },
     district_student_id: { type: String },
     addresses: [ Address ],
     school_district: { type: String },
     programs: [ StudentProgram ],
+    college_bound: { type: String, index: true, trim: true, enum: [ 'Yes', 'No' ] },
+    phone: { type: String, trim: true },
+    email: { type: String, trim: true },
+    address: String,
+    emergency1_name: { type: String, trim: true },
+    emergency1_relationship: String,
+    emergency1_email: { type: String, trim: true },
+    emergency1_phone: { type: String, trim: true },
+    emergency2_name: { type: String, trim: true },
+    emergency2_relationship: String,
+    emergency2_email: { type: String, trim: true },
+    emergency2_phone: { type: String, trim: true },
+    mentor1_name: { type: String, trim: true },
+    mentor2_name: { type: String, trim: true },
     created: { type: Date, required: true, default: Date.now },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
+
+/**
+ *
+ * @param values
+ * @param exclude
+ * @returns {{}}
+ */
+StudentSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    [
+        '_id', 'first_name', 'middle_name', 'last_name', 'organization',
+        'district_student_id', 'school_district', 'middle_name'
+    ].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            criteria[iterator] = values[iterator];
+
+        }
+    });
+
+
+
+    /**
+     * Find Match Element
+     */
+    var isStartDate = false, isEndDate = false;
+
+    ['cohort', 'active', 'participation_start_date', 'participation_end_date'].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            switch (iterator){
+
+                case 'participation_end_date':
+
+                    criteria.programs.$elemMatch.participation_end_date = moment(values[iterator]).toDate();
+                    isEndDate = true;
+                    break;
+
+                case 'participation_start_date':
+
+                    criteria.programs.$elemMatch.participation_start_date = moment(values[iterator]).toDate();
+                    isStartDate = true;
+                    break;
+
+                case 'cohort':
+
+                    criteria.programs.$elemMatch.cohort = { $in: values[iterator] };
+                    break;
+
+                case 'active':
+
+                    criteria.programs.$elemMatch.active = values[iterator] ? true : false;
+                    break;
+
+                default :
+
+                    criteria[iterator] = { $in : values[iterator] };
+                    break;
+            }
+
+        }
+
+    });
+
+    if(isStartDate && isEndDate){
+
+        criteria.programs.$elemMatch.participation_start_date = { $gte : criteria.programs.$elemMatch.participation_start_date };
+
+        criteria.programs.$elemMatch.participation_end_date = { $lte : criteria.programs.$elemMatch.participation_end_date };
+
+    }
+
+    return criteria;
+
+};
+
+StudentSchema.plugin(require('../../lib/protector'));
 // Export the Mongoose model
-module.exports = mongoose.model('Student', StudentSchema);
+var Student = mongoose.model('Student', StudentSchema);
+
+
+Student.setRules([
+    {
+        role: {
+            name: 'superadmin',
+            allow: {
+                "*": "*"
+            }
+        }
+    },
+    {
+        role: {
+            name: 'admin',
+            allow: {
+                "*": "*"
+            }
+        }
+    },
+    {
+        role: {
+            name: 'case-worker',
+            allow: {
+                read: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                update: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                delete: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+]);
+module.exports = Student;
