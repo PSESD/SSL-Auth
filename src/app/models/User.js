@@ -40,6 +40,87 @@ var UserSchema = new mongoose.Schema({
 });
 /**
  *
+ * @param index
+ * @private
+ */
+UserSchema.methods._checkRole = function(index){
+    var role = this.role;
+    var is_special = this.isSpecialCaseWorker();
+    var permissions = this.permissions[index];
+    if(permissions.length === 0){
+        switch ( role ){
+            case 'admin':
+            case 'superadmin':
+                permissions.push(
+                    {
+                        "model" : "Student",
+                        "allow" : "all",
+                        "operation" : "*"
+                    }
+                );
+                break;
+            case 'case-worker':
+                var allow = is_special ? 'all' : 'own';
+                permissions = [{
+                    model: 'Student',
+                    operation: 'read',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'create',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'update',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'delete',
+                    allow: allow
+                }];
+                break;
+        }
+    }
+
+    this.permissions[index] = permissions;
+
+};
+/**
+ *
+ * @param user
+ * @param organizationId
+ * @param cb
+ */
+UserSchema.methods.saveWithRole = function(user, organizationId, cb){
+
+    if(this.isCaseWorker() && user.isAdmin()) {
+
+        var allow = !this.isSpecialCaseWorker() ? 'all' : 'own';
+
+        for (var i = 0; i < this.permissions.length; i++) {
+
+            this._checkRole(i);
+
+            for (var j = 0; j < this.permissions[i].permissions.length; j++) {
+
+                this.permissions[i].permissions[j].allow = allow;
+
+            }
+
+        }
+    }
+
+
+    // set update time and update by user
+    this.last_updated = new Date();
+
+    this.last_updated_by = user.userId;
+
+    this.save(cb);
+
+};
+/**
+ *
  * @param values
  * @param exclude
  * @returns {{}}

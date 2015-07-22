@@ -70,6 +70,10 @@ exports.sendInvite = function (req, res) {
 
     var email = req.body.email;
 
+    var role = req.body.role || 'case-worker';
+
+    var is_special_case_worker = req.body.is_special_case_worker || true;
+
     var user = {
         email: req.body.email,
         password: req.body.password,
@@ -121,7 +125,11 @@ exports.sendInvite = function (req, res) {
 
                 user.authCode = authCode;
 
-                user.save(function (err) {
+                user.is_special_case_worker = is_special_case_worker;
+
+                user.role = role;
+
+                user.saveWithRole(req.user, organization._id, function (err) {
 
                     if (err) return res.errJson(err);
 
@@ -341,6 +349,8 @@ exports.activate = function (req, res) {
             // No user found with that username
             if (!user) return callback('User not found', false);
 
+            console.log(user.organizationId, organization._id.toString(), user.organizationId.indexOf(organization._id.toString()));
+
             if(user.organizationId.indexOf(organization._id.toString()) !== -1) return callback('You have already used this link to activate your user.', false);
 
             // Make sure the password is correct
@@ -527,27 +537,27 @@ exports.processChangePassword = function(req, res){
 
         };
 
-        User.findOne(where, function(err, user){
+        var parse_url = php.parse_url(redirectTo), curl = null;
 
-            if(err){
+        if (parse_url['host']) {
 
-                errors.push(err.message);
+            curl = parse_url['host'];
 
-                return renderError();
+        } else {
 
-            }
+            curl = parse_url['path'];
 
-            user.password = password;
+        }
 
-            user.first_name = first_name;
+        Organization.findOne({url: curl}, function (err, organization) {
 
-            user.middle_name = middle_name;
+            if (err) return callback(err);
 
-            user.last_name = last_name;
+            if (!organization) return callback('Organization not found!');
 
-            user.save(function(err){
+            User.findOne(where, function (err, user) {
 
-                if(err){
+                if (err) {
 
                     errors.push(err.message);
 
@@ -555,12 +565,31 @@ exports.processChangePassword = function(req, res){
 
                 }
 
-                if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+                user.password = password;
 
-                return res.redirect(redirectTo);
+                if (first_name) user.first_name = first_name;
+
+                if (middle_name) user.middle_name = middle_name;
+
+                user.last_name = last_name;
+
+                user.save(function (err) {
+
+                    if (err) {
+
+                        errors.push(err.message);
+
+                        return renderError();
+
+                    }
+
+                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+
+                    return res.redirect(redirectTo);
+
+                });
 
             });
-
         });
 
     })();

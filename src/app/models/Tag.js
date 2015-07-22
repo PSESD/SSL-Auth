@@ -34,6 +34,12 @@ TagSchema.statics.crit = function(values, exclude){
 
             if(iterator in values && exclude.indexOf(iterator) === -1){
 
+                if(iterator === 'name') {
+
+                    values[iterator] = new RegExp(values[iterator], 'i');
+
+                }
+
                 criteria[iterator] = values[iterator];
 
             }
