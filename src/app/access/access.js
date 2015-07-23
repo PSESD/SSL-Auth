@@ -140,23 +140,16 @@ Access.hasAccess = function(req, res, next){
 
         var curl = null;
 
-        if(req.headers.host){
+        var parse_url = php.parse_url(req.headers.origin);
 
-            curl = req.headers.host;
+        if (parse_url['host']) {
+
+            curl = parse_url['host'];
 
         } else {
 
-            var parse_url = php.parse_url(req.headers.origin);
+            curl = parse_url['path'];
 
-            if (parse_url['host']) {
-
-                curl = parse_url['host'];
-
-            } else {
-
-                curl = parse_url['path'];
-
-            }
         }
 
 
