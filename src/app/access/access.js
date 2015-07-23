@@ -137,17 +137,28 @@ Access.hasAccess = function(req, res, next){
 
 
     } else {
-        var parse_url = php.parse_url(req.body.redirect_url), curl = null;
 
-        if (parse_url['host']) {
+        var curl = null;
 
-            curl = parse_url['host'];
+        if(req.headers.host){
+
+            curl = req.headers.host;
 
         } else {
 
-            curl = parse_url['path'];
+            var parse_url = php.parse_url(req.headers.origin);
 
+            if (parse_url['host']) {
+
+                curl = parse_url['host'];
+
+            } else {
+
+                curl = parse_url['path'];
+
+            }
         }
+
 
         crit = { url: curl };
 

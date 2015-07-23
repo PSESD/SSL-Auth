@@ -16,7 +16,8 @@ exports.postUsers = function (req, res) {
     var user = new User({
         email: req.body.email,
         password: req.body.password,
-        last_name: req.body.last_name
+        last_name: req.body.last_name,
+        is_super_admin: req.body.role === 'superadmin'
     });
 
     user.save(function (err) {
