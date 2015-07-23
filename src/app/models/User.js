@@ -28,12 +28,11 @@ var UserSchema = new mongoose.Schema({
     last_name: { type: String, trim: true },
     email: { type: String, trim: true, unique: true, required: true, index: true, minlength: 6 },
     permissions: [ UserPermission ], // Store a permission a user has, by each organization.
+    is_super_admin: { type: Boolean, default: false, index: true },
     created: {
         type: Date,
         default: Date.now
     },
-    role: { type: String, default: 'case-worker' },
-    is_special_case_worker: { type: Boolean, default: false, index: true },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -93,9 +92,13 @@ UserSchema.methods._checkRole = function(index){
  */
 UserSchema.methods.saveWithRole = function(user, organizationId, cb){
 
-    if(this.isCaseWorker() && user.isAdmin()) {
+    this.orgId = organizationId;
 
-        var allow = !this.isSpecialCaseWorker() ? 'all' : 'own';
+    this.getCurrentPermission();
+
+    if(this.role === 'case-worker') {
+
+        var allow = !this.is_special_case_worker ? 'all' : 'own';
 
         for (var i = 0; i < this.permissions.length; i++) {
 
@@ -108,6 +111,12 @@ UserSchema.methods.saveWithRole = function(user, organizationId, cb){
             }
 
         }
+
+    }
+
+    if(this.permissions.indexOf(this.getIndexCurrentPermission()) !== -1){
+        if(typeof this.role !== undefined) this.permissions[this.getIndexCurrentPermission()].role = this.role;
+        if(typeof this.is_special_case_worker !== undefined) this.permissions[this.getIndexCurrentPermission()].is_special_case_worker = this.is_special_case_worker;
     }
 
 
@@ -131,7 +140,7 @@ UserSchema.statics.crit = function(values, exclude){
     /**
      * Find match
      */
-    ['first_name', 'middle_name', 'last_name', 'email', 'role'].forEach(function(iterator){
+    ['first_name', 'middle_name', 'last_name', 'email'].forEach(function(iterator){
         if(iterator in values && exclude.indexOf(iterator) === -1){
             criteria[iterator] = values[iterator];
         }
@@ -201,31 +210,104 @@ UserSchema.methods.encryptForgotPassword = function (code) {
 };
 /**
  * If current user is admin
+ * @params organizationId
  * @returns {boolean}
  */
-UserSchema.methods.isAdmin = function(){
-  return 'admin' === this.role || this.isSuperAdmin();
+UserSchema.methods.isAdmin = function(organizationId){
+    return 'admin' === this.getCurrentPermission(organizationId).role || this.isSuperAdmin();
 };
+
+UserSchema.virtual('orgId').set(function(organizationId){
+    this._organizationId = organizationId;
+}).get(function(){
+   return this._organizationId;
+});
+
+UserSchema.virtual('role').set(function(role){
+    this._role = role;
+}).get(function(){
+    if(typeof this._role === undefined){
+        this.getCurrentPermission();
+    }
+   return this._role;
+});
 /**
  *
  * @returns {boolean}
  */
-UserSchema.methods.isSuperAdmin = function(){
-    return 'superadmin' === this.role;
+UserSchema.virtual('is_special_case_worker').set(function(is_special_case_worker){
+    this._is_special_case_worker = is_special_case_worker;
+}).get(function(){
+    if(typeof this._is_special_case_worker === undefined){
+        this.getCurrentPermission();
+    }
+    return this._is_special_case_worker ? true : false;
+});
+/**
+ *
+ * @param organizationId
+ * @returns {*}
+ */
+UserSchema.methods.getCurrentPermission = function(organizationId){
+
+    if(organizationId) {
+        this.orgId = organizationId;
+    }
+
+    if(!this._currentPermission){
+        for(var i = 0; i < this.permissions.length; i++){
+            if((this.permissions[i].organization+'') === (this.orgId+'')){
+                this._currentPermission = this.permissions[i];
+                this._indexCurrentPermission = i;
+                break;
+            }
+        }
+    }
+    if(this._currentPermission) {
+        this._role = this._currentPermission.role;
+        this._is_special_case_worker = this._currentPermission.is_special_case_worker;
+    } else {
+        this._role = undefined;
+        this._is_special_case_worker = undefined;
+        return {
+            role: undefined,
+            is_special_case_worker: undefined,
+            organization: undefined,
+            students: [],
+            permissions: []
+        };
+    }
+    return this._currentPermission;
 };
 /**
  *
+ * @returns {number|*|i}
+ */
+UserSchema.methods.getIndexCurrentPermission = function(){
+  return this._indexCurrentPermission;
+};
+/**
+ *
+ * @param organizationId
+ * @returns {boolean}
+ */
+UserSchema.methods.isSuperAdmin = function(organizationId){
+    return this.is_super_admin;
+};
+/**
+ * @param organizationId
  * @returns {UserSchema.is_special_case_worker|{type, default, index}}
  */
-UserSchema.methods.isSpecialCaseWorker = function(){
-    return this.is_special_case_worker;
+UserSchema.methods.isSpecialCaseWorker = function(organizationId){
+    return this.getCurrentPermission(organizationId).is_special_case_worker;
 };
 /**
  * If current user is case worker
+ * @param organizationId
  * @returns {boolean}
  */
-UserSchema.methods.isCaseWorker = function(){
-    return 'case-worker' === this.role;
+UserSchema.methods.isCaseWorker = function(organizationId){
+    return 'case-worker' === this.getCurrentPermission(organizationId).role;
 };
 /**
  *
@@ -237,7 +319,9 @@ UserSchema.virtual('password')
       this.hashedPassword = this.encryptPassword(password);
     })
     .get(function() { return this._plainPassword; });
-
+/**
+ *
+ */
 UserSchema.virtual('authCode')
     .set(function (code) {
         var password = crypto.randomBytes(12).toString('base64');

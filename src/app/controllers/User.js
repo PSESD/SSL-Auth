@@ -16,8 +16,7 @@ exports.postUsers = function (req, res) {
     var user = new User({
         email: req.body.email,
         password: req.body.password,
-        last_name: req.body.last_name,
-        role: req.body.role || 'case-worker'
+        last_name: req.body.last_name
     });
 
     user.save(function (err) {
@@ -368,7 +367,7 @@ exports.activate = function (req, res) {
                 // Success
                 User.where({_id: user._id}).update({
                     $unset: {hashedAuthCode: ""},
-                    $push: {permissions: {organization: organization._id, permissions: [], students: []}}
+                    $push: {permissions: {organization: organization._id, permissions: [], students: [], role: '', is_special_case_worker: false}}
                 }, function (err, updated) {
 
                     if (err) return res.errJson(err);

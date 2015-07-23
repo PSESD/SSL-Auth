@@ -6,6 +6,7 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var User = require('../models/User');
 var Client = require('../models/Client');
+var Access = require('../access/access');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
 var tokenHash = require('../../lib/utils').tokenHash;
@@ -209,5 +210,9 @@ exports.logout = function (req, res) {
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
 
 exports.isClientAuthenticated = passport.authenticate('client-basic', { session : false });
+
+exports.hasAccess = Access.hasAccess;
+
+exports.isAdmin = Access.isAdmin;
 
 exports.isBearerAuthenticated = passport.authenticate('bearer', { session: false });
