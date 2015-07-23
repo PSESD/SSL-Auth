@@ -1,6 +1,7 @@
 // Load required packages
 var User = require('../models/User');
 var Organization = require('../models/Organization');
+var Invite = require('../models/Invite');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
@@ -133,52 +134,64 @@ exports.sendInvite = function (req, res) {
 
                     if (err) return res.errJson(err);
 
+                    var invite = new Invite({
+                        authCode: authCode,
+                        organization: organization._id,
+                        role: role,
+                        is_special_case_worker: is_special_case_worker
+                    });
 
-                    var async = false;
+                    invite.save(function(err){
 
-                    var ip_pool = "Main Pool";
+                        if(err) return res.errJson(err);
 
-                    var send_at = new Date();
+                        var async = false;
 
-                    mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
+                        var ip_pool = "Main Pool";
 
-                        var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
-                        var message = {
-                            "html": html,
-                            "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
-                            "from_email": result.publish_from_email,
-                            "from_name": result.publish_from_name,
-                            "to": [{email: user.email, name: user.last_name, type: "to"}],
-                            "headers": {
-                                "Reply-To": "no-replay@studentsuccesslink.org"
-                            }
+                        var send_at = new Date();
 
-                        };
-                        mandrill_client.messages.send({"message": message}, function (result) {
+                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
 
-                            if (result[0].status == 'sent') {
+                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                            var message = {
+                                "html": html,
+                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                                "from_email": result.publish_from_email,
+                                "from_name": result.publish_from_name,
+                                "to": [{email: user.email, name: user.last_name, type: "to"}],
+                                "headers": {
+                                    "Reply-To": "no-replay@studentsuccesslink.org"
+                                }
 
-                                return res.okJson("Email was sent");
+                            };
+                            mandrill_client.messages.send({"message": message}, function (result) {
 
-                            } else {
+                                if (result[0].status == 'sent') {
 
-                                return res.errJson(result[0].reject_reason);
+                                    return res.okJson("Email was sent");
 
-                            }
+                                } else {
+
+                                    return res.errJson(result[0].reject_reason);
+
+                                }
+                            }, function (e) {
+                                // Mandrill returns the error as an object with name and message keys
+                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+
+                                return res.errJson("Email not sent");
+                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                            });
+
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                            // A mandrill error occurred: Invalid_Key - Invalid API key
                             return res.errJson("Email not sent");
-                            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                         });
 
-                    }, function (e) {
-                        // Mandrill returns the error as an object with name and message keys
-                        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                        // A mandrill error occurred: Invalid_Key - Invalid API key
-                        return res.errJson("Email not sent");
-                    });
+                    }); 
 
                 });
 
@@ -365,17 +378,32 @@ exports.activate = function (req, res) {
 
                 }
 
-                // Success
-                User.where({_id: user._id}).update({
-                    $unset: {hashedAuthCode: ""},
-                    $push: {permissions: {organization: organization._id, permissions: [], students: [], role: '', is_special_case_worker: false}}
-                }, function (err, updated) {
+                Invite.findOne({ authCode: authCode }, function(err, invite){
 
-                    if (err) return res.errJson(err);
+                    if (err) return callback(err);
 
-                    callback(null, updated[0]);
+                    if(!invite) return callback('Invalid token', false);
+
+                    // Success
+                    User.where({_id: user._id}).update({
+                        $unset: {hashedAuthCode: ""},
+                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role, is_special_case_worker: invite.is_special_case_worker}}
+                    }, function (err, updated) {
+
+                        if (err) return res.errJson(err);
+
+                        Invite.remove({ _id: invite._id }, function(err){
+
+                            callback(null, updated[0]);
+                        
+                        });
+
+                        
+
+                    });
 
                 });
+                
 
             });
 
