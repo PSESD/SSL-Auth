@@ -140,7 +140,17 @@ Access.hasAccess = function(req, res, next){
 
         var curl = null;
 
-        var parse_url = php.parse_url(req.headers.origin);
+        var clientUrl = req.headers.origin;
+
+        var hackUrl = 'x-cbo-client-url';
+
+        if(hackUrl in req.headers){
+
+            clientUrl = req.headers[hackUrl];
+
+        }
+
+        var parse_url = php.parse_url(clientUrl);
 
         if (parse_url['host']) {
 
@@ -169,7 +179,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!organization) {
 
-            console.log('Dont have "Organization not found" and skip by middleware');
+            console.log('Dont have "Organization not found" and skip by middleware => ', crit);
 
             return res.errUnauthorized();
 

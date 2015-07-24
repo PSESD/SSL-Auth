@@ -88,17 +88,27 @@ UserSchema.methods._checkRole = function(index){
  *
  * @param user
  * @param organizationId
+ * @param role
+ * @param is_special_case_worker
  * @param cb
  */
-UserSchema.methods.saveWithRole = function(user, organizationId, cb){
+UserSchema.methods.saveWithRole = function(user, organizationId, role, is_special_case_worker, cb){
 
-    this.orgId = organizationId;
 
-    this.getCurrentPermission();
+    var currentPermission = this.getCurrentPermission(organizationId);
 
-    if(this.role === 'case-worker') {
+    if(typeof role === 'function'){
+        cb = role;
+        role = this._role;
+        is_special_case_worker = this._is_special_case_worker;
+    } else {
+        this._role = role;
+        this._is_special_case_worker = is_special_case_worker;
+    }
 
-        var allow = !this.is_special_case_worker ? 'all' : 'own';
+    if(role === 'case-worker') {
+
+        var allow = !is_special_case_worker ? 'all' : 'own';
 
         for (var i = 0; i < this.permissions.length; i++) {
 
@@ -114,11 +124,10 @@ UserSchema.methods.saveWithRole = function(user, organizationId, cb){
 
     }
 
-    if(this.permissions.indexOf(this.getIndexCurrentPermission()) !== -1){
-        if(typeof this.role !== undefined) this.permissions[this.getIndexCurrentPermission()].role = this.role;
-        if(typeof this.is_special_case_worker !== undefined) this.permissions[this.getIndexCurrentPermission()].is_special_case_worker = this.is_special_case_worker;
+    if(this.getIndexCurrentPermission() in this.permissions){
+        if(typeof role === 'string' && this.permissions[this.getIndexCurrentPermission()].role !== role) this.permissions[this.getIndexCurrentPermission()].role = role;
+        if(typeof is_special_case_worker === 'boolean' && this.permissions[this.getIndexCurrentPermission()].is_special_case_worker !== is_special_case_worker) this.permissions[this.getIndexCurrentPermission()].is_special_case_worker = is_special_case_worker;
     }
-
 
     // set update time and update by user
     this.last_updated = new Date();
@@ -254,18 +263,25 @@ UserSchema.methods.getCurrentPermission = function(organizationId){
         this.orgId = organizationId;
     }
 
-    if(!this._currentPermission){
-        for(var i = 0; i < this.permissions.length; i++){
-            if((this.permissions[i].organization+'') === (this.orgId+'')){
-                this._currentPermission = this.permissions[i];
-                this._indexCurrentPermission = i;
-                break;
-            }
+    if(typeof this._currentPermission !== 'object'){
+        this._currentPermission = {};
+    }
+
+    if(this.orgId in this._currentPermission) {
+        return this._currentPermission[this.orgId];
+    }
+
+    for(var i = 0; i < this.permissions.length; i++){
+        if((this.permissions[i].organization+'') === (this.orgId+'')){
+            this._currentPermission[this.orgId] = this.permissions[i];
+            this._indexCurrentPermission = i;
+            break;
         }
     }
-    if(this._currentPermission) {
-        this._role = this._currentPermission.role;
-        this._is_special_case_worker = this._currentPermission.is_special_case_worker;
+
+    if(this.orgId in this._currentPermission) {
+        this._role = this._currentPermission[this.orgId].role;
+        this._is_special_case_worker = this._currentPermission[this.orgId].is_special_case_worker;
     } else {
         this._role = undefined;
         this._is_special_case_worker = undefined;
@@ -277,7 +293,7 @@ UserSchema.methods.getCurrentPermission = function(organizationId){
             permissions: []
         };
     }
-    return this._currentPermission;
+    return this._currentPermission[this.orgId];
 };
 /**
  *

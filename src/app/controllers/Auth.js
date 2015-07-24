@@ -9,6 +9,7 @@ var Client = require('../models/Client');
 var Access = require('../access/access');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
+var RefreshToken = require('../models/RefreshToken');
 var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
