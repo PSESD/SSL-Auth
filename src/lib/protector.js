@@ -11,6 +11,7 @@ var context;
 var currentRole;
 var protectFilter;
 var _permissions;
+var _is_special_case_worker;
 var _acl;
 var _errorMessage = 'Access Denied';
 
@@ -26,37 +27,47 @@ module.exports = function protector(schema, options) {
 
         _acl = [];
 
+        _is_special_case_worker = false;
+
         var _collectionName = collection;
+        /**
+         * Get current permission by admin
+         * @type {{role, is_special_case_worker, organization, students, permissions}}
+         * @private
+         */
+        var _currentPermissions = user.getCurrentPermission();
 
-        if(user && _.isArray(user.permissions)) {
+        console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', _currentPermissions);
 
-            user.permissions.forEach(function (permission) {
+        _is_special_case_worker = _currentPermissions.is_special_case_worker;
 
-                var is = false;
+        if(user && _.isObject(_currentPermissions)) {
 
-                if (permission.permissions.length > 0) {
+            var is = false;
 
-                    permission.permissions.forEach(function (perm) {
+            if (_currentPermissions.permissions.length > 0) {
 
-                        if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
+                _currentPermissions.permissions.forEach(function (perm) {
 
-                            _acl.push(perm);
+                    //console.log('FILTERS: ', perm.model, _collectionName, perm.model.toLowerCase(),  _collectionName.indexOf(perm.model.toLowerCase()) !== -1);
 
-                            is = true;
+                    if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
 
-                        }
+                        _acl.push(perm);
 
-                    });
+                        is = true;
 
-                }
+                    }
 
-                if(is) _permissions = permission;
+                });
 
-            });
+            }
+
+            _permissions = _currentPermissions;
 
         }
 
-        console.log('ROLE (', currentRole, ') Permissions: ', JSON.stringify(_acl));
+        console.log('ROLE (', currentRole, ') ACL Permissions: ', JSON.stringify(_acl));
 
     }
 
@@ -369,6 +380,8 @@ module.exports = function protector(schema, options) {
 
                         var tmp = _permissions[collection];
 
+                        console.log('LIST OF ', collection, ' is ', tmp);
+
                         if('_id' in crit){
 
                             if(crit._id.hasOwnProperty('$in')){
@@ -386,9 +399,10 @@ module.exports = function protector(schema, options) {
                             }
 
                             delete crit._id;
+
                         }
 
-                        crit._id = { $in: tmp };
+                        crit._id = {$in: tmp};
 
                     } else {
 

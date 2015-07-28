@@ -8,6 +8,7 @@ var Client = require('./Client');
 var Student = require('./Student');
 var Program = require('./Program');
 var ObjectId = mongoose.Types.ObjectId;
+var _ = require('underscore');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -43,9 +44,9 @@ var UserSchema = new mongoose.Schema({
  * @private
  */
 UserSchema.methods._checkRole = function(index){
-    var role = this.role;
+    var role = this._role;
     var is_special = this.isSpecialCaseWorker();
-    var permissions = this.permissions[index];
+    var permissions = this.permissions[index].permissions;
     if(permissions.length === 0){
         switch ( role ){
             case 'admin':
@@ -81,7 +82,7 @@ UserSchema.methods._checkRole = function(index){
         }
     }
 
-    this.permissions[index] = permissions;
+    this.permissions[index].permissions = permissions;
 
 };
 /**
@@ -108,7 +109,7 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, is_specia
 
     if(role === 'case-worker') {
 
-        var allow = !is_special_case_worker ? 'all' : 'own';
+        var allow = is_special_case_worker ? 'all' : 'own';
 
         for (var i = 0; i < this.permissions.length; i++) {
 
@@ -227,7 +228,8 @@ UserSchema.methods.isAdmin = function(organizationId){
 };
 
 UserSchema.virtual('orgId').set(function(organizationId){
-    this._organizationId = organizationId;
+    if(_.isObject(organizationId)) this._organizationId = organizationId.toString();
+    else this._organizationId = organizationId;
 }).get(function(){
    return this._organizationId;
 });
