@@ -110,6 +110,14 @@ exports.sendInvite = function (req, res) {
 
             var authCode = crypto.randomBytes(16).toString('base64');
 
+            var isTester = false;
+
+            if(email === 'cbo_test@upwardstech.com'){
+
+                isTester = true;
+
+            }
+
             var activateUrl = base + "/api/user/activate?email=" + encodeURIComponent(user.email) + "&authCode=" + encodeURIComponent(authCode) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
 
             var isNew = raw.upserted ? true : false;
@@ -141,6 +149,11 @@ exports.sendInvite = function (req, res) {
                         is_special_case_worker: is_special_case_worker
                     });
 
+                    var testerInfo = {
+                        user: user.toObject(),
+                        activateUrl: activateUrl
+                    };
+
                     invite.save(function(err){
 
                         if(err) return res.errJson(err);
@@ -169,13 +182,14 @@ exports.sendInvite = function (req, res) {
 
                                 if (result[0].status == 'sent') {
 
-                                    return res.okJson("Email was sent");
+                                    return res.okJson("Email was sent", isTester ? testerInfo : null);
 
                                 } else {
 
-                                    return res.errJson(result[0].reject_reason);
+                                    return res.errJson(isTester ? testerInfo : result[0].reject_reason);
 
                                 }
+
                             }, function (e) {
                                 // Mandrill returns the error as an object with name and message keys
                                 console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);

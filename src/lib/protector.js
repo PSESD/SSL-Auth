@@ -37,7 +37,7 @@ module.exports = function protector(schema, options) {
          */
         var _currentPermissions = user.getCurrentPermission();
 
-        console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', _currentPermissions);
+        //console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', JSON.stringify(_currentPermissions));
 
         _is_special_case_worker = _currentPermissions.is_special_case_worker;
 
@@ -67,22 +67,28 @@ module.exports = function protector(schema, options) {
 
         }
 
-        console.log('ROLE (', currentRole, ') ACL Permissions: ', JSON.stringify(_acl));
+        //console.log('ROLE (', currentRole, ') ACL Permissions: ', JSON.stringify(_acl));
 
     }
 
     /**
      *
      * @param req
+     * @param _protectFilter
+     * @param user
      * @returns {{save: Function}}
      */
-    schema.methods.protect = function protect(req) {
+    schema.methods.protect = function protect(req, _protectFilter, user) {
+
+        var caller = this;
 
         currentRole = req;
 
         collection = this.collection.name;
 
-        var caller = this;
+        protectFilter = _protectFilter || {};
+
+        setUser(user, collection);
 
         /**
          *  FYI, THE FOLLOWING SECTION WAS A QUICK HACK TO GET SOMETHING WORKING
@@ -329,7 +335,7 @@ module.exports = function protector(schema, options) {
          */
         if('admin' === currentRole){
 
-            console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
+            //console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
 
             return {fields: localRules.properties, crit: crit};
 

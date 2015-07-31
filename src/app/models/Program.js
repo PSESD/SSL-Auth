@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 // Define our Program schema
 var ProgramSchema = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true },
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     created: { type: Date, required: true, default: Date.now },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },

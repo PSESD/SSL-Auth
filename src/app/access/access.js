@@ -7,6 +7,8 @@ var php = require('phpjs');
 var _ = require('underscore');
 var ObjectId = require('mongoose').Types.ObjectId;
 
+var log = require('./../../lib/utils').log;
+
 var instance = null;
 /**
  *
@@ -123,7 +125,7 @@ Access.hasAccess = function(req, res, next){
      */
     if(!req.user){
 
-        console.log('Dont have permission because not "user" and skip by middleware');
+        log('Dont have permission because not "user" and skip by middleware');
 
         return res.errUnauthorized();
 
@@ -179,7 +181,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!organization) {
 
-            console.log('Dont have "Organization not found" and skip by middleware => ', crit);
+            log('Dont have "Organization not found" and skip by middleware => ', crit);
 
             return res.errUnauthorized();
 
@@ -195,7 +197,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!access.hasPermission()){
 
-            console.log('Dont have "permission" and skip by middleware');
+            log('Dont have "permission" and skip by middleware');
 
             return res.errUnauthorized();
 
@@ -214,7 +216,7 @@ Access.isAdmin = function(req, res, next){
      */
     if(!req.user){
 
-        console.log('Dont have permission because not "user" and skip by middleware');
+        log('Dont have permission because not "user" and skip by middleware');
 
         return res.errUnauthorized();
 
@@ -222,7 +224,7 @@ Access.isAdmin = function(req, res, next){
 
     if(!req.user.isAdmin()){
 
-        console.log('Dont have permission because not "admin user" and skip by middleware');
+        log('Dont have permission because not "admin user" and skip by middleware');
 
         return res.errUnauthorized();
 

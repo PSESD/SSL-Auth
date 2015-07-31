@@ -29,7 +29,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	  .get(authController.isAuthenticated, userController.getUsers);
 
 	router.route('/user/invite')
-		.post(authController.isBearerAuthenticated, userController.sendInvite);
+		.post(authController.isBearerAuthenticated, authController.hasAccess, authController.isAdmin, userController.sendInvite);
 
 	router.route('/user/send/forgotpassword')
 		.post(userController.sendForgotPassword);

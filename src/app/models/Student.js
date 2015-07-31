@@ -164,6 +164,17 @@ Student.setRules([
         role: {
             name: 'case-worker',
             allow: {
+
+                create: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+
                 read: {
                     properties: {
                         '*': '*' // allows all fields to be visible
