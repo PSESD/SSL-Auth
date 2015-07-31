@@ -76,9 +76,7 @@ exports.sendInvite = function (req, res) {
     var is_special_case_worker = req.body.is_special_case_worker || true;
 
     var user = {
-        email: req.body.email,
-        password: req.body.password,
-        last_name: req.body.last_name
+        email: req.body.email
     };
 
     if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
@@ -113,6 +111,14 @@ exports.sendInvite = function (req, res) {
             var isTester = false;
 
             if(email === 'cbo_test@upwardstech.com'){
+
+                isTester = true;
+
+            }
+
+            var hackUrl = 'x-invite-test';
+
+            if(hackUrl in req.headers && req.headers[hackUrl] === email){
 
                 isTester = true;
 
@@ -406,13 +412,19 @@ exports.activate = function (req, res) {
 
                         if (err) return res.errJson(err);
 
-                        Invite.remove({ _id: invite._id }, function(err){
+                        user.saveWithRole(user, organization._id.toString(), invite.role, invite.is_special_case_worker, function(err){
 
-                            callback(null, updated[0]);
-                        
+                            if (err) return res.errJson(err);
+
+                            Invite.remove({ _id: invite._id }, function(err){
+
+                                if (err) return res.errJson(err);
+
+                                callback(null, updated[0]);
+
+                            });
+
                         });
-
-                        
 
                     });
 

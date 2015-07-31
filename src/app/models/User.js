@@ -332,9 +332,11 @@ UserSchema.methods.isCaseWorker = function(organizationId){
  */
 UserSchema.virtual('password')
     .set(function(password) {
-      this._plainPassword = password;
-      this.salt = crypto.randomBytes(128).toString('base64');
-      this.hashedPassword = this.encryptPassword(password);
+        if(!_.isEmpty(password)) {
+            this._plainPassword = password;
+            this.salt = crypto.randomBytes(128).toString('base64');
+            this.hashedPassword = this.encryptPassword(password);
+        }
     })
     .get(function() { return this._plainPassword; });
 /**

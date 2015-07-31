@@ -100,7 +100,7 @@ Access.prototype.hasPermission = function(options){
 
     var isMatch = orgid.indexOf(organizationId + '') !== -1;
 
-    console.log(
+    log(
         'USER: ' + JSON.stringify(currentUser.email),
         'USER ORG: ' + JSON.stringify(orgid),
         'CURR ORG: ' + JSON.stringify(organizationId),
@@ -181,7 +181,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!organization) {
 
-            log('Dont have "Organization not found" and skip by middleware => ', crit);
+            log('Dont have "Organization not found" and skip by middleware => ' + JSON.stringify(crit));
 
             return res.errUnauthorized();
 
