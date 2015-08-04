@@ -34,6 +34,12 @@ TagSchema.statics.crit = function(values, exclude){
 
             if(iterator in values && exclude.indexOf(iterator) === -1){
 
+                if(iterator === 'name') {
+
+                    values[iterator] = new RegExp(values[iterator], 'i');
+
+                }
+
                 criteria[iterator] = values[iterator];
 
             }
@@ -48,8 +54,14 @@ TagSchema.statics.crit = function(values, exclude){
  * @param title
  */
 TagSchema.statics.addTag = function(organizationId, title){
+
+    if(!title) return false;
+
     var TagModel = this.model('Tag');
     var tokens = !_.isArray(title) ? tokenizer.tokenize(title) : title;
+
+    if(!_.isArray(tokens)) return false;
+
     _.each(tokens, function(token){
         TagModel.update({ name: token, organization: organizationId}, { name: token, organization: organizationId, slug: slug(token)}, { multi: true, upsert: true }, function(err, raw){
             if(err) console.log(err);

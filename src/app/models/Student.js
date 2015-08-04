@@ -70,6 +70,12 @@ StudentSchema.statics.crit = function(values, exclude){
 
         if(iterator in values && exclude.indexOf(iterator) === -1){
 
+            if(iterator === 'first_name' || iterator === 'middle_name' || iterator === 'last_name') {
+
+                values[iterator] = new RegExp(values[iterator], 'i');
+
+            }
+
             criteria[iterator] = values[iterator];
 
         }
@@ -158,6 +164,17 @@ Student.setRules([
         role: {
             name: 'case-worker',
             allow: {
+
+                create: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+
                 read: {
                     properties: {
                         '*': '*' // allows all fields to be visible

@@ -205,7 +205,7 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
 
             // Password did not match
             if (!isMatch) {
-                return callback(null, false);
+                return callback(new Error('Password did not match'), false);
             }
 
             var token = uid(256);

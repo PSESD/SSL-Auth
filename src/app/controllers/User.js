@@ -1,11 +1,13 @@
 // Load required packages
 var User = require('../models/User');
 var Organization = require('../models/Organization');
+var Invite = require('../models/Invite');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 var crypto = require('crypto');
 var php = require('phpjs');
+var url = require('url');
 var csurf = require('csurf');
 var cookieParser = require('cookie-parser');
 
@@ -16,7 +18,7 @@ exports.postUsers = function (req, res) {
         email: req.body.email,
         password: req.body.password,
         last_name: req.body.last_name,
-        role: req.body.role || 'case-worker'
+        is_super_admin: req.body.role === 'superadmin'
     });
 
     user.save(function (err) {
@@ -69,85 +71,154 @@ exports.sendInvite = function (req, res) {
 
     var email = req.body.email;
 
+    var role = req.body.role || 'case-worker';
+
+    var is_special_case_worker = req.body.is_special_case_worker || true;
+
     var user = {
-        email: req.body.email,
-        password: req.body.password,
-        last_name: req.body.last_name
+        email: req.body.email
     };
 
     if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
 
-    User.update({email: email}, {$set: user}, {safe: true, upsert: true}, function (err, raw) {
+
+    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+
+    Organization.findOne({url: curl}, function(err, organization) {
 
         if (err) return res.errJson(err);
 
-        var base = config.get('auth.url');
+        if (!organization) return res.errJson('Organization not found!');
 
-        var authCode = crypto.randomBytes(16).toString('base64');
-
-        var activateUrl = base + "/api/user/activate?email=" + encodeURIComponent(user.email) + "&authCode=" + encodeURIComponent(authCode) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
-
-        var isNew = raw.upserted ? true : false;
-
-        if(isNew){
-
-            activateUrl += '&__n=1';
-
-        }
-
-        User.findOne({email: email}, function (err, user) {
+        User.update({email: email}, {$set: user}, {safe: true, upsert: true}, function (err, raw) {
 
             if (err) return res.errJson(err);
 
-            user.authCode = authCode;
+            var base = config.get('auth.url');
 
-            user.save(function (err) {
+            var authCode = crypto.randomBytes(16).toString('base64');
+
+            var isTester = false;
+
+            if(email === 'cbo_test@upwardstech.com'){
+
+                isTester = true;
+
+            }
+
+            var hackUrl = 'x-invite-test';
+
+            if(hackUrl in req.headers && req.headers[hackUrl] === email){
+
+                isTester = true;
+
+            }
+
+            var activateUrl = base + "/api/user/activate?email=" + encodeURIComponent(user.email) + "&authCode=" + encodeURIComponent(authCode) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
+
+            var isNew = raw.upserted ? true : false;
+
+            if (isNew) {
+
+                activateUrl += '&__n=1';
+
+            }
+
+            User.findOne({email: email}, function (err, user) {
 
                 if (err) return res.errJson(err);
 
-                var message = {
-                    "html": "<p>" + "Invite members here: " + activateUrl + "</p>",
-                    "subject": "example subject",
-                    "from_email": "no-replay@cbo.upward.st",
-                    "from_name": "Example Name",
-                    "to": [{email: user.email, name: user.last_name, type: "to"}],
-                    "headers": {
-                        "Reply-To": "no-replay@cbo.upward.st"
-                    }
+                user.authCode = authCode;
 
-                };
+                user.is_special_case_worker = is_special_case_worker;
 
-                var async = false;
+                user.role = role;
 
-                var ip_pool = "Main Pool";
+                user.saveWithRole(req.user, organization._id, function (err) {
 
-                var send_at = new Date();
+                    if (err) return res.errJson(err);
 
-                mandrill_client.messages.send({"message": message}, function (result) {
+                    var invite = new Invite({
+                        authCode: authCode,
+                        organization: organization._id,
+                        role: role,
+                        is_special_case_worker: is_special_case_worker
+                    });
 
-                    if (result[0].status == 'sent') {
+                    var testerInfo = {
+                        user: user.toObject(),
+                        activateUrl: activateUrl
+                    };
 
-                        return res.okJson("Email was sent");
+                    invite.save(function(err){
 
-                    } else {
+                        if(err) return res.errJson(err);
 
-                        return res.errJson(result[0].reject_reason);
+                        var async = false;
 
-                    }
-                }, function (e) {
-                    // Mandrill returns the error as an object with name and message keys
-                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                        var ip_pool = "Main Pool";
 
-                    return res.errJson("Email not sent");
-                    // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                        var send_at = new Date();
+
+                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
+
+                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                            var message = {
+                                "html": html,
+                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                                "from_email": result.publish_from_email,
+                                "from_name": result.publish_from_name,
+                                "to": [{email: user.email, name: user.last_name, type: "to"}],
+                                "headers": {
+                                    "Reply-To": "no-replay@studentsuccesslink.org"
+                                }
+
+                            };
+                            mandrill_client.messages.send({"message": message}, function (result) {
+
+                                if (result[0].status == 'sent') {
+
+                                    return res.okJson("Email was sent", isTester ? testerInfo : null);
+
+                                } else {
+
+                                    return res.errJson(isTester ? testerInfo : result[0].reject_reason);
+
+                                }
+
+                            }, function (e) {
+                                // Mandrill returns the error as an object with name and message keys
+                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+
+                                return res.errJson("Email not sent");
+                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                            });
+
+                        }, function (e) {
+                            // Mandrill returns the error as an object with name and message keys
+                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                            // A mandrill error occurred: Invalid_Key - Invalid API key
+                            return res.errJson("Email not sent");
+                        });
+
+                    }); 
+
                 });
 
             });
 
         });
-
     });
-
 };
 
 exports.sendForgotPassword = function (req, res) {
@@ -157,6 +228,17 @@ exports.sendForgotPassword = function (req, res) {
 
     if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
 
+    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
 
     var base = config.get('auth.url');
 
@@ -164,60 +246,77 @@ exports.sendForgotPassword = function (req, res) {
 
     var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
 
+    Organization.findOne({url: curl}, function(err, organization){
 
-    User.findOne({email: email}, function (err, user) {
+        if(err) return res.errJson(err);
 
-        if (err) return res.errJson(err);
+        if(!organization) return res.errJson('Organization not found!');
 
-        if(!user) return res.errJson('User email not found!');
-
-        user.forgotPassword = forgotPassword;
-
-        user.save(function (err) {
+        User.findOne({email: email}, function (err, user) {
 
             if (err) return res.errJson(err);
 
-            var message = {
-                "html": "<p>" + "Your Membership ID is " + user._id + " <br><br>Click here to reset your password " + forgotPasswordUrl + "</p>",
-                "subject": "Forgot password",
-                "from_email": "no-replay@cbo.upward.st",
-                "from_name": "CBO",
-                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                "headers": {
-                    "Reply-To": "no-replay@cbo.upward.st"
-                }
+            if(!user) return res.errJson('User email not found!');
 
-            };
+            user.forgotPassword = forgotPassword;
 
-            var async = false;
+            user.save(function (err) {
 
-            var ip_pool = "Main Pool";
+                if (err) return res.errJson(err);
 
-            var send_at = new Date();
+                var async = false;
 
-            mandrill_client.messages.send({"message": message}, function (result) {
+                var ip_pool = "Main Pool";
 
-                if (result[0].status == 'sent') {
+                var send_at = new Date();
 
-                    return res.okJson("Email was sent");
+                mandrill_client.templates.info({ name: 'cbo_forgot_password'}, function(result) {
 
-                } else {
+                    var html = php.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
 
-                    return res.errJson(result[0].reject_reason);
+                        var message = {
+                            "html": html,
+                            "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                            "from_email": result.publish_from_email,
+                            "from_name": result.publish_from_name,
+                            "to": [{email: user.email, name: user.last_name, type: "to"}],
+                            "headers": {
+                                "Reply-To": "no-replay@studentsuccesslink.org"
+                            }
 
-                }
-            }, function (e) {
-                // Mandrill returns the error as an object with name and message keys
-                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                        };
+                        mandrill_client.messages.send({"message": message}, function (result) {
 
-                return res.errJson("Email not sent");
-                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                            if (result[0].status == 'sent') {
+
+                                return res.okJson("Email was sent");
+
+                            } else {
+
+                                return res.errJson(result[0].reject_reason);
+
+                            }
+                        }, function (e) {
+                            // Mandrill returns the error as an object with name and message keys
+                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+
+                            return res.errJson("Email not sent");
+                            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                        });
+
+
+                }, function(e) {
+                    // Mandrill returns the error as an object with name and message keys
+                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                    // A mandrill error occurred: Invalid_Key - Invalid API key
+                    return res.errJson("Email not sent");
+                });
+
             });
 
         });
 
     });
-
 
 };
 
@@ -257,54 +356,86 @@ exports.activate = function (req, res) {
 
     };
 
-    User.findOne({email: email}, function (err, user) {
+    var parse_url = php.parse_url(redirectTo), curl = null;
+
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+
+    Organization.findOne({url: curl}, function (err, organization) {
 
         if (err) return callback(err);
 
-        // No user found with that username
-        if (!user) return callback('User not found', false);
+        if (!organization) return callback('Organization not found!');
 
-        // Make sure the password is correct
-        user.verifyAuthCode(authCode, function (err, isMatch) {
+
+        User.findOne({email: email}, function (err, user) {
 
             if (err) return callback(err);
 
-            // Password did not match
-            if (!isMatch) {
+            // No user found with that username
+            if (!user) return callback('User not found', false);
 
-                return callback('Invalid token', false);
+            console.log(user.organizationId, organization._id.toString(), user.organizationId.indexOf(organization._id.toString()));
 
-            }
+            if(user.organizationId.indexOf(organization._id.toString()) !== -1) return callback('You have already used this link to activate your user.', false);
 
-            var parse_url = php.parse_url(redirectTo), url = null;
-
-            if (parse_url['host']) {
-
-                url = parse_url['host'];
-
-            } else {
-
-                url = parse_url['path'];
-
-            }
-
-            Organization.findOne({url: url}, function (err, organization) {
+            // Make sure the password is correct
+            user.verifyAuthCode(authCode, function (err, isMatch) {
 
                 if (err) return callback(err);
 
-                if (!organization) return callback(err);
+                // Password did not match
+                if (!isMatch) {
 
-                // Success
-                User.where({_id: user._id}).update({
-                    $unset: {hashedAuthCode: ""},
-                    $push: {permissions: {organization: organization._id, permissions: [], students: []}}
-                }, function (err, updated) {
+                    return callback('Invalid token', false);
 
-                    if (err) return res.errJson(err);
+                }
 
-                    callback(null, updated[0]);
+                Invite.findOne({ authCode: authCode }, function(err, invite){
+
+                    if (err) return callback(err);
+
+                    if(!invite) return callback('Invalid token', false);
+
+                    // Success
+                    User.where({_id: user._id}).update({
+                        $unset: {hashedAuthCode: ""},
+                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role, is_special_case_worker: invite.is_special_case_worker}}
+                    }, function (err, updated) {
+
+                        if (err) return res.errJson(err);
+
+                        User.findOne({_id: user._id}, function(err, updateUser) {
+
+                            if (err) return res.errJson(err);
+
+                            updateUser.saveWithRole(user, organization._id.toString(), invite.role, invite.is_special_case_worker, function (err) {
+
+                                if (err) return res.errJson(err);
+
+                                Invite.remove({_id: invite._id}, function (err) {
+
+                                    if (err) return res.errJson(err);
+
+                                    callback(null, updated[0]);
+
+                                });
+
+                            });
+
+                        });
+
+                    });
 
                 });
+                
 
             });
 
@@ -336,45 +467,52 @@ exports.formForgotPassword = function (req, res) {
         });
 
     };
+    var parse_url = php.parse_url(redirectTo), curl = null;
 
-    User.findOne({email: email}, function (err, user) {
+    if (parse_url['host']) {
+
+        curl = parse_url['host'];
+
+    } else {
+
+        curl = parse_url['path'];
+
+    }
+
+    Organization.findOne({url: curl}, function (err, organization) {
 
         if (err) return callback(err);
 
-        // No user found with that username
-        if (!user) return callback('User not found', false);
+        if (!organization) return callback('Organization not found!');
 
-        // Make sure the password is correct
-        user.verifyForgotPassword(code, function (err, isMatch) {
+        User.findOne({email: email}, function (err, user) {
 
             if (err) return callback(err);
 
-            // Password did not match
-            if (!isMatch) {
+            // No user found with that username
+            if (!user) return callback('User not found', false);
 
-                return callback('Invalid token', false);
+            // Make sure the password is correct
+            user.verifyForgotPassword(code, function (err, isMatch) {
 
-            }
+                if (err) return callback(err);
 
-            var parse_url = php.parse_url(redirectTo), url = null;
+                // Password did not match
+                if (!isMatch) {
 
-            if (parse_url['host']) {
+                    return callback('Invalid token', false);
 
-                url = parse_url['host'];
+                }
 
-            } else {
+                User.where({_id: user._id}).update({
+                    $unset: {hashedForgotPassword: ""}
+                }, function (err, updated) {
 
-                url = parse_url['path'];
+                    if (err) return res.errJson(err);
 
-            }
+                    callback(null, updated[0]);
 
-            User.where({_id: user._id}).update({
-                $unset: { hashedForgotPassword: "" }
-            }, function (err, updated) {
-
-                if (err) return res.errJson(err);
-
-                callback(null, updated[0]);
+                });
 
             });
 
@@ -400,6 +538,10 @@ exports.processChangePassword = function(req, res){
     var password = req.body.password;
 
     var confirmPassword = req.body.confirm_password;
+
+    var first_name = req.body.first_name;
+
+    var middle_name = req.body.middle_name;
 
     var last_name = req.body.last_name;
 
@@ -455,23 +597,27 @@ exports.processChangePassword = function(req, res){
 
         };
 
-        User.findOne(where, function(err, user){
+        var parse_url = php.parse_url(redirectTo), curl = null;
 
-            if(err){
+        if (parse_url['host']) {
 
-                errors.push(err.message);
+            curl = parse_url['host'];
 
-                return renderError();
+        } else {
 
-            }
+            curl = parse_url['path'];
 
-            user.password = password;
+        }
 
-            user.last_name = last_name;
+        Organization.findOne({url: curl}, function (err, organization) {
 
-            user.save(function(err){
+            if (err) return callback(err);
 
-                if(err){
+            if (!organization) return callback('Organization not found!');
+
+            User.findOne(where, function (err, user) {
+
+                if (err) {
 
                     errors.push(err.message);
 
@@ -479,12 +625,31 @@ exports.processChangePassword = function(req, res){
 
                 }
 
-                if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+                user.password = password;
 
-                return res.redirect(redirectTo);
+                if (first_name) user.first_name = first_name;
+
+                if (middle_name) user.middle_name = middle_name;
+
+                user.last_name = last_name;
+
+                user.save(function (err) {
+
+                    if (err) {
+
+                        errors.push(err.message);
+
+                        return renderError();
+
+                    }
+
+                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+
+                    return res.redirect(redirectTo);
+
+                });
 
             });
-
         });
 
     })();

@@ -11,8 +11,10 @@ var context;
 var currentRole;
 var protectFilter;
 var _permissions;
+var _is_special_case_worker;
 var _acl;
 var _errorMessage = 'Access Denied';
+var onlyAssign = false;
 
 module.exports = function protector(schema, options) {
     /**
@@ -26,52 +28,85 @@ module.exports = function protector(schema, options) {
 
         _acl = [];
 
+        _is_special_case_worker = false;
+
         var _collectionName = collection;
+        /**
+         * Get current permission by admin
+         * @type {{role, is_special_case_worker, organization, students, permissions}}
+         * @private
+         */
+        var _currentPermissions = user.getCurrentPermission();
 
-        if(user && _.isArray(user.permissions)) {
+        //console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', JSON.stringify(_currentPermissions));
 
-            user.permissions.forEach(function (permission) {
+        _is_special_case_worker = _currentPermissions.is_special_case_worker;
 
-                var is = false;
+        if(user && _.isObject(_currentPermissions)) {
 
-                if (permission.permissions.length > 0) {
+            var is = false;
 
-                    permission.permissions.forEach(function (perm) {
+            if (_currentPermissions.permissions.length > 0) {
 
-                        if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
+                _currentPermissions.permissions.forEach(function (perm) {
 
-                            _acl.push(perm);
+                    //console.log('FILTERS: ', perm.model, _collectionName, perm.model.toLowerCase(),  _collectionName.indexOf(perm.model.toLowerCase()) !== -1);
 
-                            is = true;
+                    if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
 
-                        }
+                        _acl.push(perm);
 
-                    });
+                        is = true;
 
-                }
+                    }
 
-                if(is) _permissions = permission;
+                });
 
-            });
+            }
+
+            _permissions = _currentPermissions;
 
         }
 
-        console.log('ROLE (', currentRole, ') Permissions: ', JSON.stringify(_acl));
+        //console.log('ROLE (', currentRole, ') ACL Permissions: ', JSON.stringify(_acl));
 
     }
 
     /**
      *
+     * @param _protectFilter
+     */
+    function setFilter(_protectFilter){
+
+        protectFilter = _protectFilter || {};
+
+        if('onlyAssign' in protectFilter){
+
+            onlyAssign = protectFilter.onlyAssign ? true : false;
+
+            delete protectFilter.onlyAssign;
+
+        }
+    }
+
+    /**
+     *
      * @param req
+     * @param _protectFilter
+     * @param user
      * @returns {{save: Function}}
      */
-    schema.methods.protect = function protect(req) {
+    schema.methods.protect = function protect(req, _protectFilter, user) {
+
+        var caller = this;
 
         currentRole = req;
 
         collection = this.collection.name;
 
-        var caller = this;
+        setFilter(_protectFilter);
+
+        setUser(user, collection);
 
         /**
          *  FYI, THE FOLLOWING SECTION WAS A QUICK HACK TO GET SOMETHING WORKING
@@ -167,7 +202,7 @@ module.exports = function protector(schema, options) {
 
         collection = this.collection.name;
 
-        protectFilter = _protectFilter || {};
+        setFilter(_protectFilter);
 
         setUser(user, collection);
 
@@ -316,9 +351,9 @@ module.exports = function protector(schema, options) {
         /**
          * Skipped checked acl if admin user
          */
-        if('admin' === currentRole){
+        if('admin' === currentRole && !onlyAssign){
 
-            console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
+            //console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
 
             return {fields: localRules.properties, crit: crit};
 
@@ -347,13 +382,22 @@ module.exports = function protector(schema, options) {
 
         if (typeof localRules.where !== "undefined") {
 
-            switch (acl.permission.allow){
+            var isAllow = acl.permission.allow;
+
+            if(onlyAssign === true){
+
+                isAllow = 'assign';
+
+            }
+
+            switch (isAllow){
                 case 'all':
                 case '*':
                     //Skip this checked
                     break;
                 case 'own':
                 case 'owner':
+                case 'assign':
 
                     console.log('CHECK PERMISSION INDEX OF >> ', collection, ' is ', collection in _permissions);
 
@@ -368,6 +412,8 @@ module.exports = function protector(schema, options) {
                         }
 
                         var tmp = _permissions[collection];
+
+                        console.log('LIST OF ', collection, ' is ', tmp);
 
                         if('_id' in crit){
 
@@ -386,9 +432,10 @@ module.exports = function protector(schema, options) {
                             }
 
                             delete crit._id;
+
                         }
 
-                        crit._id = { $in: tmp };
+                        crit._id = {$in: tmp};
 
                     } else {
 
@@ -694,6 +741,15 @@ function checkAcl(method){
     do {
 
         acl = _acl[i];
+
+        if(_.isEmpty(acl)){
+
+            return {
+                denied: false,
+                permission: acl
+            };
+
+        }
 
         if(operation.indexOf(acl.operation) !== -1){
 
