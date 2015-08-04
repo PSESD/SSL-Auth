@@ -101,11 +101,11 @@ Access.prototype.hasPermission = function(options){
     var isMatch = orgid.indexOf(organizationId + '') !== -1;
 
     log(
-        'USER: ' + JSON.stringify(currentUser.email),
-        'USER ORG: ' + JSON.stringify(orgid),
-        'CURR ORG: ' + JSON.stringify(organizationId),
-        'TYPEOF ORG: ' + (typeof organizationId),
-        'MATCH: ' + isMatch
+        ' USER: ' + JSON.stringify(currentUser.email) +
+        ' USER ORG: ' + JSON.stringify(orgid) +
+        ' CURR ORG: ' + JSON.stringify(organizationId) +
+        ' TYPEOF ORG: ' + (typeof organizationId) +
+        ' MATCH: ' + isMatch
 
     );
 

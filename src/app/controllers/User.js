@@ -412,15 +412,21 @@ exports.activate = function (req, res) {
 
                         if (err) return res.errJson(err);
 
-                        user.saveWithRole(user, organization._id.toString(), invite.role, invite.is_special_case_worker, function(err){
+                        User.findOne({_id: user._id}, function(err, updateUser) {
 
                             if (err) return res.errJson(err);
 
-                            Invite.remove({ _id: invite._id }, function(err){
+                            updateUser.saveWithRole(user, organization._id.toString(), invite.role, invite.is_special_case_worker, function (err) {
 
                                 if (err) return res.errJson(err);
 
-                                callback(null, updated[0]);
+                                Invite.remove({_id: invite._id}, function (err) {
+
+                                    if (err) return res.errJson(err);
+
+                                    callback(null, updated[0]);
+
+                                });
 
                             });
 
