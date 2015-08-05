@@ -4,8 +4,11 @@
 var Index = {
 
     index: function(req, res){
+
         res.json({ "test": "Welcome To Auth Server"});
+
     }
+
 };
 
 module.exports = Index;

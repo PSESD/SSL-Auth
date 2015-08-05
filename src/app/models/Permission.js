@@ -3,7 +3,7 @@
  */
 // Load required packages
 var mongoose = require('mongoose');
-
+var PermissionSchema = require('./schema/Permission');
 
 // Export the Mongoose model
-module.exports = mongoose.model('Permission', require('./schema/Permission'));
+module.exports = mongoose.model('Permission', PermissionSchema);
