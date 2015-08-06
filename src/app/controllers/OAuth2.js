@@ -78,7 +78,7 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
                 
             var regex = new RegExp(uriRegex, 'i');
 
-            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));  
+            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));
             if(!parser.host.match(regex)) return callback('Url not match!');
 
         } catch(e){
