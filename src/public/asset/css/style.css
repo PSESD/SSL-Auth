@@ -22,60 +22,75 @@ II MEDIA
 
 */
 
+
 /*
 ===============================================
 ==================== 1.Body ===================
 ===============================================
 */
-html
-{
 
-}
-body
-{
+html {}
+body {
     padding-bottom: 50px;
     background: #DADFDC;
+    height: 100vh;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+    background: rgb(252, 230, 35);
+    /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* W3C */
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
 }
-li{
-    list-style:none;
+li {
+    list-style: none;
 }
 a,
 a:focus,
-a:hover
-{
-    color: #000;
-}
-/*- Typography -*/
-*{
-    font-family:quicksand;
-    font-weight: 400;
+a:hover {
+    color: #29B6D8;
 }
 
-h1{
+/*- Typography -*/
+
+* {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+}
+h1 {
     font-size: 1.6em;
     letter-spacing: .2em;
     color: #555;
     text-transform: uppercase;
-    font-family:quicksand;
-    font-weight: 400;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
 }
-
-p{
+p {
     font-size: 1em;
     color: #555;
-    font-family:quicksand;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: .2em;
     font-weight: 400;
-    max-width:400px;
+    max-width: 400px;
 }
-
 
 /*
 ===============================================
 ================== 2.Header ===================
 ===============================================
 */
-.navbar
-{
+
+.navbar {
     position: fixed;
     margin-bottom: 0;
     height: 100%;
@@ -88,14 +103,13 @@ p{
 =================== 2a.Menu ===================
 ===============================================
 */
+
 .navbar-nav .dropdown-menu > li > a,
-.navbar-right .dropdown-menu > li > a
-{
+.navbar-right .dropdown-menu > li > a {
     color: #9d9d9d;
 }
 .navbar-nav .dropdown-menu > li > a:hover,
-.navbar-right .dropdown-menu > li > a:hover
-{
+.navbar-right .dropdown-menu > li > a:hover {
     background: transparent;
     background-image: none;
     color: #FFFFFF;
@@ -105,19 +119,24 @@ p{
 .navbar-inverse .navbar-nav>.active>a:hover,
 .navbar-inverse .navbar-nav>.open>a,
 .navbar-inverse .navbar-nav>.open>a:focus,
-.navbar-inverse .navbar-nav>.open>a:hover
-{
+.navbar-inverse .navbar-nav>.open>a:hover {
     background: transparent;
     background-color: transparent;
     background-image: none;
     box-shadow: none;
 }
-
-a:hover
-{
-	text-decoration:none;
-	color:#3572b0;
-	cursor:pointer;
+#desktop .navbar-inverse .navbar-nav .active>a {
+    text-decoration: none;
+    border-bottom: 3px solid white;
+}
+#mobile .navbar-inverse .navbar-nav .active>a {
+    text-decoration: none;
+    border-bottom: 3px solid white;
+}
+a:hover {
+    text-decoration: none;
+    color: #3572b0;
+    cursor: pointer;
 }
 
 /*
@@ -125,46 +144,61 @@ a:hover
 ================= 3.Container =================
 ===============================================
 */
-.container-fluid
-{
 
+.container-fluid {}
+#center-panel {
+    background-color: none !important;
 }
+
 /*- Cards -*/
-.card{
-    background:#fff;
+
+.card {
+    background: #fff;
     padding: 24px 50px;
-    border-bottom: solid 5px rgba(0,0,0,0.1);
-    border-radius:2px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
     margin: 10px 0;
 }
-
-.col-md-3 .card{
+.col-md-3 .card {
     min-height: 300px;
 }
-
-.col-md-6 .card{
+.col-md-6 .card {
     min-height: 620px;
 }
-
-.card .title hr{
-    width:30px;
-    border-top: solid 2px #555;
+.card .title hr {
+    width: 100%;
+    /*border-top: solid 2px #555;*/
+    margin: 10px 0 40px 0;
+    height: 2px;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+    background: rgb(252, 230, 35);
+    /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* W3C */
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
+}
+.flexible-card {
+    background: #fff;
+    padding: 24px 50px;
+    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
     margin: 10px 0;
+    margin-left: 100px;
 }
-
-.flexible-card{
-  background: #fff;
-  padding: 24px 50px;
-  border-bottom: solid 5px rgba(0,0,0,0.1);
-  border-radius: 2px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-  margin: 10px 0;
-  margin-left: 100px;
-}
-
-table h1
-{
+table h1 {
     font-size: 16px;
     font-weight: bold;
 }
@@ -174,37 +208,33 @@ table h1
 ============= 3a.Login/Forget Form ============
 ===============================================
 */
+
 #login-container,
-#forget-container
-{
+#forget-container {
     position: absolute;
-    top: 30%;
+    /*top: 30%;*/
+    margin: 25%;
 }
 #login-container,
 #login-container .card,
 #forget-container,
-#forget-container .card
-{
-    background-color: #404040;
-    color: #FFFFFF;
+#forget-container .card {
+    color: #555;
 }
 #login-container .card h1,
 #forget-container .card h1,
 #login-container .card p,
-#forget-container .card p
-{
-    color: #FFFFFF;
+#forget-container .card p {
+    color: #555;
 }
 #login-container .card .title hr,
-#forget-container .card .title hr
-{
-    border-top: solid 2px #FFFFFF;
-}
+#forget-container .card .title hr {}
 
+/*
 select{
 -webkit-appearance: none;
 }
-
+*/
 
 
 /*
@@ -213,7 +243,18 @@ select{
 ===============================================
 */
 
-
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: none !important;
+}
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>thead>tr>th {
+    border-top: none !important;
+    padding: 16px 8px !important;
+}
 
 /*
 ===============================================
@@ -227,107 +268,201 @@ select{
 ================== 5.Utility ==================
 ===============================================
 */
+.panel-border{
+    border: 2px solid black;
+}
+.top-border {
+    border-top: 2px solid black;
+}
+.days-field {
+    width: 10%;
+    font-weight: bolder;
+}
+.align-top-left {
+    vertical-align: top;
+    text-align: left
+}
+.header-period {
+    width: 15%;
+    font-weight: bold;
+}
+.presence-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #8CECFF;
+}
+.late-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #0080FF;
+}
+.excused-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #5C9EE0;
+}
+.unexcused-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: red;
+}
+.holiday-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #8B4A94;
+}
+.late-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #0080FF
+}
+.last-update {
+    font-size: 14px;
+    color: #aaa;
+}
+.attendance-card {
+    background-color: #ededed;
+    height: 5%;
+    overflow: auto;
+}
+.attendance-header {
+    font-weight: bold;
+    margin-left: 3%
+}
+.header-attendance-table {
+    margin-bottom: 0;
+}
+.sidebar-nav .navbar-inverse + a {
+    padding-left: 0;
+}
+.link-nav {
+    letter-spacing: 2px;
+    font-weight: bold;
+    width: 70%;
+}
+.underline_text {
+    border-bottom: solid 2px #000000;
+    display: inline;
+    padding-bottom: 3px;
+}
+.row.vertical-divider {
+    overflow: hidden;
+}
+.row.vertical-divider > div[class^="col-"] {
+    padding-bottom: 100px;
+    margin-bottom: -100px;
+    border-left: 2px solid #F2F7F9;
+    border-right: 2px solid #F2F7F9;
+}
+.row.vertical-divider div[class^="col-"]:first-child {
+    border-left: none;
+}
+.row.vertical-divider div[class^="col-"]:last-child {
+    border-right: none;
+}
 
+/*
 .table{
 	height:350px;	
 }
+*/
 
 div[contentEditable] {
-  cursor: pointer;
-  background-color: white;
+    cursor: pointer;
+    background-color: white;
     padding: .2em;
 }
 div[contentEditable]:focus {
-  cursor: pointer;
-  background-color: #D0D0D0;
+    cursor: pointer;
+    background-color: #D0D0D0;
     border: 1px solid red;
-  padding: .2em;
+    padding: .2em;
 }
-
 .no-gutter > [class*='col-'] {
-    padding-right:0;
-    padding-left:0;
+    padding-right: 0;
+    padding-left: 0;
 }
-
-.btn-expand
-{
+.login-page {
+    margin-top: 250px!important;
+    left: 50px;
+}
+.login-page-mobile {
+    left: -30px;
+}
+.btn-expand {
     position: absolute;
     bottom: 30px;
     right: 45px;
 }
-.help-block
-{
-    font-weight: normal; font-size: 10px; vertical-align: middle;
+.help-block {
+    font-weight: normal;
+    font-size: 10px;
+    vertical-align: middle;
 }
-.small
-{
+.small {
     font-size: 50%;
 }
-.bold{
+.bold {
     font-weight: 700;
 }
-.font16
-{
+.font16 {
     font-size: 16px;
 }
-.subhead{
-    text-transform:uppercase;
+.subhead {
+    text-transform: uppercase;
+}
+#collapse-sidebarmenu:hover {
+    cursor: pointer;
 }
 
 /*- Flags -*/
 
-.flag{
+.flag {
     background: #E75051;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
-
-.flag .title h1, .flag .content p, .flag .button, .flag .button:hover, .flag .button:active{
+.flag .title h1,
+.flag .content p,
+.flag .button,
+.flag .button:hover,
+.flag .button:active {
     color: #fff;
 }
-
-.flag .title hr{
+.flag .title hr {
     border-top: solid 2px #fff;
 }
 
 /*- View/Read Icons -*/
 
-.lock{
+.lock {
     background-image: url(../img/icon-lock.png);
     background-repeat: no-repeat;
     background-position: right 10px top 10px;
     background-size: 18px;
 }
-
-.pencil{
+.pencil {
     background-image: url(../img/icon-pencil.png);
     background-repeat: no-repeat;
     background-position: right 10px top 10px;
     background-size: 18px;
 }
-
-
-
-.colour{
+.colour {
     width: 100%;
     height: 10px;
     margin-bottom: 20px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
 }
-.label-checkbox
-{
+.label-checkbox {
     display: inline-block;
 }
-.ng-hide
-{
-    display: none;
+.ng-hide {
+    display: none !important;
 }
-.glyphicon-spin
-{
+.glyphicon-spin {
     -webkit-animation: glyphicon-spin 2s infinite linear;
     animation: glyphicon-spin 2s infinite linear;
 }
-@-webkit-keyframes glyphicon-spin
-{
+@-webkit-keyframes glyphicon-spin {
     0% {
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
@@ -337,8 +472,7 @@ div[contentEditable]:focus {
         transform: rotate(359deg);
     }
 }
-@keyframes glyphicon-spin
-{
+@keyframes glyphicon-spin {
     0% {
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
@@ -351,12 +485,11 @@ div[contentEditable]:focus {
 
 /*- Sidebar Collapse Icon -*/
 
-.collapse-icon{
-color:white;
+.collapse-icon {
+    color: white;
 }
-
-.collapse-icon:hover{
-cursor:pointer;
+.collapse-icon:hover {
+    cursor: pointer;
 }
 
 /*
@@ -364,25 +497,24 @@ cursor:pointer;
 =================== 6.Form ====================
 ===============================================
 */
-.form-control
-{
+
+.form-control {
     border: 0 !important;
     box-shadow: none !important;
     border-bottom: 1px #000 solid !important;
     border-radius: 0 !important;
 }
-.form-inline
-{
+.form-inline {
     padding-bottom: 40px;
 }
 
-
 /*- Buttons -*/
-.button{
-    font-family:'quicksand';
+
+.button {
+    font-family: 'Lato', sans-serif;
     font-weight: 700;
-    background:transparent;
-    font-size:1em;
+    background: transparent;
+    font-size: 1em;
     letter-spacing: .1em;
     text-transform: uppercase;
     color: #555;
@@ -390,25 +522,22 @@ cursor:pointer;
     padding: 3px 25px;
     border-radius: 3px;
     margin: 10px 0;
-    outline:0px !important;
-    -webkit-appearance:none;
+    outline: 0px !important;
+    -webkit-appearance: none;
     min-height: 30px;
 }
-a.button
-{
+a.button {
     padding-top: 5px;
     padding-bottom: 5px;
 }
-
-.button:hover{
+.button:hover {
     /*
     border-bottom:solid 3px;
     */
     color: #555;
     text-decoration: none;
 }
-
-.button:active{
+.button:active {
     /*
     border-bottom:solid 2px rgba(0,0,0,0.0);
     background: rgba(0,0,0,0.1);
@@ -416,58 +545,64 @@ a.button
     text-decoration: none;
     */
 }
-
-.button:visted{
+.button:visted {
     box-shadow: none;
 }
-
 #login-container input,
-#forget-container input
-{
+#forget-container input {
     background: transparent;
-    border-bottom: 1px #FFFFFF solid !important;
-    color: #FFFFFF;
+    border-bottom: 1px #555 solid !important;
+    color: #555;
 }
-#login-container input::-webkit-input-placeholder, /* WebKit browsers */
+#login-container input::-webkit-input-placeholder,
+
+/* WebKit browsers */
+
 #forget-container input::-webkit-input-placeholder,
-#login-container input:-moz-placeholder, /* Mozilla Firefox 4 to 18 */
+#login-container input:-moz-placeholder,
+
+/* Mozilla Firefox 4 to 18 */
+
 #forget-container input:-moz-placeholder,
-#login-container input::-moz-placeholder, /* Mozilla Firefox 19+ */
+#login-container input::-moz-placeholder,
+
+/* Mozilla Firefox 19+ */
+
 #forget-container input::-moz-placeholder,
-#login-container input:-ms-input-placeholder, /* Internet Explorer 10+ */
-#forget-container input:-ms-input-placeholder
-{
-    color: #FFFFFF;
+#login-container input:-ms-input-placeholder,
+
+/* Internet Explorer 10+ */
+
+#forget-container input:-ms-input-placeholder {
+    color: #555;
 }
-#login-container .card .help-block.label-checkbox
-{
-    color: #FFFFFF;
+#login-container .card .help-block.label-checkbox {
+    color: #555;
 }
 #login-container .button,
-#forget-container .button
-{
-    color: #FFFFFF;
-    border-color: #FFFFFF;
+#forget-container .button {
+    color: #555;
+    border-color: #555;
 }
-
 
 /*
 ===============================================
 =========== media (max-width:767px) ===========
 ===============================================
 */
-@media (max-width:767px) {
 
+@media (max-width:767px) {
     /*
     ===============================================
     =================== 2.Header ==================
     ===============================================
     */
-    .navbar
-    {
+    .navbar {
         width: 75px;
     }
-
+    #forgot_button {
+        display: block;
+    }
     /*
     ===============================================
     =================== 2a.Menu ===================
@@ -477,20 +612,19 @@ a.button
         position: fixed;
         top: 0;
         height: 100%;
-        bottom:0;
+        bottom: 0;
         width: 80%;
         left: -80%;
-        background-image: -webkit-linear-gradient(top,#3c3c3c 0,#222 100%);
-        background-image: -o-linear-gradient(top,#3c3c3c 0,#222 100%);
-        background-image: -webkit-gradient(linear,left top,left bottom,from(#3c3c3c),to(#222));
-        background-image: linear-gradient(to bottom,#3c3c3c 0,#222 100%);
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
-        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        background-image: -webkit-linear-gradient(top, #3c3c3c 0, #222 100%);
+        background-image: -o-linear-gradient(top, #3c3c3c 0, #222 100%);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
+        background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
+        filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+        filter: progid: DXImageTransform.Microsoft.gradient(enabled=false);
         background-repeat: repeat-x;
         z-index: -1;
     }
-    #navbar #slidemenu
-    {
+    #navbar #slidemenu {
         left: -100%;
         width: 80%;
         min-width: 0;
@@ -499,125 +633,110 @@ a.button
         z-index: 1;
         margin: 0;
     }
-    .navbar.slide-active
-    {
+    .navbar.slide-active {
         width: 80%;
         z-index: 2;
     }
     #navbar .navbar-toggle.slide-active .icon-bar {
         background: orange;
     }
-    #navbar .navbar-brand
-    {
+    #navbar .navbar-brand {
         display: none;
     }
-    #navbar .navbar-header.slide-active .navbar-brand
-    {
+    #navbar .navbar-header.slide-active .navbar-brand {
         display: block;
     }
-    #navbar #slidemenu.slide-active .navbar-nav
-    {
+    #navbar #slidemenu.slide-active .navbar-nav {
         margin: 7.5px 10px;
     }
-
     /*
     ===============================================
     ================= 3.Container =================
     ===============================================
     */
-    .container-with-menu
-      {
+    .container-with-menu {
         width: calc(100% - 75px);
         margin-left: 75px;
     }
-
-
 }
-
 
 /*
 ===============================================
 =========== media (min-width:768px) ===========
 ===============================================
 */
-@media (min-width:768px) {
 
+@media (min-width:768px) {
     /*
     ===============================================
     =================== 2.Header ==================
     ===============================================
     */
-    .navbar
-    {
+    .navbar {
         width: 15%;
     }
-
     /*
     ===============================================
     =================== 2a.Menu ===================
     ===============================================
     */
-    #navbar
-    {
+    .custom-table {
+        width: 100%;
+        max-width: 100%;
+    }
+    .custom-table tr td {
+        padding: 1%;
+    }
+    .custom-table .border-top-bottom {
+        border-top: 1px solid black!important;
+        border-bottom: 1px solid black!important;
+    }
+    #navbar {
         padding: 35px 10px 10px 10px;
         border-radius: 0;
         overflow-x: hidden;
     }
-    .navbar-header
-    {
+    .navbar-header {
         float: none;
     }
-    .navbar-nav
-    {
+    .navbar-nav {
         float: none;
     }
-    .navbar-right
-    {
+    .navbar-right {
         float: none !important;
     }
     .navbar-nav li,
-    .navbar-right li
-    {
+    .navbar-right li {
         float: none;
     }
     .navbar-nav .dropdown-menu,
-    .navbar-right .dropdown-menu
-    {
+    .navbar-right .dropdown-menu {
         position: relative;
         float: none;
         background-color: transparent;
         box-shadow: none;
         border: 0;
     }
-
     /*
     ===============================================
     ================= 3.Container =================
     ===============================================
     */
-    .container-with-menu
-    {
+    .container-with-menu {
         width: 85%;
         margin-left: 15%;
     }
-
-
     /*
     ===============================================
     ================== 5.Utility ==================
     ===============================================
     */
-
 }
-
-
 @media (max-height:600px) {
-
     #login-container,
-    #forget-container
-    {
+    #forget-container {
         position: absolute;
-        top: 10%;
+        /*top: 10%;*/
+        margin: 18%;
     }
-
 }

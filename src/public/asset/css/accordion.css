@@ -1,0 +1,11 @@
+#accordian {
+width: inherit;
+margin: 100px auto 0 auto;
+color: inherit;
+}
+	
+#accordion li{
+    list-style-type: none;
+}
+
+}
