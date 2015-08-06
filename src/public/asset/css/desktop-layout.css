@@ -1,0 +1,28 @@
+html,
+body {
+    height: 100%
+}
+#side-panel {
+    float: left;
+    width: 15%;
+    height: 100%;
+    border-right: 1px solid #dddddd;
+}
+#center-panel {
+    margin-left: 15%;
+    background-color: ;
+}
+#center-panel .row-fluid {
+    overflow: auto;
+}
+#center-panel .large {
+    height: 400px;
+    padding: 10px;
+    background-color: #f17f49
+}
+#desktop-nav{
+    position: fixed;
+    width: 15%;
+    height: 100%;
+    box-shadow: -10px 0 20px rgba(0,0,0,0.1) inset;
+}
