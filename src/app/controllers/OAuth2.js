@@ -310,7 +310,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 
         if (!token) return callback(null, false);
 
-        if (''+client.clientId !== ''+token.clientId) return callback(null, false);
+        if (''+client.id !== ''+token.clientId) return callback(null, false);
 
         var newAccessToken = uid(256);
 

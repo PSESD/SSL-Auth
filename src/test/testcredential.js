@@ -68,7 +68,6 @@ describe( 'OAuth2', function () {
             .expect( 200 )
             .expect( function (res) {
                 secretCode = res.body.client_secret;
-                console.dir( res.body );
                 console.log('SECRET: ', secretCode);
             } )
             .end( done );
@@ -80,7 +79,6 @@ describe( 'OAuth2', function () {
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
-                console.dir( res.body );
             } )
             .end( done );
 
@@ -107,19 +105,30 @@ describe( 'OAuth2', function () {
             .end( done );
 
     } );
+    it( 'use refresh token to get a token', function (done) {
 
-    it( 'use token to get a user api end point', function (done) {
-        request(api_endpoint)
-            .get('/user')
-            .set('authorization', tokenType + ' ' + token)
-            .expect( function (res) {
-                console.dir(res.body);
-            } )
+        var rfParam = {
+            grant_type  : 'refresh_token',
+            refresh_token: refreshToken,
+        };
+
+        var out = [];
+        Object.keys(rfParam).forEach(function(key) {
+            out.push(key+'='+encodeURIComponent(rfParam[key]));
+        });
+        console.log(url+'/api/oauth2/token', out.join("&"));
+
+        request( url ).post( '/api/oauth2/token' )
+            .auth( 'client', secretCode )
+            .expect( 'Content-Type', /json/ ).type( 'form' )
+            .send( rfParam )
+            .type( 'urlencoded' )
             .expect( 200 )
+            .expect( function (res) {
+            } )
             .end( done );
 
     } );
-
     after( function (done) {
         done();
     } )
