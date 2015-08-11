@@ -577,7 +577,7 @@ exports.processChangePassword = function(req, res){
 
         if(password !== confirmPassword){
 
-            errors.push("Password doesn't match!");
+            errors.push("Password did not match");
 
             return false;
 
