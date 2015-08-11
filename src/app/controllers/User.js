@@ -73,7 +73,13 @@ exports.sendInvite = function (req, res) {
 
     var role = req.body.role || 'case-worker';
 
-    var is_special_case_worker = req.body.is_special_case_worker || true;
+    var is_special_case_worker = false;
+
+    if(req.body.is_special_case_worker === 'true' || parseInt(req.body.is_special_case_worker) === 1){
+
+        is_special_case_worker = true;
+
+    }
 
     var user = {
         email: req.body.email
