@@ -442,19 +442,11 @@ UserSchema.methods.verifyPassword = function(password, cb) {
 };
 
 UserSchema.methods.verifyAuthCode = function (code, cb) {
-    if (!this.salt) {
-        cb(null, false);
-    } else {
-        cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
-    }
+    cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
 };
 
 UserSchema.methods.verifyForgotPassword = function (code, cb) {
-    if (!this.salt) {
-        cb(null, false);
-    } else {
-        cb(null, (this.encryptForgotPassword(code) === this.hashedForgotPassword && new Date() < this.hashedForgotPasswordExpire));
-    }
+    cb(null, (this.encryptForgotPassword(code) === this.hashedForgotPassword && new Date() < this.hashedForgotPasswordExpire));
 };
 
 /**
