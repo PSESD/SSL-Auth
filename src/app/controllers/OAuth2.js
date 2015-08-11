@@ -28,16 +28,21 @@ var server = oauth2orize.createServer();
 // the client by ID from the database.
 
 server.serializeClient(function (client, callback) {
+
     return callback(null, client._id);
+
 });
 
 server.deserializeClient(function (id, callback) {
+
     Client.findOne({_id: id}, function (err, client) {
-        if (err) {
-            return callback(err);
-        }
+
+        if (err) return callback(err);
+
         return callback(null, client);
+
     });
+
 });
 
 // Register supported grant types.
@@ -55,46 +60,51 @@ server.deserializeClient(function (id, callback) {
 // values, and will be exchanged for an access token.
 
 server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, callback) {
+
     // Create a new authorization code
+    Client.findOne({_id: client._id.toString()}, function(err, cln){
 
+        if (err) return callback(err);
 
-
-    Client.findOne({_id: ''+client._id}, function(err, cln){
-        if(err){
-            return callback(err);
-        }
         if(!cln) return callback('Url not match!');
+
         try{
+
             var uri = require('url');
+
             var parser = uri.parse(redirectUri);
+
             var uriRegex = (''+cln.redirectUri);
                 
             var regex = new RegExp(uriRegex, 'i');
 
-            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));  
+            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));
+            if(!parser.host.match(regex)) return callback('Url not match!');
 
-
-            if(!parser.host.match(regex)){
-                return callback('Url not match!');
-            }
         } catch(e){
+
             console.log(e);
+
             return callback('Url not match!');
+
         }
+
         var code = new Code({
             code: codeHash(uid(16)),
             clientId: client._id,
             redirectUri: redirectUri,
             userId: user._id
         });
+
         // Save the auth code and check for errors
         code.save(function (err) {
-            if (err) {
-                return callback(err);
-            }
+
+            if (err) return callback(err);
 
             callback(null, code.code);
+
         });
+
     });
 
 }));
@@ -107,29 +117,36 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 
 server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, callback) {
 
+
     Code.findOne({code: code}, function (err, authCode) {
-        if (err) {
-            return callback(err);
-        }
+
+        if (err) return callback(err);
+
         if (authCode === undefined || authCode === null) {
             return callback(null, false);
         }
+
         if (client._id.toString() !== authCode.clientId) {
             return callback(null, false);
         }
+
         if (redirectUri !== authCode.redirectUri) {
             return callback(null, false);
         }
 
         // Delete auth code now that it has been used
         authCode.remove(function (err) {
-            if (err) {
-                return callback(err);
-            }
+
+            if (err) return callback(err);
+
             var token = uid(256);
+
             var refreshToken = uid(256);
+
             var refreshTokenHash = tokenHash(refreshToken);
+
             var expired = calculateExp();
+
             // Create a new access token
             var tokenModel = new Token({
                 token: tokenHash(token),
@@ -137,6 +154,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
                 userId: authCode.userId,
                 expired: expired
             });
+
             //Refresh Token Code
             var refreshTokenModel = new RefreshToken({
                 refreshToken: refreshTokenHash,
@@ -146,16 +164,20 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
 
             // Save the access token and check for errors
             tokenModel.save(function (err) {
-                if (err) {
-                    return callback(err);
-                }
+
+                if (err) return callback(err);
+
                 refreshTokenModel.save(function (err) {
                     if (err) return callback(err);
                     callback(null, token, refreshToken, {expires_in: expiresIn});
                 });
+
             });
+
         });
+
     });
+
 }));
 /**
  * Exchange user id and password for access tokens.
@@ -165,11 +187,11 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  * application issues an access token on behalf of the user who authorized the code.
  */
 server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
+
     //Validate the user
     User.findOne({email: username}, function (err, user) {
-        if (err) {
-            return callback(err);
-        }
+
+        if (err) return callback(err);
 
         // No user found with that username
         if (!user) {
@@ -178,16 +200,16 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
 
         // Make sure the password is correct
         user.verifyPassword(password, function (err, isMatch) {
-            if (err) {
-                return callback(err);
-            }
+
+            if (err) return callback(err);
 
             // Password did not match
             if (!isMatch) {
-                return callback(null, false);
+                return callback(new Error('Password did not match'), false);
             }
 
             var token = uid(256);
+
             var expired = calculateExp();
 
             // Create a new access token
@@ -199,32 +221,46 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
                 expired: expired
             });
 
-
             // Save the access token and check for errors
             tokenModel.save(function (err) {
-                if (err) {
-                    return callback(err);
-                }
+
+                if (err) return callback(err);
+
                 var refreshToken = uid(256);
+
                 var refreshTokenHash = tokenHash(refreshToken);
+
                 //Refresh Token Code
                 var refreshTokenModel = new RefreshToken({
                     refreshToken: refreshTokenHash,
                     clientId: client.id,
                     userId: user.userId
                 });
+
                 if (scope && scope.indexOf("offline_access") === 0) {
+
                     refreshTokenModel.save(function (err) {
+
                         if (err) return callback(err);
+
                         callback(null, token, refreshToken, {expires_in: expiresIn});
+
                     });
+
                 } else {
+
                     refreshToken = null;
+
                     callback(null, token, refreshToken, {expires_in: expiresIn});
+
                 }
+
             });
+
         });
+
     });
+
 }));
 
 /**
@@ -236,7 +272,9 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
  */
 server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, callback) {
     var token = uid(256);
+
     var expired = calculateExp();
+
     var tokenModel = new Token({
         token: tokenHash(token),
         clientId: client.id,
@@ -244,13 +282,16 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, 
         scope: scope,
         expired: expired
     });
+
     //Pass in a null for user id since there is no user when using this grant type
     tokenModel.save(function (err) {
-        if (err) {
-            return callback(err);
-        }
+
+        if (err) return callback(err);
+
         callback(null, token, null, {expires_in: expiresIn});
+
     });
+
 }));
 /**
  * Exchange the refresh token for an access token.
@@ -260,16 +301,19 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, 
  * token on behalf of the client who authorized the code
  */
 server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, callback) {
+
     var refreshTokenHash = tokenHash(refreshToken);
 
     RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
         
         if (err) return callback(err);
+
         if (!token) return callback(null, false);
 
-        if (''+client.clientId !== ''+token.clientId) return callback(null, false);
+        if (''+client.id !== ''+token.clientId) return callback(null, false);
 
         var newAccessToken = uid(256);
+
         var accessTokenHash = tokenHash(newAccessToken);
 
         var expired = calculateExp();
@@ -281,10 +325,15 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
                 expired: expired
             }
         }, function (err) {
+
             if (err) return callback(err);
+
             callback(null, newAccessToken, refreshToken, {expires_in: expiresIn});
+
         });
+
     });
+
 }));
 // user authorization endpoint
 //
@@ -303,15 +352,23 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 // first, and rendering the `dialog` view. 
 
 exports.authorization = [
+
     server.authorization(function (clientId, redirectUri, callback) {
 
         Client.findOne({id: clientId}, function (err, client) {
+<<<<<<< HEAD
             if (err) {
                 return callback(err);
             }
+=======
+
+            if (err) return callback(err);
+>>>>>>> staging
 
             return callback(null, client, redirectUri);
+
         });
+<<<<<<< HEAD
     })/*,
     function (client, user, done) {
 
@@ -328,13 +385,21 @@ exports.authorization = [
             }
         });
     })*/,
+=======
+
+    }),
+
+>>>>>>> staging
     function (req, res) {
+
         res.render('../app/views/dialog', {
             transactionID: req.oauth2.transactionID,
             user: req.user,
             client: req.oauth2.client
         });
+
     }
+
 ];
 
 // user decision endpoint
@@ -345,7 +410,9 @@ exports.authorization = [
 // a response.
 
 module.exports.decision = [
+
     server.decision()
+
 ];
 
 // token endpoint
@@ -356,7 +423,10 @@ module.exports.decision = [
 // authenticate when making requests to this endpoint.
 
 exports.token = [
+
     server.token(),
+
     server.errorHandler()
+
 ];
 

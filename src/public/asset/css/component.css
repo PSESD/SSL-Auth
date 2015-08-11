@@ -1,0 +1,54 @@
+#showLeftPush{
+	position: relative;
+	left: 235px;
+	top: 30px;
+	color:white;
+}
+#showLeftPush:hover{
+	cursor:pointer;
+}
+/* General styles for all menus */
+.cbp-spmenu {
+	position: fixed;
+	background-color:black;
+}
+
+.cbp-spmenu-vertical {
+	width: 286px;
+	height: 100%;
+	top: 0;
+	z-index: 1000;
+	left:0;
+	padding-left:20px;
+}
+
+.cbp-spmenu-left {
+	left: -240px;
+}
+
+.cbp-spmenu-left.cbp-spmenu-open {
+	left: 0px;
+}
+
+.cbp-spmenu-push {
+	overflow-x: hidden;
+	position: relative;
+	left: 0;
+}
+
+.cbp-spmenu-push-toright {
+	left: 240px;
+}
+
+.cbp-spmenu-push-toleft {
+	left: -240px;
+}
+
+/* Transitions */
+
+.cbp-spmenu,
+.cbp-spmenu-push {
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+}
