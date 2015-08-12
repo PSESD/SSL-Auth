@@ -9,10 +9,7 @@ var Client = require('../models/Client');
 var Access = require('../access/access');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
-<<<<<<< HEAD
-=======
 var RefreshToken = require('../models/RefreshToken');
->>>>>>> staging
 var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
@@ -159,40 +156,7 @@ passport.use(new BearerStrategy(
   }
 
 ));
-/**
- * Logout
- * @param req
- * @param res
- */
-exports.logout =
-function (req, res) {
-  /**
-   * Remove token, refresh_token and auth code
-   */
-  var accessToken = req.query.token || req.body.token;
-  var accessTokenHash = tokenHash(accessToken);
-  if(accessTokenHash){
-    Token.findOne({ token: accessTokenHash }, function(err, token){
-      if(err){ return req.logout(); }
-      if(token){
-        var crit = { clientId: token.clientId, userId: token.userId };
-        Code.remove(crit, function(err){
-          Token.remove(crit, function(err){
-            RefreshToken.remove(crit, function(err){
-              req.logout();
-            });
-          });
-        });
-      }
-    });
-  } else {
-    req.logout();
-  }
 
-
-<<<<<<< HEAD
-  res.redirect('/');
-=======
 /**
  * Logout
  * @param req
@@ -242,7 +206,6 @@ exports.logout = function (req, res) {
 
   res.redirect('/');
 
->>>>>>> staging
 };
 
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
