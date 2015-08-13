@@ -200,7 +200,7 @@ UserSchema.virtual('userId')
  * @returns {*}
  */
 UserSchema.methods.encryptPassword = function (password) {
-    return crypto.pbkdf2Sync(''+password, this.salt, 4096, 512, 'sha256').toString('hex');
+    return crypto.pbkdf2Sync(''+password, this.salt+'', 4096, 512, 'sha256').toString('hex');
 };
 /**
  *
@@ -208,7 +208,7 @@ UserSchema.methods.encryptPassword = function (password) {
  * @returns {*}
  */
 UserSchema.methods.encryptAuthCode = function (code) {
-    return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');
+    return crypto.pbkdf2Sync(''+code, this.salt+'', 4096, 64, 'sha256').toString('hex');
 };
 /**
  *
@@ -216,7 +216,7 @@ UserSchema.methods.encryptAuthCode = function (code) {
  * @returns {*}
  */
 UserSchema.methods.encryptForgotPassword = function (code) {
-    return crypto.pbkdf2Sync(''+code, this.salt, 4096, 32, 'sha256').toString('hex');
+    return crypto.pbkdf2Sync(''+code, this.salt+'', 4096, 32, 'sha256').toString('hex');
 };
 /**
  * If current user is admin
@@ -334,7 +334,7 @@ UserSchema.virtual('password')
     .set(function(password) {
         if(!_.isEmpty(password)) {
             this._plainPassword = password;
-            this.salt = crypto.randomBytes(128).toString('base64');
+            if(!this.salt) this.salt = crypto.randomBytes(128).toString('base64');
             this.hashedPassword = this.encryptPassword(password);
         }
     })
@@ -344,11 +344,8 @@ UserSchema.virtual('password')
  */
 UserSchema.virtual('authCode')
     .set(function (code) {
-        var password = crypto.randomBytes(12).toString('base64');
+
         this._plainAuthCode = code;
-        this._plainPassword = password;
-        this.salt = crypto.randomBytes(128).toString('base64');
-        this.hashedPassword = this.encryptPassword(password);
         this.hashedAuthCode = this.encryptAuthCode(code);
     })
     .get(function () {
@@ -357,6 +354,7 @@ UserSchema.virtual('authCode')
 
 UserSchema.virtual('forgotPassword')
     .set(function (code) {
+
         this._plainForgotPassword = code;
         this.hashedForgotPassword = this.encryptForgotPassword(code);
         this.hashedForgotPasswordExpire = new Date(new Date().getTime() + (86400 * 1000)); // set to 24 hour
@@ -444,19 +442,11 @@ UserSchema.methods.verifyPassword = function(password, cb) {
 };
 
 UserSchema.methods.verifyAuthCode = function (code, cb) {
-    if (!this.salt) {
-        cb(null, false);
-    } else {
-        cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
-    }
+    cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
 };
 
 UserSchema.methods.verifyForgotPassword = function (code, cb) {
-    if (!this.salt) {
-        cb(null, false);
-    } else {
-        cb(null, (this.encryptForgotPassword(code) === this.hashedForgotPassword && new Date() < this.hashedForgotPasswordExpire));
-    }
+    cb(null, (this.encryptForgotPassword(code) === this.hashedForgotPassword && new Date() < this.hashedForgotPasswordExpire));
 };
 
 /**
