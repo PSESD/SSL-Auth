@@ -7,7 +7,7 @@ var php = require('phpjs');
 var _ = require('underscore');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-var log = require('./../../lib/utils').log;
+var log = console.log;
 
 var instance = null;
 /**

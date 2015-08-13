@@ -61,6 +61,15 @@ var utils = {
 
     },
     /**
+     *
+     * @param value
+     */
+    md5: function(value){
+
+        return crypto.createHash('md5').update(value).digest('hex');
+
+    },
+    /**
      * Return a unique identifier with the given `len`.
      *
      *     uid(10);
