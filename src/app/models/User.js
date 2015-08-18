@@ -476,7 +476,20 @@ UserSchema.method('toJSON', function(){
     delete user.organizationId;
     delete user.hashedForgotPasswordExpire;
     delete user.__v;
-    delete user.is_super_admin;
+    delete user.is_super_admin
+    var fullname = [];
+
+    if(user.first_name) fullname.push(user.first_name);
+    if(user.middle_name) fullname.push(user.middle_name);
+    if(user.last_name) fullname.push(user.last_name);
+
+    if(fullname.length === 0){
+        fullname.push('n/a');
+        user.last_name = 'n/a';
+    }
+
+    user.full_name = fullname.join(' ');
+
     return user;
 });
 
