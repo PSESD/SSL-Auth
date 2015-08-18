@@ -466,5 +466,16 @@ UserSchema.statics.removeDeep = function(userId, done){
 UserSchema.set('toJSON', { hide: 'hashedPassword', virtuals: true });
 UserSchema.set('toObject', { hide: 'hashedPassword', virtuals: true });
 
+UserSchema.method('toJSON', function(){
+    var user = this.toObject();
+    delete user.salt;
+    delete user.hashedPassword;
+    delete user.allPermissions;
+    delete user.hashedForgotPasswordExpire;
+    delete user.__v;
+    delete user.is_super_admin;
+    return user;
+});
+
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);
