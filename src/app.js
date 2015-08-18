@@ -1,4 +1,5 @@
 var express = require("express");
+var i18n = require("i18n");
 var mongoose = require('mongoose');
 var bodyParser  = require("body-parser");
 var cookieParser = require('cookie-parser');
@@ -56,6 +57,35 @@ function Api(){
     self.env = app.get('env');
 
     self.connectDb();
+
+    i18n.configure({
+        // setup some locales - other locales default to en silently
+        locales:['en'],
+
+        // you may alter a site wide default locale
+        defaultLocale: 'en',
+
+        // sets a custom cookie name to parse locale settings from  - defaults to NULL
+        cookie: '__lang',
+
+        // where to store json files - defaults to './locales' relative to modules directory
+        directory: __dirname + '/app/locales',
+
+        // whether to write new locale information to disk - defaults to true
+        updateFiles: false,
+
+        // what to use as the indentation unit - defaults to "\t"
+        indent: "\t",
+
+        // setting extension of json files - defaults to '.json' (you might want to set this to '.js' according to webtranslateit)
+        extension: '.json',
+
+        // setting prefix of json files name - default to none '' (in case you use different locale files naming scheme (webapp-en.json), rather then just en.json)
+        prefix: 'lang-',
+
+        // enable object notation
+        objectNotation: true
+    });
 
 }
 /**
@@ -195,6 +225,8 @@ Api.prototype.configureExpress = function (db) {
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(cookieParser());
+
+    app.use(i18n.init);
 
     app.use(bodyParser.json());
 

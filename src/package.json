@@ -21,6 +21,7 @@
     "express": "^4.12.3",
     "express-session": "^1.11.1",
     "hal": "^0.1.0",
+    "i18n": "^0.5.0",
     "mandrill-api": "^1.0.45",
     "method-override": "^2.3.3",
     "mocha": "^2.2.4",
