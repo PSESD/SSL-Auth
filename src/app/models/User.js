@@ -414,7 +414,7 @@ UserSchema.virtual('allStudents').get(function(){
     if(this.permissions.length > 0){
 
         this.permissions.forEach(function(perm){
-            _students.push(perm._students);
+            _students.push(perm.students);
         });
     }
     return _students;
