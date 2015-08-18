@@ -471,6 +471,9 @@ UserSchema.method('toJSON', function(){
     delete user.salt;
     delete user.hashedPassword;
     delete user.allPermissions;
+    delete user.permissions;
+    delete user.allStudents;
+    delete user.organizationId;
     delete user.hashedForgotPasswordExpire;
     delete user.__v;
     delete user.is_super_admin;
