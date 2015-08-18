@@ -390,14 +390,21 @@ UserSchema.virtual('allPermissions').get(function(){
 
 UserSchema.virtual('allPermissionsByOrganization').get(function(){
     var _permissions = {};
+
+    if(!this.orgId) return _permissions;
+
     if(this.permissions.length > 0){
 
+        var orgId = this.orgId;
+
         this.permissions.forEach(function(perm){
-            if(!_permissions.hasOwnProperty(perm.organization)){
-                _permissions[perm.organization] = [];
+
+            if(orgId === perm.organization.toString()){
+                _permissions = perm;
             }
-            _permissions[perm.organization].push(perm.permissions);
+
         });
+
     }
     return _permissions;
 });
@@ -414,14 +421,18 @@ UserSchema.virtual('allStudents').get(function(){
 });
 
 UserSchema.virtual('allStudentsByOrganization').get(function(){
-    var _students = {};
+    var _students = [];
+    if(!this.orgId) return _students;
+
     if(this.permissions.length > 0){
 
+        var orgId = this.orgId;
+
         this.permissions.forEach(function(perm){
-            if(!_students.hasOwnProperty(perm.organization)){
-                _students[perm.organization] = [];
+
+            if(orgId === perm.organization.toString() && perm.students.length > 0 ) {
+                _students = perm.students;
             }
-            _students[perm.organization].push(perm.students);
         });
     }
     return _students;
@@ -476,7 +487,7 @@ UserSchema.method('toJSON', function(){
     delete user.organizationId;
     delete user.hashedForgotPasswordExpire;
     delete user.__v;
-    delete user.is_super_admin
+    delete user.is_super_admin;
     var fullname = [];
 
     if(user.first_name) fullname.push(user.first_name);
