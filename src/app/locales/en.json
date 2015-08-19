@@ -1,13 +1,13 @@
 {
     "general": {
-        "close": "L Close",
-        "change": "L Change",
-        "change_password": "L Change Password",
-        "new_password": "L New Password",
-        "confirm_password": "L Confirm Password",
-        "first_name": "L First Name",
-        "middle_name": "L Middle Name",
-        "last_name": "L Last Name",
+        "close": "Close",
+        "change": "Change",
+        "change_password": "Change Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "first_name": "First Name",
+        "middle_name": "Middle Name",
+        "last_name": "Last Name",
         "unknown": "Unknown"
     }
 }
