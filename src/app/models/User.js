@@ -135,7 +135,11 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, is_specia
 
     this.last_updated_by = user.userId;
 
-    this.save(cb);
+    var _this = this;
+
+    _this.save(function(err){
+        cb(err, _this);
+    });
 
 };
 /**

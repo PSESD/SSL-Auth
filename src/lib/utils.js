@@ -23,6 +23,119 @@ var utils = {
 
         var options = {};
 
+        if(!cache.enable){
+
+            var self = {};
+            /**
+             * Looks for an item in cache tiers.
+             * When a key is found in a lower cache, all higher levels are updated.
+             *
+             * @param {string} key
+             * @param {function} cb
+             */
+            self.getAndPassUp = function(key, cb) {
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Wraps a function in one or more caches.
+             * Has same API as regular caching module.
+             *
+             * If a key doesn't exist in any cache, it gets set in all caches.
+             * If a key exists in a high-priority (e.g., first) cache, it gets returned immediately
+             * without getting set in other lower-priority caches.
+             * If a key doesn't exist in a higher-priority cache but exists in a lower-priority
+             * cache, it gets set in all higher-priority caches.
+             *
+             * @param {string} key - The cache key to use in cache operations
+             * @param {function} work - The function to wrap
+             * @param {object} [options] - options passed to `set` function
+             * @param {function} cb
+             */
+            self.wrap = function(key, work, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Set value in all caches
+             *
+             * @function
+             * @name set
+             *
+             * @param {string} key
+             * @param {*} value
+             * @param {object} [options] to pass to underlying set function.
+             * @param {function} [cb]
+             */
+            self.set = function(key, value, options, cb) {
+
+                cb(null);
+
+            };
+
+            /**
+             * Get value from highest level cache that has stored it.
+             *
+             * @function
+             * @name get
+             *
+             * @param {string} key
+             * @param {object} [options] to pass to underlying get function.
+             * @param {function} cb
+             */
+            self.get = function(key, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Delete value from all caches.
+             *
+             * @function
+             * @name del
+             *
+             * @param {string} key
+             * @param {object} [options] to pass to underlying del function.
+             * @param {function} cb
+             */
+            self.del = function(key, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null);
+
+            };
+
+            return self;
+        }
+
         var getCache = function(name) {
 
             switch (name) {
