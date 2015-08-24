@@ -162,7 +162,7 @@ exports.sendInvite = function (req, res) {
                     });
 
                     var testerInfo = {
-                        user: user.toObject(),
+                        user: user.toJSON(),
                         activateUrl: activateUrl
                     };
 
