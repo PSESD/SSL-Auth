@@ -1,0 +1,13 @@
+{
+    "general": {
+        "close": "Close",
+        "change": "Change",
+        "change_password": "Change Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "first_name": "First Name",
+        "middle_name": "Middle Name",
+        "last_name": "Last Name",
+        "unknown": "Unknown"
+    }
+}
