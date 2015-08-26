@@ -135,7 +135,11 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, is_specia
 
     this.last_updated_by = user.userId;
 
-    this.save(cb);
+    var _this = this;
+
+    _this.save(function(err){
+        cb(err, _this);
+    });
 
 };
 /**
@@ -390,14 +394,21 @@ UserSchema.virtual('allPermissions').get(function(){
 
 UserSchema.virtual('allPermissionsByOrganization').get(function(){
     var _permissions = {};
+
+    if(!this.orgId) return _permissions;
+
     if(this.permissions.length > 0){
 
+        var orgId = this.orgId;
+
         this.permissions.forEach(function(perm){
-            if(!_permissions.hasOwnProperty(perm.organization)){
-                _permissions[perm.organization] = [];
+
+            if(orgId === perm.organization.toString()){
+                _permissions = perm;
             }
-            _permissions[perm.organization].push(perm.permissions);
+
         });
+
     }
     return _permissions;
 });
@@ -407,21 +418,25 @@ UserSchema.virtual('allStudents').get(function(){
     if(this.permissions.length > 0){
 
         this.permissions.forEach(function(perm){
-            _students.push(perm._students);
+            _students.push(perm.students);
         });
     }
     return _students;
 });
 
 UserSchema.virtual('allStudentsByOrganization').get(function(){
-    var _students = {};
+    var _students = [];
+    if(!this.orgId) return _students;
+
     if(this.permissions.length > 0){
 
+        var orgId = this.orgId;
+
         this.permissions.forEach(function(perm){
-            if(!_students.hasOwnProperty(perm.organization)){
-                _students[perm.organization] = [];
+
+            if(orgId === perm.organization.toString() && perm.students.length > 0 ) {
+                _students = perm.students;
             }
-            _students[perm.organization].push(perm.students);
         });
     }
     return _students;
@@ -465,6 +480,33 @@ UserSchema.statics.removeDeep = function(userId, done){
 
 UserSchema.set('toJSON', { hide: 'hashedPassword', virtuals: true });
 UserSchema.set('toObject', { hide: 'hashedPassword', virtuals: true });
+
+UserSchema.method('toJSON', function(){
+    var user = this.toObject();
+    delete user.salt;
+    delete user.hashedPassword;
+    delete user.allPermissions;
+    delete user.permissions;
+    delete user.allStudents;
+    delete user.organizationId;
+    delete user.hashedForgotPasswordExpire;
+    delete user.__v;
+    delete user.is_super_admin;
+    var fullname = [];
+
+    if(user.first_name) fullname.push(user.first_name);
+    if(user.middle_name) fullname.push(user.middle_name);
+    if(user.last_name) fullname.push(user.last_name);
+
+    if(fullname.length === 0){
+        fullname.push('n/a');
+        user.last_name = 'n/a';
+    }
+
+    user.full_name = fullname.join(' ');
+
+    return user;
+});
 
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);
