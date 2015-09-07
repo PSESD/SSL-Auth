@@ -162,7 +162,54 @@ Student.setRules([
     },
     {
         role: {
-            name: 'case-worker',
+            name: 'case-worker-unrestricted',
+            allow: {
+
+                create: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+
+                read: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                update: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                },
+                delete: {
+                    properties: {
+                        '*': '*' // allows all fields to be visible
+                    },
+                    where: {
+                        //creator: "$dynamic._id"
+                    }
+
+                }
+            }
+
+        }
+
+    },
+    {
+        role: {
+            name: 'case-worker-restricted',
             allow: {
 
                 create: {

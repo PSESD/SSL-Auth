@@ -11,7 +11,7 @@ var context;
 var currentRole;
 var protectFilter;
 var _permissions;
-var _is_special_case_worker;
+var _isCaseWorkerUnrestricted;
 var _acl;
 var _errorMessage = 'Access Denied';
 var onlyAssign = false;
@@ -28,19 +28,19 @@ module.exports = function protector(schema, options) {
 
         _acl = [];
 
-        _is_special_case_worker = false;
+        _isCaseWorkerUnrestricted = false;
 
         var _collectionName = collection;
         /**
          * Get current permission by admin
-         * @type {{role, is_special_case_worker, organization, students, permissions}}
+         * @type {{role, organization, students, permissions}}
          * @private
          */
         var _currentPermissions = user.getCurrentPermission();
 
         //console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', JSON.stringify(_currentPermissions));
 
-        _is_special_case_worker = _currentPermissions.is_special_case_worker;
+        _isCaseWorkerUnrestricted = _currentPermissions.role === 'case-worker-unrestricted';
 
         if(user && _.isObject(_currentPermissions)) {
 
