@@ -107,7 +107,7 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, cb){
         this._caseWorkerUnrestricted = caseWorkerUnrestricted = (role === 'case-worker-unrestricted');
     }
 
-    if(role.indexOf('case-worker') !== -1) {
+    if((''+role).indexOf('case-worker') !== -1) {
 
         var allow = caseWorkerUnrestricted ? 'all' : 'own';
 
