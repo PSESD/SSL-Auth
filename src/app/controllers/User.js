@@ -71,15 +71,7 @@ exports.sendInvite = function (req, res) {
 
     var email = req.body.email;
 
-    var role = req.body.role || 'case-worker';
-
-    var is_special_case_worker = false;
-
-    if(req.body.is_special_case_worker === 'true' || parseInt(req.body.is_special_case_worker) === 1){
-
-        is_special_case_worker = true;
-
-    }
+    var role = req.body.role || 'case-worker-restricted';
 
     var user = {
         email: req.body.email
@@ -146,8 +138,6 @@ exports.sendInvite = function (req, res) {
 
                 user.authCode = authCode;
 
-                user.is_special_case_worker = is_special_case_worker;
-
                 user.role = role;
 
                 user.saveWithRole(req.user, organization._id, function (err) {
@@ -157,8 +147,7 @@ exports.sendInvite = function (req, res) {
                     var invite = new Invite({
                         authCode: authCode,
                         organization: organization._id,
-                        role: role,
-                        is_special_case_worker: is_special_case_worker
+                        role: role
                     });
 
                     var testerInfo = {
@@ -413,7 +402,7 @@ exports.activate = function (req, res) {
                     // Success
                     User.where({_id: user._id}).update({
                         $unset: {hashedAuthCode: ""},
-                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role, is_special_case_worker: invite.is_special_case_worker}}
+                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role}}
                     }, function (err, updated) {
 
                         if (err) return res.errJson(err);
@@ -422,7 +411,7 @@ exports.activate = function (req, res) {
 
                             if (err) return res.errJson(err);
 
-                            updateUser.saveWithRole(user, organization._id.toString(), invite.role, invite.is_special_case_worker, function (err) {
+                            updateUser.saveWithRole(user, organization._id.toString(), invite.role, function (err) {
 
                                 if (err) return res.errJson(err);
 

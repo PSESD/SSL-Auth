@@ -125,7 +125,6 @@ describe('All-Test', function () {
         email: 'support@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech',
-        is_special_case_worker: false,
         role: 'case-worker',
         is_super_admin: true
     };
@@ -134,7 +133,6 @@ describe('All-Test', function () {
         email: 'admin@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech2',
-        is_special_case_worker: false,
         role: 'admin'
     };
 
@@ -142,7 +140,6 @@ describe('All-Test', function () {
         email: 'support3@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech3',
-        is_special_case_worker: false,
         role: 'case-worker'
     };
 
@@ -150,7 +147,6 @@ describe('All-Test', function () {
         email: 'support4@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech4',
-        is_special_case_worker: false,
         role: 'case-worker'
     };
 

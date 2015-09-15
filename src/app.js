@@ -20,7 +20,8 @@ var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
-if(rollbarAccessToken) {
+if (rollbarAccessToken) {
+
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
@@ -32,7 +33,7 @@ if(rollbarAccessToken) {
  *
  * @constructor
  */
-function Api(){
+function Api() {
 
     var self = this;
 
@@ -257,8 +258,11 @@ Api.prototype.configureExpress = function (db) {
          * @param rstatus
          */
         res.errUnauthorized = function(rstatus){
+
             res.statusCode = rstatus || 403;
+
             return res.end('Unauthorized');
+
         };
 
         res.okJson = function (message, data, key, collection) {
