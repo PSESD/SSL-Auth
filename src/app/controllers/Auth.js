@@ -167,7 +167,8 @@ exports.logout = function (req, res) {
    * Remove token, refresh_token and auth code
    */
   var accessToken = req.query.token || req.body.token;
- 
+  var refreshToken = req.query.refresh_token || req.body.refresh_token;
+
   if(accessToken){
 
     var accessTokenHash = tokenHash(accessToken);
@@ -182,13 +183,21 @@ exports.logout = function (req, res) {
 
         Code.remove(crit, function(err){
 
-          Token.remove(crit, function(err){
+          token.remove(function(err){
 
-            RefreshToken.remove(crit, function(err){
+            if(refreshToken){
+
+              RefreshToken.remove({ refreshToken: tokenHash(refreshToken) }, function(err){
+
+                req.logout();
+
+              });
+
+            } else {
 
               req.logout();
 
-            });
+            }
 
           });
 
