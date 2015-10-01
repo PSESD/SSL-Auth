@@ -131,9 +131,13 @@ passport.use(new BearerStrategy(
       //check for expired token
       if (new Date() > token.expired) {
 
-        Token.remove({token: accessTokenHash}, function (err) { callback(err) });
+        token.remove(function (err) {
 
-        callback(null, false, { message: 'Token expired' });
+          if (err) return callback(err);
+
+          callback(null, false, { message: 'Token expired' });
+
+        });
 
       } else {
 
