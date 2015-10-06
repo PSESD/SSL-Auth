@@ -25,7 +25,7 @@ if (rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, {exitOnUncaughtException: true});
 
 }
 
