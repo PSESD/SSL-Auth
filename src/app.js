@@ -25,7 +25,7 @@ if (rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, {exitOnUncaughtException: true});
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 }
 
@@ -252,6 +252,7 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(function (req, res, next) {
 
+
         var resource = null;
         /**
          *
@@ -264,11 +265,57 @@ Api.prototype.configureExpress = function (db) {
             return res.end('Unauthorized');
 
         };
+        /**
+         *
+         * @param req
+         * @param res
+         * @param data
+         * @returns {*}
+         */
+        function sendFormat(req, res, data){
 
-        res.okJson = function (message, data, key, collection) {
+            var format = req.params.format;
+
+            switch( format ){
+
+                case 'json':
+
+                    return res.json(data);
+
+                case 'xml':
+                    //if(res.bigXml){
+                    //    return res.send(utils.js2xml(data, res.xmlOptions));
+                    //}
+
+                    return res.send(xmlmodel(data, res.xmlOptions || 'response'));
+
+
+            }
+
+            return res.send(data);
+
+        }
+
+        res.sendFormat = sendFormat;
+
+
+        res.sendSuccess = function (message, data, key, collection) {
+
+            if(!req.params.format) req.params.format = 'json';
+
+            var format = req.params.format;
+
+            if(format === 'xml' && res.xmlKey && !key){
+
+                key = res.xmlKey;
+
+            }
+
             /**
              * If message is object will direct return
              */
+            //console.log('CLASS: ', message.constructor.name);
+
             if (_.isObject(message)) {
 
                 if (typeof message.toJSON === 'function') {
@@ -279,7 +326,7 @@ Api.prototype.configureExpress = function (db) {
 
                 resource = new hal.Resource(message, req.originalUrl);
 
-                return res.json(resource.toJSON());
+                return sendFormat(req, res, resource.toJSON());
 
             }
 
@@ -335,11 +382,13 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
-        res.errJson = function (err) {
+        res.sendError = function (err) {
+
+            if(!req.params.format) req.params.format = 'json';
 
             if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
 
@@ -347,7 +396,7 @@ Api.prototype.configureExpress = function (db) {
 
             resource = new hal.Resource(response, req.originalUrl);
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
@@ -385,11 +434,15 @@ Api.prototype.configureExpress = function (db) {
      */
     self.startServer();
 
+    //self.forkingStart();
+
 };
 /**
  * Start Server
  */
 Api.prototype.startServer = function () {
+
+    var me = this;
 
     app.listen(port, function () {
 
@@ -399,12 +452,57 @@ Api.prototype.startServer = function () {
 
 };
 /**
+ * Forking server
+ */
+Api.prototype.forkingStart = function(){
+
+    var me = this;
+
+    var cluster = require('cluster');
+
+    var workers = process.env.WORKERS || require('os').cpus().length;
+
+    if (cluster.isMaster) {
+
+        console.log('start cluster with %s workers', workers);
+
+        for (var i = 0; i < workers; ++i) {
+
+            var worker = cluster.fork().process;
+
+            console.log('worker %s started.', worker.pid);
+
+        }
+
+        cluster.on('exit', function(worker) {
+
+            console.log('worker %s died. restart...', worker.process.pid);
+
+            cluster.fork();
+
+        });
+
+    } else {
+
+        me.startServer();
+
+    }
+
+    process.on('uncaughtException', function (err) {
+
+        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+
+        me.stop(err);
+
+    });
+};
+/**
  * Stop Server
  * @param err
  */
 Api.prototype.stop = function (err) {
 
-    console.log("ERROR \n" + err);
+    console.log("ERROR \n" + err.stack);
 
     if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
 
@@ -425,12 +523,4 @@ Api.errorStack = function (ex) {
 
 };
 
-try {
-
-    new Api();
-
-} catch (e) {
-
-    Api.errorStack(e);
-
-}
+new Api();
