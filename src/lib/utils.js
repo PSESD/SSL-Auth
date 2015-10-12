@@ -6,6 +6,9 @@ var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
+var xml2js = require('xml2js');
+var _ = require('underscore');
+var parseString = require('xml2js').parseString;
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
@@ -172,6 +175,42 @@ var utils = {
 
         return cacheManager.multiCaching(caches);
 
+    },
+    /**
+     *
+     * @param data
+     * @param options
+     */
+    js2xml: function(data, options){
+
+        var root = 'response';
+
+        if(_.isString(options)){
+
+            root = options;
+
+            options = {};
+
+        }
+
+        return require('js2xmlparser')(root, data, options);
+
+    },
+    /**
+     *
+     * @param body
+     * @param callback
+     */
+    xml2js: function(body, callback){
+        parseString(body, {
+            normalize: true,
+            explicitArray: false,
+            parseBooleans: true,
+            parseNumbers: true,
+            stripPrefix: true,
+            firstCharLowerCase: true,
+            ignoreAttrs: true
+        }, callback);
     },
     /**
      *
