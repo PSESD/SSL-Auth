@@ -173,7 +173,7 @@ Access.hasAccess = function(req, res, next){
 
         if(err) {
 
-            res.errJson(err);
+            res.sendError(err);
 
             return res.end();
 

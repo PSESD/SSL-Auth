@@ -139,6 +139,7 @@ passport.use(new BearerStrategy(
 
         });
 
+
       } else {
 
         User.findOne({ _id: token.userId }, function (err, user) {
