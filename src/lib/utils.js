@@ -233,31 +233,27 @@ var utils = {
      */
     uid: function (len) {
 
-        var buf = []
-            , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-            , charlen = chars.length;
-
+        var chars = '+?*er*F+AY%vJ,tmwt$e[AzIy|(}(;W7]-Gw}Nazr}iD}--vA}+Jq%+$LCPsP#J#';
         /**
-         * Return a random int, used by `uid()`
          *
-         * @param {Number} min
-         * @param {Number} max
-         * @return {Number}
-         * @api private
+         * @param howMany
+         * @param chars
+         * @returns {string}
          */
-        var getRandomInt = function (min, max) {
+        var randomValueHex = function (howMany, chars) {
+            var rnd = crypto.randomBytes(howMany)
+                  , value = new Array(howMany)
+                  , len = chars.length;
 
-            return Math.floor(Math.random() * (max - min + 1)) + min;
+            for (var i = 0; i < howMany; i++) {
+                value[i] = chars[rnd[i] % len]
+            }
+
+            return new Buffer(value.join('')).toString('hex');
 
         };
 
-        for (var i = 0; i < len; ++i) {
-
-            buf.push(chars[getRandomInt(0, charlen - 1)]);
-
-        }
-
-        return buf.join('');
+        return randomValueHex(len, chars);
 
     },
     /**
