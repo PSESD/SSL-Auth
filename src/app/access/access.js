@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 22/07/15.
  */
@@ -16,9 +17,13 @@ var instance = null;
  */
 function Access(user, organizationId){
 
-    if(user) this.user = user;
+    if(user) {
+        this.user = user;
+    }
 
-    if(organizationId) this.organizationId = organizationId;
+    if(organizationId) {
+        this.organizationId = organizationId;
+    }
 
 }
 /**
@@ -71,7 +76,9 @@ Access.prototype.hasPermission = function(options){
 
     var currentUser = this.user;
 
-    if(!_.isObject(options)) options = {};
+    if(!_.isObject(options)) {
+        options = {};
+    }
 
     if('user' in options && options.user instanceof User){
 
@@ -79,13 +86,19 @@ Access.prototype.hasPermission = function(options){
 
     }
 
-    if(!currentUser) return false;
+    if(!currentUser) {
+        return false;
+    }
 
-    if(currentUser.isSuperAdmin()) return true;
+    if(currentUser.isSuperAdmin()) {
+        return true;
+    }
 
     var organizationId = this.organizationId;
 
-    if(!organizationId) return false;
+    if(!organizationId) {
+        return false;
+    }
 
 
     if('organizationId' in options && String.valueOf(options.organizationId).length > 0){
@@ -94,7 +107,9 @@ Access.prototype.hasPermission = function(options){
 
     }
 
-    if(!organizationId) return false;
+    if(!organizationId) {
+        return false;
+    }
 
     var orgid = currentUser.organizationId;
 

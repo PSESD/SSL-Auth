@@ -32,13 +32,21 @@ exports.postClients = function (req, res) {
     // Save the client and check for errors
     client.save(function (err) {
 
-        if (err) return errorClient(err, res);
+        if (err) {
 
-        var set = {secret: secretHash('' + client._id) };
+            return errorClient(err, res);
+
+        }
+
+        var set = { secret: secretHash('' + client._id) };
 
         Client.findByIdAndUpdate(client._id, { $set: set }, function (err, newClient) {
 
-            if (err) return errorClient(err, res);
+            if (err) {
+
+                return errorClient(err, res);
+
+            }
 
             res.json({
                 userId: newClient.userId,
@@ -60,7 +68,11 @@ exports.getClients = function (req, res) {
     // Use the Client model to find all clients
     Client.find({userId: req.user._id}, function (err, clients) {
 
-        if (err) return res.send(err);
+        if (err) {
+
+            return res.send(err);
+
+        }
 
         var response = [];
 

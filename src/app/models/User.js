@@ -1,3 +1,4 @@
+'use strict';
 // Load required packages
 var mongoose = require('mongoose');
 var crypto = require('crypto');
@@ -97,6 +98,8 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, cb){
 
 
     var currentPermission = this.getCurrentPermission(organizationId);
+
+    var caseWorkerUnrestricted = false;
 
     if(typeof role === 'function'){
         cb = role;

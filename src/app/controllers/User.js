@@ -365,14 +365,14 @@ exports.activate = function (req, res) {
 
     Organization.findOne({url: curl}, function (err, organization) {
 
-        if (err) return callback(err);
+        if (err) { return callback(err); }
 
         if (!organization) return callback('Organization not found!');
 
 
         User.findOne({email: email}, function (err, user) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             // No user found with that username
             if (!user) return callback('User not found', false);
@@ -384,7 +384,7 @@ exports.activate = function (req, res) {
             // Make sure the password is correct
             user.verifyAuthCode(authCode, function (err, isMatch) {
 
-                if (err) return callback(err);
+                if (err) { return callback(err); }
 
                 // Password did not match
                 if (!isMatch) {
@@ -395,7 +395,7 @@ exports.activate = function (req, res) {
 
                 Invite.findOne({ authCode: authCode }, function(err, invite){
 
-                    if (err) return callback(err);
+                    if (err) { return callback(err); }
 
                     if(!invite) return callback('Invalid token', false);
 
@@ -476,13 +476,13 @@ exports.formForgotPassword = function (req, res) {
 
     Organization.findOne({url: curl}, function (err, organization) {
 
-        if (err) return callback(err);
+        if (err) { return callback(err); }
 
         if (!organization) return callback('Organization not found!');
 
         User.findOne({email: email}, function (err, user) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             // No user found with that username
             if (!user) return callback('User not found', false);
@@ -490,7 +490,7 @@ exports.formForgotPassword = function (req, res) {
             // Make sure the password is correct
             user.verifyForgotPassword(code, function (err, isMatch) {
 
-                if (err) return callback(err);
+                if (err) { return callback(err); }
 
                 // Password did not match
                 if (!isMatch) {
@@ -606,7 +606,7 @@ exports.processChangePassword = function(req, res){
 
         Organization.findOne({url: curl}, function (err, organization) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             if (!organization) return callback('Organization not found!');
 

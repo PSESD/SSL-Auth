@@ -1,5 +1,10 @@
-
-
+'use strict';
+/**
+ *
+ * @param router
+ * @param Api
+ * @constructor
+ */
 function Rest(router, Api) {
     var self = this;
     self.handleRoutes(router, Api);
