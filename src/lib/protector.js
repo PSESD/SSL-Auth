@@ -1,7 +1,7 @@
+'use strict';
 /**
  * Created by zaenal on 23/06/15.
  */
-'use strict'
 
 var rules = {};
 var mongoose = require('mongoose');
@@ -11,7 +11,7 @@ var context;
 var currentRole;
 var protectFilter;
 var _permissions;
-var _is_special_case_worker;
+var _isCaseWorkerUnrestricted;
 var _acl;
 var _errorMessage = 'Access Denied';
 var onlyAssign = false;
@@ -28,19 +28,19 @@ module.exports = function protector(schema, options) {
 
         _acl = [];
 
-        _is_special_case_worker = false;
+        _isCaseWorkerUnrestricted = false;
 
         var _collectionName = collection;
         /**
          * Get current permission by admin
-         * @type {{role, is_special_case_worker, organization, students, permissions}}
+         * @type {{role, organization, students, permissions}}
          * @private
          */
         var _currentPermissions = user.getCurrentPermission();
 
         //console.log('CURRENT ('+_collectionName+') PERMISSIONS: ', JSON.stringify(_currentPermissions));
 
-        _is_special_case_worker = _currentPermissions.is_special_case_worker;
+        _isCaseWorkerUnrestricted = _currentPermissions.role === 'case-worker-unrestricted';
 
         if(user && _.isObject(_currentPermissions)) {
 
@@ -138,7 +138,9 @@ module.exports = function protector(schema, options) {
                 // this is a new document, does the user have create permission?
                 if (caller.isNew) {
 
-                    if(checkAcl('create').denied) return _localDenied();
+                    if(checkAcl('create').denied) {
+                        return _localDenied();
+                    }
 
                     gotRules = getRules(collection);
 
@@ -161,7 +163,9 @@ module.exports = function protector(schema, options) {
                 // this document is being updated, does the user have update permission?
                 else {
 
-                    if(checkAcl('update').denied) return _localDenied();
+                    if(checkAcl('update').denied) {
+                        return _localDenied();
+                    }
 
                     gotRules = getRules(collection);
 
@@ -184,7 +188,7 @@ module.exports = function protector(schema, options) {
                 }
 
             }
-        }
+        };
 
     };
 
@@ -382,9 +386,11 @@ module.exports = function protector(schema, options) {
 
         }
 
+        var isAllow = null;
+
         if (typeof localRules.where !== "undefined") {
 
-            var isAllow = acl.permission.allow;
+            isAllow = acl.permission.allow;
 
             if(onlyAssign === true){
 
@@ -458,6 +464,8 @@ module.exports = function protector(schema, options) {
 
                     break;
             }
+
+
 
             for (var attrn in localRules.where) {
 
@@ -562,7 +570,7 @@ module.exports = function protector(schema, options) {
 
                             }
 
-                        }
+                        };
 
                     },
                     /**
@@ -575,7 +583,7 @@ module.exports = function protector(schema, options) {
 
                     }
 
-                }
+                };
 
             }
 
@@ -632,7 +640,7 @@ module.exports = function protector(schema, options) {
                                 callback(_errorMessage);
 
                             }
-                        }
+                        };
                     },
                     /**
                      *
@@ -644,7 +652,7 @@ module.exports = function protector(schema, options) {
 
                     }
 
-                }
+                };
 
             }
 
@@ -694,7 +702,7 @@ module.exports = function protector(schema, options) {
 
                     }
 
-                }
+                };
 
             }
 
@@ -719,10 +727,12 @@ function _denied () {
  */
 function checkAcl(method){
 
-    if(!_acl) return {
-        denied: true,
-        permission: null
-    };
+    if(!_acl) {
+        return {
+            denied: true,
+            permission: null
+        };
+    }
 
     if(currentRole === 'admin' || currentRole === 'superadmin'){
 
@@ -783,7 +793,7 @@ function getRulesForRoleForMethod(rules, roleName, method) {
 
     for (var i = 0; i < rules.length; i++) {
 
-        if (rules[i].role.name == roleName) {
+        if (rules[i].role.name === roleName) {
 
             if (typeof rules[i].role.allow !== "undefined") {
 

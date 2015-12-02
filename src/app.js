@@ -1,4 +1,6 @@
+'use strict';
 var express = require("express");
+var i18n = require("i18n");
 var mongoose = require('mongoose');
 var bodyParser  = require("body-parser");
 var cookieParser = require('cookie-parser');
@@ -19,11 +21,12 @@ var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
-if(rollbarAccessToken) {
+if (rollbarAccessToken) {
+
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 }
 
@@ -31,7 +34,7 @@ if(rollbarAccessToken) {
  *
  * @constructor
  */
-function Api(){
+function Api() {
 
     var self = this;
 
@@ -57,6 +60,35 @@ function Api(){
 
     self.connectDb();
 
+    i18n.configure({
+        // setup some locales - other locales default to en silently
+        locales:['en'],
+
+        // you may alter a site wide default locale
+        defaultLocale: 'en',
+
+        // sets a custom cookie name to parse locale settings from  - defaults to NULL
+        cookie: '__lang',
+
+        // where to store json files - defaults to './locales' relative to modules directory
+        directory: __dirname + '/app/locales',
+
+        // whether to write new locale information to disk - defaults to true
+        updateFiles: false,
+
+        // what to use as the indentation unit - defaults to "\t"
+        indent: "\t",
+
+        // setting extension of json files - defaults to '.json' (you might want to set this to '.js' according to webtranslateit)
+        extension: '.json',
+
+        // setting prefix of json files name - default to none '' (in case you use different locale files naming scheme (webapp-en.json), rather then just en.json)
+        prefix: 'lang-',
+
+        // enable object notation
+        objectNotation: true
+    });
+
 }
 /**
  *
@@ -68,7 +100,11 @@ function Api(){
  */
 Api.prototype.sendMessage = function (type, message, cb) {
 
-    if (!rollbarAccessToken) return;
+    if (!rollbarAccessToken) {
+
+        return;
+
+    }
 
     rollbar.reportMessage(message, type || 'debug', function (rollbarErr) {
 
@@ -150,7 +186,11 @@ Api.prototype.registerRoute = function (cb) {
 
     });
 
-    if (cb) cb();
+    if (cb) {
+
+        cb();
+
+    }
 
     app.get('/heartbeat', function(req, res) {
 
@@ -196,6 +236,8 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(cookieParser());
 
+    app.use(i18n.init);
+
     app.use(bodyParser.json());
 
     app.use(methodOverride());
@@ -219,20 +261,70 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(function (req, res, next) {
 
+
         var resource = null;
         /**
          *
          * @param rstatus
          */
         res.errUnauthorized = function(rstatus){
-            res.statusCode = rstatus || 403;
-            return res.end('Unauthorized');
-        };
 
-        res.okJson = function (message, data, key, collection) {
+            res.statusCode = rstatus || 403;
+
+            return res.end('Unauthorized');
+
+        };
+        /**
+         *
+         * @param req
+         * @param res
+         * @param data
+         * @returns {*}
+         */
+        function sendFormat(req, res, data){
+
+            var format = req.params.format;
+
+            switch( format ){
+
+                case 'json':
+
+                    return res.json(data);
+
+                case 'xml':
+                    //if(res.bigXml){
+                    //    return res.send(utils.js2xml(data, res.xmlOptions));
+                    //}
+
+                    return res.send(xmlmodel(data, res.xmlOptions || 'response'));
+
+
+            }
+
+            return res.send(data);
+
+        }
+
+        res.sendFormat = sendFormat;
+
+
+        res.sendSuccess = function (message, data, key, collection) {
+
+            if(!req.params.format) req.params.format = 'json';
+
+            var format = req.params.format;
+
+            if(format === 'xml' && res.xmlKey && !key){
+
+                key = res.xmlKey;
+
+            }
+
             /**
              * If message is object will direct return
              */
+            //console.log('CLASS: ', message.constructor.name);
+
             if (_.isObject(message)) {
 
                 if (typeof message.toJSON === 'function') {
@@ -243,7 +335,7 @@ Api.prototype.configureExpress = function (db) {
 
                 resource = new hal.Resource(message, req.originalUrl);
 
-                return res.json(resource.toJSON());
+                return sendFormat(req, res, resource.toJSON());
 
             }
 
@@ -299,19 +391,29 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
-        res.errJson = function (err) {
+        res.sendError = function (err) {
 
-            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
+            if(!req.params.format) {
+
+                req.params.format = 'json';
+
+            }
+
+            if(err === 'Access Denied' || err === 'Permission Denied') {
+
+                return res.errUnauthorized();
+
+            }
 
             var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
@@ -349,6 +451,8 @@ Api.prototype.configureExpress = function (db) {
      */
     self.startServer();
 
+    //self.forkingStart();
+
 };
 /**
  * Start Server
@@ -363,14 +467,63 @@ Api.prototype.startServer = function () {
 
 };
 /**
+ * Forking server
+ */
+Api.prototype.forkingStart = function(){
+
+    var me = this;
+
+    var cluster = require('cluster');
+
+    var workers = process.env.WORKERS || require('os').cpus().length;
+
+    if (cluster.isMaster) {
+
+        console.log('start cluster with %s workers', workers);
+
+        for (var i = 0; i < workers; ++i) {
+
+            var worker = cluster.fork().process;
+
+            console.log('worker %s started.', worker.pid);
+
+        }
+
+        cluster.on('exit', function(worker) {
+
+            console.log('worker %s died. restart...', worker.process.pid);
+
+            cluster.fork();
+
+        });
+
+    } else {
+
+        me.startServer();
+
+    }
+
+    process.on('uncaughtException', function (err) {
+
+        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+
+        me.stop(err);
+
+    });
+};
+/**
  * Stop Server
  * @param err
  */
 Api.prototype.stop = function (err) {
 
-    console.log("ERROR \n" + err);
+    console.log("ERROR \n" + err.stack);
 
-    if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
+    if (rollbarAccessToken) {
+
+        rollbar.reportMessage("ERROR \n" + err);
+
+    }
 
     process.exit(1);
 
@@ -389,12 +542,4 @@ Api.errorStack = function (ex) {
 
 };
 
-try {
-
-    new Api();
-
-} catch (e) {
-
-    Api.errorStack(e);
-
-}
+new Api();

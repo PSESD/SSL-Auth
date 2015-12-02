@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 12/05/15.
  */
@@ -6,6 +7,9 @@ var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
+var xml2js = require('xml2js');
+var _ = require('underscore');
+var parseString = require('xml2js').parseString;
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
@@ -22,6 +26,119 @@ var utils = {
         var caches = [];
 
         var options = {};
+
+        if(!cache.enable){
+
+            var self = {};
+            /**
+             * Looks for an item in cache tiers.
+             * When a key is found in a lower cache, all higher levels are updated.
+             *
+             * @param {string} key
+             * @param {function} cb
+             */
+            self.getAndPassUp = function(key, cb) {
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Wraps a function in one or more caches.
+             * Has same API as regular caching module.
+             *
+             * If a key doesn't exist in any cache, it gets set in all caches.
+             * If a key exists in a high-priority (e.g., first) cache, it gets returned immediately
+             * without getting set in other lower-priority caches.
+             * If a key doesn't exist in a higher-priority cache but exists in a lower-priority
+             * cache, it gets set in all higher-priority caches.
+             *
+             * @param {string} key - The cache key to use in cache operations
+             * @param {function} work - The function to wrap
+             * @param {object} [options] - options passed to `set` function
+             * @param {function} cb
+             */
+            self.wrap = function(key, work, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Set value in all caches
+             *
+             * @function
+             * @name set
+             *
+             * @param {string} key
+             * @param {*} value
+             * @param {object} [options] to pass to underlying set function.
+             * @param {function} [cb]
+             */
+            self.set = function(key, value, options, cb) {
+
+                cb(null);
+
+            };
+
+            /**
+             * Get value from highest level cache that has stored it.
+             *
+             * @function
+             * @name get
+             *
+             * @param {string} key
+             * @param {object} [options] to pass to underlying get function.
+             * @param {function} cb
+             */
+            self.get = function(key, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null, false);
+
+            };
+
+            /**
+             * Delete value from all caches.
+             *
+             * @function
+             * @name del
+             *
+             * @param {string} key
+             * @param {object} [options] to pass to underlying del function.
+             * @param {function} cb
+             */
+            self.del = function(key, options, cb) {
+
+                if (typeof options === 'function') {
+
+                    cb = options;
+
+                    options = {};
+
+                }
+
+                cb(null);
+
+            };
+
+            return self;
+        }
 
         var getCache = function(name) {
 
@@ -62,6 +179,42 @@ var utils = {
     },
     /**
      *
+     * @param data
+     * @param options
+     */
+    js2xml: function(data, options){
+
+        var root = 'response';
+
+        if(_.isString(options)){
+
+            root = options;
+
+            options = {};
+
+        }
+
+        return require('js2xmlparser')(root, data, options);
+
+    },
+    /**
+     *
+     * @param body
+     * @param callback
+     */
+    xml2js: function(body, callback){
+        parseString(body, {
+            normalize: true,
+            explicitArray: false,
+            parseBooleans: true,
+            parseNumbers: true,
+            stripPrefix: true,
+            firstCharLowerCase: true,
+            ignoreAttrs: true
+        }, callback);
+    },
+    /**
+     *
      * @param value
      */
     md5: function(value){
@@ -81,31 +234,27 @@ var utils = {
      */
     uid: function (len) {
 
-        var buf = []
-            , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-            , charlen = chars.length;
-
+        var chars = '+?*er*F+AY%vJ,tmwt$e[AzIy|(}(;W7]-Gw}Nazr}iD}--vA}+Jq%+$LCPsP#J#';
         /**
-         * Return a random int, used by `uid()`
          *
-         * @param {Number} min
-         * @param {Number} max
-         * @return {Number}
-         * @api private
+         * @param howMany
+         * @param chars
+         * @returns {string}
          */
-        var getRandomInt = function (min, max) {
+        var randomValueHex = function (howMany, chars) {
+            var rnd = crypto.randomBytes(howMany)
+                  , value = new Array(howMany)
+                  , len = chars.length;
 
-            return Math.floor(Math.random() * (max - min + 1)) + min;
+            for (var i = 0; i < howMany; i++) {
+                value[i] = chars[rnd[i] % len]
+            }
+
+            return new Buffer(value.join('')).toString('hex');
 
         };
 
-        for (var i = 0; i < len; ++i) {
-
-            buf.push(chars[getRandomInt(0, charlen - 1)]);
-
-        }
-
-        return buf.join('');
+        return randomValueHex(len, chars);
 
     },
     /**

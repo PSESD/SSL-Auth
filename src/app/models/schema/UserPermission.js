@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 20/05/15.
  * Last updated by abegodong on 02/06/15.
@@ -13,8 +14,7 @@ var UserPermissionSchema   = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true },
     students: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Student' } ],
     permissions: [ Permission ],
-    role: { type: String, default: 'case-worker' },
-    is_special_case_worker: { type: Boolean, default: false, index: true }
+    role: { type: String, default: 'case-worker-restricted' }
 });
 
 // Export the Mongoose model
