@@ -1,4 +1,7 @@
 'use strict';
+var Limiter = require('express-rate-limiter');
+var MemoryStore = require('express-rate-limiter/lib/memoryStore');
+var limiter = new Limiter({ db : new MemoryStore() });
 /**
  *
  * @param router
@@ -26,43 +29,45 @@ Rest.prototype.handleRoutes = function (router, Api) {
 
     var clientController = Api.controller('Client');
 
-    router.get('/', indexController.index);
+    var ratelimiter = limiter.middleware();
+
+    router.get('/', ratelimiter, indexController.index);
 
     // Create endpoint handlers for /users
     router.route('/users')
-        .post(userController.postUsers)
-        .get(authController.isAuthenticated, userController.getUsers);
+        .post(ratelimiter, userController.postUsers)
+        .get(ratelimiter, authController.isAuthenticated, userController.getUsers);
 
     router.route('/user/invite')
-        .post(authController.isBearerAuthenticated, authController.hasAccess, authController.isAdmin, userController.sendInvite);
+        .post(ratelimiter, authController.isBearerAuthenticated, authController.hasAccess, authController.isAdmin, userController.sendInvite);
 
     router.route('/user/send/forgotpassword')
-        .post(userController.sendForgotPassword);
+        .post(ratelimiter, userController.sendForgotPassword);
 
-    router.get('/user/changepassword', Api.csrfProtection, userController.changePassword);
+    router.get('/user/changepassword', ratelimiter, Api.csrfProtection, userController.changePassword);
 
-    router.post('/user/changepassword', Api.parseForm, Api.csrfProtection, userController.processChangePassword);
+    router.post('/user/changepassword', ratelimiter, Api.parseForm, Api.csrfProtection, userController.processChangePassword);
 
-    router.get('/user/forgotpassword', Api.csrfProtection, userController.formForgotPassword);
+    router.get('/user/forgotpassword', ratelimiter, Api.csrfProtection, userController.formForgotPassword);
 
-    router.post('/user/forgotpassword', Api.parseForm, Api.csrfProtection, userController.processForgotPassword);
+    router.post('/user/forgotpassword', ratelimiter, Api.parseForm, Api.csrfProtection, userController.processForgotPassword);
 
     // Create endpoint handlers for /clients
     router.route('/clients')
-        .post(authController.isAuthenticated, clientController.postClients)
-        .get(authController.isAuthenticated, clientController.getClients);
+        .post(ratelimiter, authController.isAuthenticated, clientController.postClients)
+        .get(ratelimiter, authController.isAuthenticated, clientController.getClients);
 
     // Create endpoint handlers for oauth2 authorize
     router.route('/oauth2/authorize')
-        .get(authController.isAuthenticated, oauth2Controller.authorization)
-        .post(authController.isAuthenticated, oauth2Controller.decision);
+        .get(ratelimiter, authController.isAuthenticated, oauth2Controller.authorization)
+        .post(ratelimiter, authController.isAuthenticated, oauth2Controller.decision);
 
     // Create endpoint handlers for oauth2 token
     router.route('/oauth2/token')
-        .post(authController.isClientAuthenticated, oauth2Controller.token);
+        .post(ratelimiter, authController.isClientAuthenticated, oauth2Controller.token);
 
-    router.post('/logout', authController.logout);
-    router.get('/user/activate', userController.activate);
+    router.post('/logout', ratelimiter, authController.logout);
+    router.get('/user/activate', ratelimiter, userController.activate);
 
 };
 /**
