@@ -1,8 +1,5 @@
 'use strict';
 /**
- * Created by zaenal on 03/07/15.
- */
-/**
  * Created by zaenal on 20/05/15.
  */
 // Load required packages
@@ -56,16 +53,22 @@ TagSchema.statics.crit = function(values, exclude){
  */
 TagSchema.statics.addTag = function(organizationId, title){
 
-    if(!title) return false;
+    if(!title) {
+        return false;
+    }
 
     var TagModel = this.model('Tag');
     var tokens = !_.isArray(title) ? tokenizer.tokenize(title) : title;
 
-    if(!_.isArray(tokens)) return false;
+    if(!_.isArray(tokens)) {
+        return false;
+    }
 
     _.each(tokens, function(token){
         TagModel.update({ name: token, organization: organizationId}, { name: token, organization: organizationId, slug: slug(token)}, { multi: true, upsert: true }, function(err, raw){
-            if(err) console.log(err);
+            if(err) {
+                console.log(err);
+            }
         });
     });
 };

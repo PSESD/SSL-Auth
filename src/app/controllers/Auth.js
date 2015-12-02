@@ -131,7 +131,9 @@ passport.use(new BearerStrategy(
       if (err) { return callback(err); }
 
       // No token found
-      if (!token) { return callback(null, false); }
+      if (!token) {
+        return callback(null, false);
+      }
 
       //check for expired token
       if (new Date() > token.expired) {

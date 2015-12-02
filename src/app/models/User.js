@@ -129,7 +129,9 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, cb){
     }
 
     if(this.getIndexCurrentPermission() in this.permissions){
-        if(typeof role === 'string' && this.permissions[this.getIndexCurrentPermission()].role !== role) this.permissions[this.getIndexCurrentPermission()].role = role;
+        if(typeof role === 'string' && this.permissions[this.getIndexCurrentPermission()].role !== role) {
+            this.permissions[this.getIndexCurrentPermission()].role = role;
+        }
     }
 
     // set update time and update by user
@@ -234,8 +236,11 @@ UserSchema.methods.isAdmin = function(organizationId){
 };
 
 UserSchema.virtual('orgId').set(function(organizationId){
-    if(_.isObject(organizationId)) this._organizationId = organizationId.toString();
-    else this._organizationId = organizationId;
+    if(_.isObject(organizationId)) {
+        this._organizationId = organizationId.toString();
+    } else {
+        this._organizationId = organizationId;
+    }
 }).get(function(){
    return this._organizationId;
 });
@@ -349,7 +354,9 @@ UserSchema.virtual('password')
     .set(function(password) {
         if(!_.isEmpty(password)) {
             this._plainPassword = password;
-            if(!this.salt) this.salt = crypto.randomBytes(128).toString('base64');
+            if(!this.salt) {
+                this.salt = crypto.randomBytes(128).toString('base64');
+            }
             this.hashedPassword = this.encryptPassword(password);
         }
     })
@@ -406,7 +413,9 @@ UserSchema.virtual('allPermissions').get(function(){
 UserSchema.virtual('allPermissionsByOrganization').get(function(){
     var _permissions = {};
 
-    if(!this.orgId) return _permissions;
+    if(!this.orgId) {
+        return _permissions;
+    }
 
     if(this.permissions.length > 0){
 
@@ -437,7 +446,9 @@ UserSchema.virtual('allStudents').get(function(){
 
 UserSchema.virtual('allStudentsByOrganization').get(function(){
     var _students = [];
-    if(!this.orgId) return _students;
+    if(!this.orgId) {
+        return _students;
+    }
 
     if(this.permissions.length > 0){
 
@@ -505,9 +516,15 @@ UserSchema.method('toJSON', function(){
     delete user.is_super_admin;
     var fullname = [];
 
-    if(user.first_name) fullname.push(user.first_name);
-    if(user.middle_name) fullname.push(user.middle_name);
-    if(user.last_name) fullname.push(user.last_name);
+    if(user.first_name) {
+        fullname.push(user.first_name);
+    }
+    if(user.middle_name) {
+        fullname.push(user.middle_name);
+    }
+    if(user.last_name) {
+        fullname.push(user.last_name);
+    }
 
     if(fullname.length === 0){
         fullname.push('n/a');

@@ -18,11 +18,15 @@ var instance = null;
 function Access(user, organizationId){
 
     if(user) {
+
         this.user = user;
+
     }
 
     if(organizationId) {
+
         this.organizationId = organizationId;
+
     }
 
 }
@@ -77,7 +81,9 @@ Access.prototype.hasPermission = function(options){
     var currentUser = this.user;
 
     if(!_.isObject(options)) {
+
         options = {};
+
     }
 
     if('user' in options && options.user instanceof User){
@@ -87,17 +93,23 @@ Access.prototype.hasPermission = function(options){
     }
 
     if(!currentUser) {
+
         return false;
+
     }
 
     if(currentUser.isSuperAdmin()) {
+
         return true;
+
     }
 
     var organizationId = this.organizationId;
 
     if(!organizationId) {
+
         return false;
+
     }
 
 
@@ -108,7 +120,9 @@ Access.prototype.hasPermission = function(options){
     }
 
     if(!organizationId) {
+
         return false;
+
     }
 
     var orgid = currentUser.organizationId;
@@ -169,13 +183,13 @@ Access.hasAccess = function(req, res, next){
 
         var parse_url = php.parse_url(clientUrl);
 
-        if (parse_url['host']) {
+        if (parse_url.host) {
 
-            curl = parse_url['host'];
+            curl = parse_url.host;
 
         } else {
 
-            curl = parse_url['path'];
+            curl = parse_url.path;
 
         }
 
@@ -256,7 +270,11 @@ Access.isAdmin = function(req, res, next){
  */
 Access.getInstance = function(user, organizationId){
 
-    if(!instance) instance = new Access(user, organizationId);
+    if(!instance) {
+
+        instance = new Access(user, organizationId);
+
+    }
 
     return instance;
 };
