@@ -1,6 +1,4 @@
-/**
- * Created by zaenal on 20/05/15.
- */
+'use strict';
 /**
  * Created by zaenal on 20/05/15.
  */

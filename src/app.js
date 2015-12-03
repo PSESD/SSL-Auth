@@ -1,3 +1,4 @@
+'use strict';
 var express = require("express");
 var i18n = require("i18n");
 var mongoose = require('mongoose');
@@ -99,7 +100,11 @@ function Api() {
  */
 Api.prototype.sendMessage = function (type, message, cb) {
 
-    if (!rollbarAccessToken) return;
+    if (!rollbarAccessToken) {
+
+        return;
+
+    }
 
     rollbar.reportMessage(message, type || 'debug', function (rollbarErr) {
 
@@ -181,7 +186,11 @@ Api.prototype.registerRoute = function (cb) {
 
     });
 
-    if (cb) cb();
+    if (cb) {
+
+        cb();
+
+    }
 
     app.get('/heartbeat', function(req, res) {
 
@@ -388,9 +397,17 @@ Api.prototype.configureExpress = function (db) {
 
         res.sendError = function (err) {
 
-            if(!req.params.format) req.params.format = 'json';
+            if(!req.params.format) {
 
-            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
+                req.params.format = 'json';
+
+            }
+
+            if(err === 'Access Denied' || err === 'Permission Denied') {
+
+                return res.errUnauthorized();
+
+            }
 
             var response = { success: false, error: err };
 
@@ -441,8 +458,6 @@ Api.prototype.configureExpress = function (db) {
  * Start Server
  */
 Api.prototype.startServer = function () {
-
-    var me = this;
 
     app.listen(port, function () {
 
@@ -504,7 +519,11 @@ Api.prototype.stop = function (err) {
 
     console.log("ERROR \n" + err.stack);
 
-    if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
+    if (rollbarAccessToken) {
+
+        rollbar.reportMessage("ERROR \n" + err);
+
+    }
 
     process.exit(1);
 

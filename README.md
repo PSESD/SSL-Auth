@@ -1,5 +1,5 @@
 
-# Secure Data Portal for community-based organizations (CBO's)
+# Secure Data Portal for community-based organizations (CBO's) [![Code Climate](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/gpa.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/feed) [![Test Coverage](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/coverage.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/coverage) [![Issue Count](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/issue_count.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/feed) 
 
 ## Overview
 The authorization sequence begins when your application redirects a browser to a CBO api URL; the URL includes query parameters that indicate the type of access being requested. As in other scenarios, CBO api server handles user authentication, session selection, and user consent. The result is an authorization code, which api returns to your application in a query string.

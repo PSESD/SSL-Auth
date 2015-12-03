@@ -27,9 +27,9 @@ exports.postUsers = function (req, res) {
             return (err.code && err.code === 11000) ? (function(){
                 User.findOne({email: user.email}, function(err, userfind){
 
-                    if(err) return res.errJson(err);
+                    if(err) return res.sendError(err);
 
-                    if(!userfind) return res.errJson('User not found');
+                    if(!userfind) return res.sendError('User not found');
 
                     res.json({
                         code: 11000, message: 'User already exists', data: {
@@ -41,7 +41,7 @@ exports.postUsers = function (req, res) {
                     })
                 });
 
-            })() : res.errJson(err);
+            })() : res.sendError(err);
 
         res.json({
             id: user.userId,
@@ -77,30 +77,30 @@ exports.sendInvite = function (req, res) {
         email: req.body.email
     };
 
-    if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
+    if (!req.body.redirect_url) return res.sendError('Redirect Url is empty');
 
 
     var parse_url = php.parse_url(req.body.redirect_url), curl = null;
 
-    if (parse_url['host']) {
+    if (parse_url.host) {
 
-        curl = parse_url['host'];
+        curl = parse_url.host;
 
     } else {
 
-        curl = parse_url['path'];
+        curl = parse_url.path;
 
     }
 
     Organization.findOne({url: curl}, function(err, organization) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        if (!organization) return res.errJson('Organization not found!');
+        if (!organization) return res.sendError('Organization not found!');
 
         User.update({email: email}, {$set: user}, {safe: true, upsert: true}, function (err, raw) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
             var base = config.get('auth.url');
 
@@ -134,7 +134,7 @@ exports.sendInvite = function (req, res) {
 
             User.findOne({email: email}, function (err, user) {
 
-                if (err) return res.errJson(err);
+                if (err) return res.sendError(err);
 
                 user.authCode = authCode;
 
@@ -142,7 +142,7 @@ exports.sendInvite = function (req, res) {
 
                 user.saveWithRole(req.user, organization._id, function (err) {
 
-                    if (err) return res.errJson(err);
+                    if (err) return res.sendError(err);
 
                     var invite = new Invite({
                         authCode: authCode,
@@ -157,7 +157,7 @@ exports.sendInvite = function (req, res) {
 
                     invite.save(function(err){
 
-                        if(err) return res.errJson(err);
+                        if(err) return res.sendError(err);
 
                         var async = false;
 
@@ -187,7 +187,7 @@ exports.sendInvite = function (req, res) {
 
                                 } else {
 
-                                    return res.errJson(isTester ? testerInfo : result[0].reject_reason);
+                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
 
                                 }
 
@@ -195,7 +195,7 @@ exports.sendInvite = function (req, res) {
                                 // Mandrill returns the error as an object with name and message keys
                                 console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 
-                                return res.errJson("Email not sent");
+                                return res.sendError("Email not sent");
                                 // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                             });
 
@@ -203,7 +203,7 @@ exports.sendInvite = function (req, res) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                             // A mandrill error occurred: Invalid_Key - Invalid API key
-                            return res.errJson("Email not sent");
+                            return res.sendError("Email not sent");
                         });
 
                     }); 
@@ -221,17 +221,17 @@ exports.sendForgotPassword = function (req, res) {
     var email = req.body.email;
 
 
-    if (!req.body.redirect_url) return res.errJson('Redirect Url is empty');
+    if (!req.body.redirect_url) return res.sendError('Redirect Url is empty');
 
     var parse_url = php.parse_url(req.body.redirect_url), curl = null;
 
-    if (parse_url['host']) {
+    if (parse_url.host) {
 
-        curl = parse_url['host'];
+        curl = parse_url.host;
 
     } else {
 
-        curl = parse_url['path'];
+        curl = parse_url.path;
 
     }
 
@@ -243,21 +243,21 @@ exports.sendForgotPassword = function (req, res) {
 
     Organization.findOne({url: curl}, function(err, organization){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!organization) return res.errJson('Organization not found!');
+        if(!organization) return res.sendError('Organization not found!');
 
         User.findOne({email: email}, function (err, user) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            if(!user) return res.errJson('User email not found!');
+            if(!user) return res.sendError('User email not found!');
 
             user.forgotPassword = forgotPassword;
 
             user.save(function (err) {
 
-                if (err) return res.errJson(err);
+                if (err) return res.sendError(err);
 
                 var async = false;
 
@@ -288,14 +288,14 @@ exports.sendForgotPassword = function (req, res) {
 
                             } else {
 
-                                return res.errJson(result[0].reject_reason);
+                                return res.sendError(result[0].reject_reason);
 
                             }
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 
-                            return res.errJson("Email not sent");
+                            return res.sendError("Email not sent");
                             // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                         });
 
@@ -304,7 +304,7 @@ exports.sendForgotPassword = function (req, res) {
                     // Mandrill returns the error as an object with name and message keys
                     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                     // A mandrill error occurred: Invalid_Key - Invalid API key
-                    return res.errJson("Email not sent");
+                    return res.sendError("Email not sent");
                 });
 
             });
@@ -327,7 +327,7 @@ exports.activate = function (req, res) {
 
     var callback = function (err, user) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
         if(isNew){
 
@@ -353,26 +353,26 @@ exports.activate = function (req, res) {
 
     var parse_url = php.parse_url(redirectTo), curl = null;
 
-    if (parse_url['host']) {
+    if (parse_url.host) {
 
-        curl = parse_url['host'];
+        curl = parse_url.host;
 
     } else {
 
-        curl = parse_url['path'];
+        curl = parse_url.path;
 
     }
 
     Organization.findOne({url: curl}, function (err, organization) {
 
-        if (err) return callback(err);
+        if (err) { return callback(err); }
 
         if (!organization) return callback('Organization not found!');
 
 
         User.findOne({email: email}, function (err, user) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             // No user found with that username
             if (!user) return callback('User not found', false);
@@ -384,7 +384,7 @@ exports.activate = function (req, res) {
             // Make sure the password is correct
             user.verifyAuthCode(authCode, function (err, isMatch) {
 
-                if (err) return callback(err);
+                if (err) { return callback(err); }
 
                 // Password did not match
                 if (!isMatch) {
@@ -395,7 +395,7 @@ exports.activate = function (req, res) {
 
                 Invite.findOne({ authCode: authCode }, function(err, invite){
 
-                    if (err) return callback(err);
+                    if (err) { return callback(err); }
 
                     if(!invite) return callback('Invalid token', false);
 
@@ -405,19 +405,19 @@ exports.activate = function (req, res) {
                         $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role}}
                     }, function (err, updated) {
 
-                        if (err) return res.errJson(err);
+                        if (err) return res.sendError(err);
 
                         User.findOne({_id: user._id}, function(err, updateUser) {
 
-                            if (err) return res.errJson(err);
+                            if (err) return res.sendError(err);
 
                             updateUser.saveWithRole(user, organization._id.toString(), invite.role, function (err) {
 
-                                if (err) return res.errJson(err);
+                                if (err) return res.sendError(err);
 
                                 Invite.remove({_id: invite._id}, function (err) {
 
-                                    if (err) return res.errJson(err);
+                                    if (err) return res.sendError(err);
 
                                     callback(null, updated[0]);
 
@@ -448,9 +448,9 @@ exports.formForgotPassword = function (req, res) {
 
     var redirectTo = req.query.redirectTo;
 
-    var callback = function (err, user) {
+    var callback = function (err) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
         res.render('../app/views/forgotPassword', {
             errors: [],
@@ -464,25 +464,25 @@ exports.formForgotPassword = function (req, res) {
     };
     var parse_url = php.parse_url(redirectTo), curl = null;
 
-    if (parse_url['host']) {
+    if (parse_url.host) {
 
-        curl = parse_url['host'];
+        curl = parse_url.host;
 
     } else {
 
-        curl = parse_url['path'];
+        curl = parse_url.path;
 
     }
 
     Organization.findOne({url: curl}, function (err, organization) {
 
-        if (err) return callback(err);
+        if (err) { return callback(err); }
 
         if (!organization) return callback('Organization not found!');
 
         User.findOne({email: email}, function (err, user) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             // No user found with that username
             if (!user) return callback('User not found', false);
@@ -490,7 +490,7 @@ exports.formForgotPassword = function (req, res) {
             // Make sure the password is correct
             user.verifyForgotPassword(code, function (err, isMatch) {
 
-                if (err) return callback(err);
+                if (err) { return callback(err); }
 
                 // Password did not match
                 if (!isMatch) {
@@ -503,7 +503,7 @@ exports.formForgotPassword = function (req, res) {
                     $unset: {hashedForgotPassword: ""}
                 }, function (err, updated) {
 
-                    if (err) return res.errJson(err);
+                    if (err) return res.sendError(err);
 
                     callback(null, updated[0]);
 
@@ -594,19 +594,19 @@ exports.processChangePassword = function(req, res){
 
         var parse_url = php.parse_url(redirectTo), curl = null;
 
-        if (parse_url['host']) {
+        if (parse_url.host) {
 
-            curl = parse_url['host'];
+            curl = parse_url.host;
 
         } else {
 
-            curl = parse_url['path'];
+            curl = parse_url.path;
 
         }
 
         Organization.findOne({url: curl}, function (err, organization) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
             if (!organization) return callback('Organization not found!');
 
