@@ -9,65 +9,67 @@ var limiter = new Limiter({ db : new MemoryStore() });
  * @constructor
  */
 function Rest(router, Api) {
-    var self = this;
-    self.handleRoutes(router, Api);
+
+    this.router = router;
+
+    this.Api = Api;
+    
+    this.indexController = this.Api.controller('Index');
+
+    this.userController = this.Api.controller('User');
+
+    this.authController = this.Api.controller('Auth');
+
+    this.oauth2Controller = this.Api.controller('OAuth2');
+
+    this.clientController = this.Api.controller('Client');
+
+    this.handleRoutes();
 }
 /**
  * Handle Route from Request
- * @param router
- * @param Api
  */
-Rest.prototype.handleRoutes = function (router, Api) {
+Rest.prototype.handleRoutes = function () {
 
-    var indexController = Api.controller('Index');
+    var ratelimiter = limiter.middleware(this.Api.config.ratelimiter);
 
-    var userController = Api.controller('User');
-
-    var authController = Api.controller('Auth');
-
-    var oauth2Controller = Api.controller('OAuth2');
-
-    var clientController = Api.controller('Client');
-
-    var ratelimiter = limiter.middleware();
-
-    router.get('/', ratelimiter, indexController.index);
+    this.router.get('/', this.indexController.index);
 
     // Create endpoint handlers for /users
-    router.route('/users')
-        .post(ratelimiter, userController.postUsers)
-        .get(ratelimiter, authController.isAuthenticated, userController.getUsers);
+    this.router.route('/users')
+        .post(this.userController.postUsers)
+        .get(this.authController.isAuthenticated, this.userController.getUsers);
 
-    router.route('/user/invite')
-        .post(ratelimiter, authController.isBearerAuthenticated, authController.hasAccess, authController.isAdmin, userController.sendInvite);
+    this.router.route('/user/invite')
+        .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.sendInvite);
 
-    router.route('/user/send/forgotpassword')
-        .post(ratelimiter, userController.sendForgotPassword);
+    this.router.route('/user/send/forgotpassword')
+        .post(this.userController.sendForgotPassword);
 
-    router.get('/user/changepassword', ratelimiter, Api.csrfProtection, userController.changePassword);
+    this.router.get('/user/changepassword', this.Api.csrfProtection, this.userController.changePassword);
 
-    router.post('/user/changepassword', ratelimiter, Api.parseForm, Api.csrfProtection, userController.processChangePassword);
+    this.router.post('/user/changepassword', this.Api.parseForm, this.Api.csrfProtection, this.userController.processChangePassword);
 
-    router.get('/user/forgotpassword', ratelimiter, Api.csrfProtection, userController.formForgotPassword);
+    this.router.get('/user/forgotpassword', this.Api.csrfProtection, this.userController.formForgotPassword);
 
-    router.post('/user/forgotpassword', ratelimiter, Api.parseForm, Api.csrfProtection, userController.processForgotPassword);
+    this.router.post('/user/forgotpassword', this.Api.parseForm, this.Api.csrfProtection, this.userController.processForgotPassword);
 
     // Create endpoint handlers for /clients
-    router.route('/clients')
-        .post(ratelimiter, authController.isAuthenticated, clientController.postClients)
-        .get(ratelimiter, authController.isAuthenticated, clientController.getClients);
+    this.router.route('/clients')
+        .post(this.authController.isAuthenticated, this.clientController.postClients)
+        .get(this.authController.isAuthenticated, this.clientController.getClients);
 
     // Create endpoint handlers for oauth2 authorize
-    router.route('/oauth2/authorize')
-        .get(ratelimiter, authController.isAuthenticated, oauth2Controller.authorization)
-        .post(ratelimiter, authController.isAuthenticated, oauth2Controller.decision);
+    this.router.route('/oauth2/authorize')
+        .get(this.authController.isAuthenticated, this.oauth2Controller.authorization)
+        .post(this.authController.isAuthenticated, this.oauth2Controller.decision);
 
     // Create endpoint handlers for oauth2 token
-    router.route('/oauth2/token')
-        .post(ratelimiter, authController.isClientAuthenticated, oauth2Controller.token);
+    this.router.route('/oauth2/token')
+        .post(ratelimiter, this.authController.isClientAuthenticated, this.oauth2Controller.token);
 
-    router.post('/logout', ratelimiter, authController.logout);
-    router.get('/user/activate', ratelimiter, userController.activate);
+    this.router.post('/logout', this.authController.logout);
+    this.router.get('/user/activate', this.userController.activate);
 
 };
 /**
