@@ -31,7 +31,14 @@ function Rest(router, Api) {
  */
 Rest.prototype.handleRoutes = function () {
 
-    var ratelimiter = limiter.middleware(this.Api.config.ratelimiter);
+    var ratelimiter = null;
+
+    if('ratelimiter' in this.Api.config){
+        ratelimiter = limiter.middleware(this.Api.config.ratelimiter);
+    } else {
+        ratelimiter = limiter.middleware();
+    }
+
 
     this.router.get('/', this.indexController.index);
 
