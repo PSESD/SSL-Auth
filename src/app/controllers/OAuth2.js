@@ -11,6 +11,7 @@ var tokenHash = require('../../lib/utils').tokenHash;
 var codeHash = require('../../lib/utils').codeHash;
 var calculateExp = require('../../lib/utils').calculateExp;
 var expiresIn = require('config').get('token.expires_in');
+var exchangePassword = require('../../lib/oauth2/exchange/password');
 
 // Create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -187,7 +188,8 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  * from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the user who authorized the code.
  */
-server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
+//server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
+server.exchange(exchangePassword(function (client, username, password, scope, params, callback) {
 
     //Validate the user
     User.findOne({email: username}, function (err, user) {
@@ -216,6 +218,7 @@ server.exchange(oauth2orize.exchange.password(function (client, username, passwo
             // Create a new access token
             var tokenModel = new Token({
                 token: tokenHash(token),
+                ip: params.clientIp,
                 clientId: client.id,
                 userId: user.userId,
                 scope: scope,
