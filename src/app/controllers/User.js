@@ -2,6 +2,7 @@
 var User = require('../models/User');
 var Organization = require('../models/Organization');
 var Invite = require('../models/Invite');
+var utils = require('../../lib/utils');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
@@ -183,10 +184,11 @@ exports.sendInvite = function (req, res) {
 
                                 if (result[0].status == 'sent') {
 
-                                    return res.okJson("Email was sent", isTester ? testerInfo : null);
+                                    return res.sendSuccess("Email was sent", isTester ? testerInfo : null);
 
                                 } else {
 
+                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
                                     return res.sendError(isTester ? testerInfo : result[0].reject_reason);
 
                                 }
@@ -194,7 +196,7 @@ exports.sendInvite = function (req, res) {
                             }, function (e) {
                                 // Mandrill returns the error as an object with name and message keys
                                 console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                                 return res.sendError("Email not sent");
                                 // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                             });
@@ -202,6 +204,7 @@ exports.sendInvite = function (req, res) {
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                             // A mandrill error occurred: Invalid_Key - Invalid API key
                             return res.sendError("Email not sent");
                         });
@@ -280,13 +283,16 @@ exports.sendForgotPassword = function (req, res) {
                             }
 
                         };
+
                         mandrill_client.messages.send({"message": message}, function (result) {
 
                             if (result[0].status == 'sent') {
 
-                                return res.okJson("Email was sent");
+                                return res.sendSuccess("Email was sent");
 
                             } else {
+
+                                utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
 
                                 return res.sendError(result[0].reject_reason);
 
@@ -294,7 +300,7 @@ exports.sendForgotPassword = function (req, res) {
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                             return res.sendError("Email not sent");
                             // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                         });
@@ -303,6 +309,7 @@ exports.sendForgotPassword = function (req, res) {
                 }, function(e) {
                     // Mandrill returns the error as an object with name and message keys
                     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                    utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                     // A mandrill error occurred: Invalid_Key - Invalid API key
                     return res.sendError("Email not sent");
                 });
