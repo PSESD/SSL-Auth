@@ -2,7 +2,7 @@
 var User = require('../models/User');
 var Organization = require('../models/Organization');
 var Invite = require('../models/Invite');
-var utils = require('../../lib/utis');
+var utils = require('../../lib/utils');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
