@@ -48,6 +48,8 @@ function Api() {
 
     self.libDir = self.baseDir + '/lib';
 
+    self.middlewareDir = self.baseDir + '/app/middlewares';
+
     self.config = config;
 
     self.mongo = mongoose;
@@ -129,6 +131,14 @@ Api.prototype.controller = function (name, newInstance) {
     }
 
     return obj;
+
+};
+/**
+ * load middleware
+ */
+Api.prototype.middleware = function (name) {
+
+    return require(this.middlewareDir + '/' + name);
 
 };
 /**
@@ -310,7 +320,9 @@ Api.prototype.configureExpress = function (db) {
 
         res.sendSuccess = function (message, data, key, collection) {
 
-            if(!req.params.format) req.params.format = 'json';
+            if(!req.params.format) {
+                req.params.format = 'json';
+            }
 
             var format = req.params.format;
 
@@ -505,7 +517,7 @@ Api.prototype.forkingStart = function(){
 
     process.on('uncaughtException', function (err) {
 
-        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+        console.error((new Date()).toUTCString() + ' uncaughtException:', err.message);
 
         me.stop(err);
 
