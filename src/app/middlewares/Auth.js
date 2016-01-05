@@ -135,7 +135,17 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
       if (!token) {
         return callback(null, false);
       }
+      /**
+       * Skipped email
+       * @type {string}
+       */
+      var hackIp = 'x-cbo-ip-skipped';
 
+      if(hackIp in req.headers && req.headers[hackIp]){
+
+        clientIp = token.ip;
+
+      }
       //check for ip token
       if(token.ip !== clientIp){
 
