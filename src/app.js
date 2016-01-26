@@ -23,10 +23,14 @@ var rollbarAccessToken = config.get('rollbar.access_token');
 
 if (rollbarAccessToken) {
 
-    // Use the rollbar error handler to send exceptions to your rollbar account
-    app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
-
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
+      // Use the rollbar error handler to send exceptions to your rollbar account
+      app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
+      var rollbarEnv = config.util.getEnv('NODE_ENV');
+      // Configure the library to send errors to api.rollbar.com
+      rollbar.init(rollbarAccessToken, {
+            environment: rollbarEnv
+      });
+      rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 }
 
