@@ -129,14 +129,14 @@ Access.prototype.hasPermission = function(options){
 
     var isMatch = orgid.indexOf(organizationId + '') !== -1;
 
-    log(
-        ' USER: ' + JSON.stringify(currentUser.email) +
-        ' USER ORG: ' + JSON.stringify(orgid) +
-        ' CURR ORG: ' + JSON.stringify(organizationId) +
-        ' TYPEOF ORG: ' + (typeof organizationId) +
-        ' MATCH: ' + isMatch
-
-    );
+    //log(
+    //    ' USER: ' + JSON.stringify(currentUser.email) +
+    //    ' USER ORG: ' + JSON.stringify(orgid) +
+    //    ' CURR ORG: ' + JSON.stringify(organizationId) +
+    //    ' TYPEOF ORG: ' + (typeof organizationId) +
+    //    ' MATCH: ' + isMatch
+    //
+    //);
 
     if('onCheck' in options && typeof options.onCheck === 'function'){
 
