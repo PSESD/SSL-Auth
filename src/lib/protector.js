@@ -421,6 +421,11 @@ module.exports = function protector(schema, options) {
 
                         var tmp = _permissions[collection];
 
+                        if('value' in protectFilter && tmp.indexOf(protectFilter.value) !== -1){
+                            var newTmp = tmp[tmp.indexOf(protectFilter.value)];
+                            tmp = [ newTmp ];
+                        }
+
                         console.log('LIST OF ', collection, ' is ', tmp);
 
                         if('_id' in crit){

@@ -10,6 +10,7 @@ var parseForm = bodyParser.urlencoded({ extended: false });
 
 var app  = express();
 var ejs = require('ejs');
+var engine = require('ejs-locals');
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
@@ -20,6 +21,12 @@ var config = require('config');
 var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
+var compress = require('compression');
+i18n.configure({
+    locales:['en'],
+    directory: __dirname + '/resource/lang'
+});
+app.use(compress());
 
 if (rollbarAccessToken) {
 
@@ -257,6 +264,7 @@ Api.prototype.configureExpress = function (db) {
     app.use(methodOverride());
 
     // Set view engine to ejs
+    app.engine('ejs', engine);
     app.set('view engine', 'ejs');
 
     // Use static public

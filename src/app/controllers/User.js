@@ -334,7 +334,9 @@ exports.activate = function (req, res) {
 
     var callback = function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err) {
+            return errorNotFound(err);
+        }
 
         if(isNew){
 
@@ -457,7 +459,7 @@ exports.formForgotPassword = function (req, res) {
 
     var callback = function (err) {
 
-        if (err) return res.sendError(err);
+        if (err) return errorNotFound(err, req, res);
 
         res.render('../app/views/forgotPassword', {
             errors: [],
@@ -523,17 +525,36 @@ exports.formForgotPassword = function (req, res) {
     });
 
 };
+/**
+ *
+ * @param message
+ * @param req
+ * @param res
+ */
+function errorNotFound(message, req, res){
+    return res.render('../app/views/500', {
+        message: message
+    });
+}
 
 
 exports.changePassword = function(req, res){
 
-    res.render('../app/views/changePassword', {
-        errors: [],
-        session: req.session.data,
-        csrfToken: req.csrfToken()
-    });
+    if(!req.session.data){
+        errorNotFound(null, req, res);
+    } else{
+        res.render('../app/views/changePassword', {
+            errors: [],
+            session: req.session.data,
+            csrfToken: req.csrfToken()
+        });
+    }
 
 };
+
+exports.page500 = function(req, res){
+    errorNotFound('Somethings error', req, res);
+}
 
 exports.processChangePassword = function(req, res){
 
@@ -613,9 +634,11 @@ exports.processChangePassword = function(req, res){
 
         Organization.findOne({url: curl}, function (err, organization) {
 
-            if (err) { return callback(err); }
+            if (err) { return errorNotFound(err, req, res); }
 
-            if (!organization) return callback('Organization not found!');
+            if (!organization) {
+                return errorNotFound('Organization not found!', req, res);
+            }
 
             User.findOne(where, function (err, user) {
 
