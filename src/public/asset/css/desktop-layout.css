@@ -10,7 +10,7 @@ body {
 }
 #center-panel {
     margin-left: 15%;
-    background-color: #f17f49;
+    /*background-color: ;*/
 }
 #center-panel .row-fluid {
     overflow: auto;
@@ -20,9 +20,48 @@ body {
     padding: 10px;
     background-color: #f17f49
 }
-#desktop-nav{
+#desktop-nav {
     position: fixed;
-    width: 15%;
+    width: 14.8%;
     height: 100%;
-    box-shadow: -10px 0 20px rgba(0,0,0,0.1) inset;
+    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.1) inset;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#footer {
+    position: fixed;
+    bottom: 0;
+    line-height: 35px;
+    padding-left: 13px;
+}
+#footer li a {
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+@media (max-width: 1280px) {
+    #footer li a {
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    #desktop-nav {
+        position: fixed;
+        width: 16%;
+        height: 100%;
+        box-shadow: -10px 0 20px rgba(0, 0, 0, 0.1) inset;
+    }
+
+    .padding-left{
+        padding-left: 25px;
+    }
+}
+@media (max-height: 640px) {
+    #footer{
+        position:relative;
+        padding: 0;
+        padding-left: 13px;
+        overflow: auto;
+    }
+    
 }
