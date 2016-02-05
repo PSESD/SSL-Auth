@@ -335,7 +335,7 @@ exports.activate = function (req, res) {
     var callback = function (err, user) {
 
         if (err) {
-            return errorNotFound(err);
+            return errorNotFound(err, req, res);
         }
 
         if(isNew){
