@@ -18,7 +18,7 @@ function Rest(router, Api) {
 
     this.userController = this.Api.controller('User');
 
-    this.authController = this.Api.controller('Auth');
+    this.auth = this.Api.middleware('Auth');
 
     this.oauth2Controller = this.Api.controller('OAuth2');
 
@@ -45,15 +45,17 @@ Rest.prototype.handleRoutes = function () {
     // Create endpoint handlers for /users
     this.router.route('/users')
         .post(this.userController.postUsers)
-        .get(this.authController.isAuthenticated, this.userController.getUsers);
+        .get(this.auth.isAuthenticated, this.userController.getUsers);
 
     this.router.route('/user/invite')
-        .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.sendInvite);
+        .post(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.sendInvite);
 
     this.router.route('/user/send/forgotpassword')
         .post(this.userController.sendForgotPassword);
 
     this.router.get('/user/changepassword', this.Api.csrfProtection, this.userController.changePassword);
+
+    this.router.get('/500', this.userController.page500);
 
     this.router.post('/user/changepassword', this.Api.parseForm, this.Api.csrfProtection, this.userController.processChangePassword);
 
@@ -63,19 +65,19 @@ Rest.prototype.handleRoutes = function () {
 
     // Create endpoint handlers for /clients
     this.router.route('/clients')
-        .post(this.authController.isAuthenticated, this.clientController.postClients)
-        .get(this.authController.isAuthenticated, this.clientController.getClients);
+        .post(this.auth.isAuthenticated, this.clientController.postClients)
+        .get(this.auth.isAuthenticated, this.clientController.getClients);
 
     // Create endpoint handlers for oauth2 authorize
     this.router.route('/oauth2/authorize')
-        .get(this.authController.isAuthenticated, this.oauth2Controller.authorization)
-        .post(this.authController.isAuthenticated, this.oauth2Controller.decision);
+        .get(this.auth.isAuthenticated, this.oauth2Controller.authorization)
+        .post(this.auth.isAuthenticated, this.oauth2Controller.decision);
 
     // Create endpoint handlers for oauth2 token
     this.router.route('/oauth2/token')
-        .post(ratelimiter, this.authController.isClientAuthenticated, this.oauth2Controller.token);
+        .post(ratelimiter, this.auth.isClientAuthenticated, this.oauth2Controller.token);
 
-    this.router.post('/logout', this.authController.logout);
+    this.router.post('/logout', this.auth.logout);
     this.router.get('/user/activate', this.userController.activate);
 
 };

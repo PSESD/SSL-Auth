@@ -2,6 +2,7 @@
 var User = require('../models/User');
 var Organization = require('../models/Organization');
 var Invite = require('../models/Invite');
+var utils = require('../../lib/utils');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
@@ -189,6 +190,7 @@ exports.sendInvite = function (req, res) {
 
                                 } else {
 
+                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
                                     return res.sendError(isTester ? testerInfo : result[0].reject_reason);
 
                                 }
@@ -196,7 +198,7 @@ exports.sendInvite = function (req, res) {
                             }, function (e) {
                                 // Mandrill returns the error as an object with name and message keys
                                 console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                                 return res.sendError("Email not sent");
                                 // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                             });
@@ -204,6 +206,7 @@ exports.sendInvite = function (req, res) {
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                             // A mandrill error occurred: Invalid_Key - Invalid API key
                             return res.sendError("Email not sent");
                         });
@@ -282,6 +285,7 @@ exports.sendForgotPassword = function (req, res) {
                             }
 
                         };
+
                         mandrill_client.messages.send({"message": message}, function (result) {
 
                             if (result[0].status == 'sent') {
@@ -290,13 +294,15 @@ exports.sendForgotPassword = function (req, res) {
 
                             } else {
 
+                                utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
+
                                 return res.sendError(result[0].reject_reason);
 
                             }
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-
+                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                             return res.sendError("Email not sent");
                             // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                         });
@@ -305,6 +311,7 @@ exports.sendForgotPassword = function (req, res) {
                 }, function(e) {
                     // Mandrill returns the error as an object with name and message keys
                     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                    utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                     // A mandrill error occurred: Invalid_Key - Invalid API key
                     return res.sendError("Email not sent");
                 });
@@ -329,7 +336,9 @@ exports.activate = function (req, res) {
 
     var callback = function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err) {
+            return errorNotFound(err, req, res);
+        }
 
         if(isNew){
 
@@ -453,7 +462,7 @@ exports.formForgotPassword = function (req, res) {
 
     var callback = function (err) {
 
-        if (err) return res.sendError(err);
+        if (err) return errorNotFound(err, req, res);
 
         res.render('../app/views/forgotPassword', {
             errors: [],
@@ -519,17 +528,36 @@ exports.formForgotPassword = function (req, res) {
     });
 
 };
+/**
+ *
+ * @param message
+ * @param req
+ * @param res
+ */
+function errorNotFound(message, req, res){
+    return res.render('../app/views/500', {
+        message: message
+    });
+}
 
 
 exports.changePassword = function(req, res){
 
-    res.render('../app/views/changePassword', {
-        errors: [],
-        session: req.session.data,
-        csrfToken: req.csrfToken()
-    });
+    if(!req.session.data){
+        errorNotFound(null, req, res);
+    } else{
+        res.render('../app/views/changePassword', {
+            errors: [],
+            session: req.session.data,
+            csrfToken: req.csrfToken()
+        });
+    }
 
 };
+
+exports.page500 = function(req, res){
+    errorNotFound('Somethings error', req, res);
+}
 
 exports.processChangePassword = function(req, res){
 
@@ -609,9 +637,11 @@ exports.processChangePassword = function(req, res){
 
         Organization.findOne({url: curl}, function (err, organization) {
 
-            if (err) { return callback(err); }
+            if (err) { return errorNotFound(err, req, res); }
 
-            if (!organization) return callback('Organization not found!');
+            if (!organization) {
+                return errorNotFound('Organization not found!', req, res);
+            }
 
             User.findOne(where, function (err, user) {
 

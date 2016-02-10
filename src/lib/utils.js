@@ -3,6 +3,7 @@
  * Created by zaenal on 12/05/15.
  */
 var crypto = require('crypto');
+var justlog = require('justlog');
 var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
@@ -10,11 +11,48 @@ var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
 var parseString = require('xml2js').parseString;
+// Nodejs encryption with CTR
+var algorithm = 'aes-256-ctr',
+      password = 'ssl-encrypted-827192';
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
  */
 var utils = {
+
+    /**
+     *
+     * @param text
+     * @returns {*}
+     */
+    encrypt: function(text){
+        return text;
+        //try{
+        //    var cipher  = crypto.createCipher(algorithm, password);
+        //    var crypted = cipher.update(text, 'utf8', 'hex');
+        //    crypted += cipher.final('hex');
+        //    return crypted;
+        //} catch(ex){
+        //    return '';
+        //}
+    },
+    /**
+     *
+     * @param text
+     * @returns {*}
+     */
+    decrypt: function(text){
+        return text;
+        //try{
+        //    var decipher = crypto.createDecipher(algorithm, password);
+        //    var dec      = decipher.update(text, 'hex', 'utf8');
+        //    dec += decipher.final('utf8');
+        //    return dec;
+        //} catch(ex){
+        //    return '';
+        //}
+    },
+
     /**
      *
      * @returns cache-manager
@@ -242,12 +280,10 @@ var utils = {
          * @returns {string}
          */
         var randomValueHex = function (howMany, chars) {
-            var rnd = crypto.randomBytes(howMany)
-                  , value = new Array(howMany)
-                  , len = chars.length;
+            var rnd = crypto.randomBytes(howMany), value = new Array(howMany), len = chars.length;
 
             for (var i = 0; i < howMany; i++) {
-                value[i] = chars[rnd[i] % len]
+                value[i] = chars[rnd[i] % len];
             }
 
             return new Buffer(value.join('')).toString('hex');
@@ -338,6 +374,19 @@ var utils = {
 
         console.log(message);
 
+    },
+
+    benchmark: function(){
+        var log = justlog({
+            file : {
+                pattern : '{fulltime} [{level}] {msg}' // use custom pattern
+            },
+            stdio : {
+                //pattern : '{fulltime} [{level}] {msg} {timestamp} {mstimestamp}' // use predefined pattern
+                pattern : 'color' // use predefined pattern
+            }
+        });
+        return log;
     }
 
 };

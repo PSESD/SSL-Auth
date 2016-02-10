@@ -16,6 +16,7 @@ var Token = require('../models/Token');
 var Code = require('../models/Code');
 var RefreshToken = require('../models/RefreshToken');
 var tokenHash = require('../../lib/utils').tokenHash;
+var requestIp = require('request-ip');
 
 passport.use(new BasicStrategy(
     
@@ -120,11 +121,11 @@ passport.use('client-basic', new BasicStrategy(
 
 ));
 
-passport.use(new BearerStrategy(
-
-  function(accessToken, callback) {
+passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, accessToken, callback) {
 
     var accessTokenHash = tokenHash(accessToken);
+
+    var clientIp = requestIp.getClientIp(req);
 
     Token.findOne({ token: accessTokenHash }, function (err, token) {
 
@@ -134,9 +135,25 @@ passport.use(new BearerStrategy(
       if (!token) {
         return callback(null, false);
       }
+      /**
+       * Skipped email
+       * @type {string}
+       */
+      var hackIp = 'x-cbo-ip-skipped';
 
-      //check for expired token
-      if (new Date() > token.expired) {
+      if(hackIp in req.headers && req.headers[hackIp]){
+
+        clientIp = token.ip;
+
+      }
+      //check for ip token
+      if(token.ip !== clientIp){
+
+        console.log('IP TOKEN: ', token.ip, ' => CLIENT IP: ', clientIp);
+
+        callback(null, false, { message: 'Token not virified' });
+
+      } else if (new Date() > token.expired) {//check for expired token
 
         token.remove(function (err) {
 

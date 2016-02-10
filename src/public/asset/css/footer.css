@@ -1,0 +1,33 @@
+ul.flexbox.footer {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    padding: 0;
+    background-color: white;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    bottom: 0;
+    margin: 0;
+    margin-top: 10px;
+}
+.stick-footer {
+    padding: 0;
+    padding-top: 1%;
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+}
+ul.flexbox.footer li{
+    margin-left: 2%
+}
+ul.flexbox.footer li a{
+    color: black;
+    text-decoration: none;
+}
