@@ -141,6 +141,8 @@ exports.sendInvite = function (req, res) {
 
                 user.role = role;
 
+                user.pending.push(organization._id);
+
                 user.saveWithRole(req.user, organization._id, function (err) {
 
                     if (err) return res.sendError(err);
@@ -411,7 +413,8 @@ exports.activate = function (req, res) {
                     // Success
                     User.where({_id: user._id}).update({
                         $unset: {hashedAuthCode: ""},
-                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role}}
+                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role}},
+                        $pull: { pending: organization._id }
                     }, function (err, updated) {
 
                         if (err) return res.sendError(err);
