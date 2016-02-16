@@ -35,6 +35,7 @@ var UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    pending: [ String ],
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }

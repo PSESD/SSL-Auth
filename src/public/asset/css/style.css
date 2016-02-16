@@ -1,4 +1,4 @@
-/*
+    /*
 ===============================================
 ==================== INDEX ====================
 ===============================================
@@ -12,6 +12,7 @@ I ALL
 4.Footer
 5.Utility
 6.Form
+7.Auto Logout
 
 II MEDIA
 @media (max-width:767px)
@@ -21,721 +22,1177 @@ II MEDIA
 1.Header
 
 */
-
-
-/*
+    /*
 ===============================================
 ==================== 1.Body ===================
 ===============================================
 */
 
-html {}
-body {
-    padding-bottom: 50px;
-    /*background: #DADFDC;*/
-    height: 100vh;
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
-    background: rgb(252, 230, 35);
-    /* Old browsers */
-    background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
-    /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* IE10+ */
-    background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* W3C */
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
-}
-li {
-    list-style: none;
-}
-a,
-a:focus,
-a:hover {
-    color: #29B6D8;
-}
+    .form-search{
+        width: 25%;
+        margin: 0;
+        padding: 0;
+    }
+    .form-search.user{
+        width: 40%;
+    }
+    .form-search>.glass{
+        position: absolute;
+        top:158px;
+        left: 190px;
+    }
+    .form-search>.glass.user{
 
-/*- Typography -*/
+        top:176px;
 
-* {
-    font-family: 'Lato', sans-serif;
-    font-weight: 400;
-}
-h1 {
-    font-size: 1.6em;
-    letter-spacing: .2em;
-    color: #555;
-    text-transform: uppercase;
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-}
-p {
-    font-size: 1em;
-    color: #555;
-    font-family: 'Lato', sans-serif;
-    letter-spacing: .2em;
-    font-weight: 400;
-    max-width: 400px;
-}
+    }
+    .popover{
+        font-size: 12px;
+        font-size: 1.2rem;
+    }
+    .panel-title{
+        font-size: 12px;
+        font-size: 1.2rem;
+    }
+    .last_update_date{
+        margin-left:10px;
+    }
+    .nav-tabs h1{
+        margin-top: 10px;
+    }
 
-/*
+    form{
+        padding-top:20px;
+    }
+
+    .form-horizontal,.control-label{
+        padding-top: 9px;
+    }
+    .form-control{
+        font-size: 12px;
+        line-height: 1.35em;
+    }
+    ul.tagit{
+        margin-top: 5px;
+    }
+    select{
+        color: black;
+        background: url(../img/arrow.png) no-repeat 96%;
+        border: 1px solid black;
+        padding: 7px 22px 7px 7px;
+    }
+
+    .dropdown-label{
+        padding-top: 12px;
+    }
+
+    .help p {
+    color:#555;
+    }
+    /*a{*/
+        /*color: #337AB7;*/
+    /*}*/
+
+    html {
+        font-weight: 300;
+        font-size: 10px;
+
+    }
+    body {
+        line-height: 1.35em; /* note we are using em here for the line-height */
+        font-size: 12px;
+        font-size: 1.2rem;
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+    h1, h2, h3, .futura {
+        font-weight: 700;
+    }
+    h4, h5, h6 {
+        font-weight: 700;
+    }
+    h1 {
+        font-size: 18px;
+        font-size: 1.8rem;
+        letter-spacing: 0.2em; /* note we are using em here for letter spacing */
+        text-transform: uppercase;
+    }
+    h2 {
+        font-size: 16px;
+        font-size: 1.6rem;
+    }
+    h3 {
+        font-size: 14px;
+        font-size: 1.4rem;
+    }
+    h4 {
+        font-size: 16px;
+        font-size: 1.6rem;
+    }
+    h5 {
+        font-size: 14px;
+        font-size: 1.4rem;
+    }
+    h6 {
+        font-size: 12px;
+        font-size: 1.2rem;
+    }
+    .btn {
+        font-size: 14px;
+        font-size: 1.4rem;
+        letter-spacing: 0.1em;
+        outline: 0px !important;
+        border-radius: 0 0 0 0;
+        padding: 3px 25px;
+        margin: 1em 0;
+        white-space: nowrap;
+        text-shadow: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        text-transform: uppercase;
+    }
+    .btn-default,.btn-secondary {
+        background: #fff!important;
+        background-image: none!important;
+        font-weight: bold!important;;
+        color: #000!important;;
+        border: 2px solid #000!important;;
+    }
+    .btn-default:hover,.btn-secondary:hover {
+        background: #000!important;
+        background-image: none!important;
+        font-weight: bold!important;;
+        color: #fff!important;;
+        border: 2px solid #000!important;;
+    }
+    .btn-primary {
+        background: #fff;
+        border: 2px solid #209920;
+        color: #209920;
+    }
+    .btn-primary:hover {
+        background: #209920;
+        color: #fff;
+        border-color: #209920;
+    }
+    .red{
+        color: #992020;
+    }
+    .btn-danger{
+        background: #fff;
+        border: 2px solid #992020;
+        color: #992020;
+    }
+    .btn-danger:hover {
+        background: #992020;
+        color: #fff!important;
+        border-color:#992020 ;
+    }
+    .title h1{
+        float: left;
+    }
+    .title hr{
+        clear: both;
+    }
+    .title span.title-lastupdate{
+        float: left;
+        margin-top: 23px;
+        margin-left: 20px;
+    }
+    .title a.btn{
+        float: right;
+    }
+    .sidemenu{
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+    a.sidemenu{
+        color: #9d9d9d;
+        font-size: 16px;
+        font-size: 1.6rem;
+    }
+    a.sidemenu:hover{
+        color: white;
+        background-color:transparent;
+    }
+
+    #border{
+        position: relative;
+        border-top: 2px solid #555;
+        width: 30px;
+        left: 15px;
+    }
+    .link-nav.sidemenu:hover,.sidebar_selected{
+        background-color: #eeeeee;
+        color: #ef7700 !important;
+    }
+
+    body {
+        overflow: auto;
+        padding-bottom: 50px;
+        background: #DADFDC;
+        height: 100vh;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+        background: rgb(252, 230, 35);
+        /* Old browsers */
+        background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+        /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
+        /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+        /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+        /* Opera 11.10+ */
+        background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+        /* IE10+ */
+        background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+        /* W3C */
+        filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+        /* IE6-9 fallback on horizontal gradient */
+        background-attachment: fixed;
+    }
+    li {
+        list-style: none;
+    }
+    /*a,*/
+    /*a:focus,*/
+    /*a:hover {*/
+        /*color : #ef7700;*/
+    /*}*/
+    /*a, a:focus, a:hover {*/
+        /*color: #29B6D8;*/
+    /*}*/
+
+    /*a:hover {*/
+        /*text-decoration: none;*/
+        /*color: #3572b0;*/
+        /*cursor: pointer;*/
+    /*}*/
+    a{
+        color: #29B6D8;
+    }
+    a:hover {
+        text-decoration: none;
+        color : #ef7700;
+        cursor: pointer;
+    }
+    a h1{
+        color: #555;
+    }
+    .jumbotron h1{
+        font-size: 2rem;
+    }
+    /*- Typography -*/
+
+    /*h1 {*/
+        /*font-size: 1.6em;*/
+        /*letter-spacing: .2em;*/
+        /*color: #555;*/
+        /*text-transform: uppercase;*/
+        /*font-family: "futura-pt",sans-serif;*/
+        /*font-weight: 700;*/
+    /*}*/
+
+    /*b,*/
+    /*strong {*/
+        /*color: #999 !important;*/
+        /*padding: 0 10px 10px 0 !important;*/
+    /*}*/
+    .bold{
+        color: #999 !important;
+    }
+    .bold-title{
+        padding: 0 10px 10px 0 !important;
+    }
+    /*
 ===============================================
 ================== 2.Header ===================
 ===============================================
 */
-
-.navbar {
-    position: fixed;
-    margin-bottom: 0;
-    height: 100%;
-    left: 0;
-    overflow: auto;
-}
-
-/*
+    
+    .navbar {
+        position: fixed;
+        margin-bottom: 0;
+        height: 100%;
+        left: 0;
+        overflow: auto;
+    }
+    /*
 ===============================================
 =================== 2a.Menu ===================
 ===============================================
 */
-
-.navbar-nav .dropdown-menu > li > a,
-.navbar-right .dropdown-menu > li > a {
-    color: #9d9d9d;
-}
-.navbar-nav .dropdown-menu > li > a:hover,
-.navbar-right .dropdown-menu > li > a:hover {
-    background: transparent;
-    background-image: none;
-    color: #FFFFFF;
-}
-.navbar-inverse .navbar-nav>.active>a,
-.navbar-inverse .navbar-nav>.active>a:focus,
-.navbar-inverse .navbar-nav>.active>a:hover,
-.navbar-inverse .navbar-nav>.open>a,
-.navbar-inverse .navbar-nav>.open>a:focus,
-.navbar-inverse .navbar-nav>.open>a:hover {
-    background: transparent;
-    background-image: none;
-    box-shadow: none;
-}
-#desktop .navbar-inverse .navbar-nav .active>a {
-    text-decoration: none;
-    border-bottom: 3px solid white;
-}
-#mobile .navbar-inverse .navbar-nav .active>a {
-    text-decoration: none;
-    border-bottom: 3px solid white;
-}
-a:hover {
-    text-decoration: none;
-    color: #3572b0;
-    cursor: pointer;
-}
-
-/*
+    
+    .navbar-nav .dropdown-menu > li > a,
+    .navbar-right .dropdown-menu > li > a {
+        color: #9d9d9d;
+    }
+    .navbar-nav .dropdown-menu > li > a:hover,
+    .navbar-right .dropdown-menu > li > a:hover {
+        background: transparent;
+        background-image: none;
+        color: #FFFFFF;
+    }
+    .navbar-inverse .navbar-nav>.active>a,
+    .navbar-inverse .navbar-nav>.active>a:focus,
+    .navbar-inverse .navbar-nav>.active>a:hover,
+    .navbar-inverse .navbar-nav>.open>a,
+    .navbar-inverse .navbar-nav>.open>a:focus,
+    .navbar-inverse .navbar-nav>.open>a:hover {
+        background: transparent;
+        background-color: transparent;
+        background-image: none;
+        box-shadow: none;
+    }
+    #desktop .navbar-inverse .navbar-nav .active>a {
+        text-decoration: none;
+        border-bottom: 3px solid white;
+    }
+    #mobile .navbar-inverse .navbar-nav .active>a {
+        text-decoration: none;
+        border-bottom: 3px solid white;
+    }
+    /*a:hover {*/
+        /*text-decoration: none;*/
+        /*color: #3572b0;*/
+        /*cursor: pointer;*/
+    /*}*/
+    /*
 ===============================================
 ================= 3.Container =================
 ===============================================
 */
-
-.container-fluid {}
-#center-panel {
-    background-color: transparent !important;
-}
-
-/*- Cards -*/
-
-.card {
-    background: #fff;
-    padding: 24px 50px;
-    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-    margin: 10px 0;
-}
-.col-md-3 .card {
-    min-height: 300px;
-}
-.col-md-6 .card {
-    min-height: 620px;
-}
-.card .title hr {
-    width: 100%;
-    /*border-top: solid 2px #555;*/
-    margin: 10px 0 40px 0;
-    height: 2px;
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
-    background: rgb(252, 230, 35);
-    /* Old browsers */
-    background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
-    /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* IE10+ */
-    background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-    /* W3C */
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
-}
-.flexible-card {
-    background: #fff;
-    padding: 24px 50px;
-    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-    margin: 10px 0;
-    margin-left: 100px;
-}
-table h1 {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/*
+    
+    .container-fluid {}
+    #center-panel {
+        background-color: initial !important;
+    }
+    /*- Cards -*/
+    
+    .card {
+        background: #fff;
+        padding: 24px 50px;
+        border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        margin: 10px 0;
+    }
+    .col-md-3 .card {
+        min-height: 300px;
+    }
+    .col-md-6 .card {
+        min-height: 620px;
+    }
+    .card .title hr {
+        width: 100%;
+        /*border-top: solid 2px #555;*/
+        margin: 10px 0 10px 0;
+        height: 2px;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+        background: rgb(252, 230, 35);
+        /* Old browsers */
+        background: -moz-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+        /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(239, 119, 0, 1)), color-stop(37%, rgba(242, 169, 0, 1)), color-stop(69%, rgba(242, 204, 16, 1)), color-stop(100%, rgba(252, 230, 35, 1)));
+        /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+        /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+        /* Opera 11.10+ */
+        background: -ms-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+        /* IE10+ */
+        background: linear-gradient(135deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+        /* W3C */
+        filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+        /* IE6-9 fallback on horizontal gradient */
+    }
+    .flexible-card {
+        background: #fff;
+        padding: 24px 50px;
+        border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        margin: 10px 0;
+        margin-left: 100px;
+    }
+    table h1 {
+        font-size: 16px;
+        font-weight: bold;
+    }
+    /*
 ===============================================
 ============= 3a.Login/Forget Form ============
 ===============================================
 */
-
-#login-container,
-#forget-container {
-    position: absolute;
-    /*top: 30%;*/
-    margin: 25%;
-}
-#login-container,
-#login-container .card,
-#forget-container,
-#forget-container .card {
-    color: #555;
-}
-#login-container .card h1,
-#forget-container .card h1,
-#login-container .card p,
-#forget-container .card p {
-    color: #555;
-}
-#login-container .card .title hr,
-#forget-container .card .title hr {}
-
-/*
+    
+    #login-container,
+    #forget-container {
+        position: absolute;
+        top: 15%;
+        /*margin: 25%;*/
+    }
+    #login-container,
+    #login-container .card,
+    #forget-container,
+    #forget-container .card {
+        color: #555;
+    }
+    #login-container .card h1,
+    #forget-container .card h1,
+    #login-container .card p,
+    #forget-container .card p {
+        color: #555;
+    }
+    #login-container .card .title hr,
+    #forget-container .card .title hr {}
+    /*
 select{
 -webkit-appearance: none;
 }
 */
-
-
-/*
+    /*
 ===============================================
 =================== 3b.Table ==================
 ===============================================
 */
-
-.table-striped>tbody>tr:nth-of-type(odd) {
-    background-color: transparent !important;
-}
-.table>tbody>tr>td,
-.table>tbody>tr>th,
-.table>tfoot>tr>td,
-.table>tfoot>tr>th,
-.table>thead>tr>td,
-.table>thead>tr>th {
-    border-top: none !important;
-    padding: 16px 8px !important;
-}
-
-/*
+    
+    .table-striped>tbody>tr:nth-of-type(odd) {
+        background-color: none !important;
+    }
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+        border-top: none !important;
+        padding: 16px 8px !important;
+    }
+    /*
 ===============================================
 =================== 4.Footer ==================
 ===============================================
 */
-
-
-/*
+    /*
 ===============================================
 ================== 5.Utility ==================
 ===============================================
 */
-.panel-border{
-    border: 2px solid black;
-}
-.top-border {
-    border-top: 2px solid black;
-}
-.days-field {
-    width: 10%;
-    font-weight: bolder;
-}
-.align-top-left {
-    vertical-align: top;
-    text-align: left
-}
-.header-period {
-    width: 15%;
-    font-weight: bold;
-}
-.presence-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: #8CECFF;
-}
-.late-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: #0080FF;
-}
-.excused-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: #5C9EE0;
-}
-.unexcused-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: red;
-}
-.holiday-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: #8B4A94;
-}
-.late-field {
-    width: 10%;
-    font-weight: bolder;
-    background-color: #0080FF
-}
-.last-update {
-    font-size: 14px;
-    color: #aaa;
-}
-.attendance-card {
-    background-color: #ededed;
-    height: 5%;
-    overflow: auto;
-}
-.attendance-header {
-    font-weight: bold;
-    margin-left: 3%
-}
-.header-attendance-table {
-    margin-bottom: 0;
-}
-.sidebar-nav .navbar-inverse + a {
-    padding-left: 0;
-}
-.link-nav {
-    letter-spacing: 2px;
-    font-weight: bold;
-    width: 70%;
-}
-.underline_text {
-    border-bottom: solid 2px #000000;
-    display: inline;
-    padding-bottom: 3px;
-}
-.row.vertical-divider {
-    overflow: hidden;
-}
-.row.vertical-divider > div[class^="col-"] {
-    padding-bottom: 100px;
-    margin-bottom: -100px;
-    border-left: 2px solid #F2F7F9;
-    border-right: 2px solid #F2F7F9;
-}
-.row.vertical-divider div[class^="col-"]:first-child {
-    border-left: none;
-}
-.row.vertical-divider div[class^="col-"]:last-child {
-    border-right: none;
-}
+    
+    .panel-border {
+        border: 2px solid black;
+    }
+    .top-border {
+        border-top: 2px solid black;
+    }
+    .days-field {
+        width: 10%;
+        font-weight: bolder;
+    }
+    .align-top-left {
+        vertical-align: top;
+        text-align: left
+    }
+    .header-period {
+        width: 15%;
+        font-weight: bold;
+    }
+    .presence-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: #8CECFF;
+    }
+    .late-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: #0080FF;
+    }
+    .excused-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: #5C9EE0;
+    }
+    .unexcused-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: red;
+    }
+    .holiday-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: #8B4A94;
+    }
+    .late-field {
+        width: 10%;
+        font-weight: bolder;
+        background-color: #0080FF
+    }
+    /*.last-update {*/
+        /*margin-left: 2%;*/
+        /*font-size: 14px;*/
+        /*color: #aaa;*/
+    /*}*/
+    .attendance-card {
+        background-color: #ededed;
+        height: 5%;
+        overflow: auto;
+    }
+    .attendance-header {
+        font-weight: bold;
+        margin-left: 3%
+    }
+    .header-attendance-table {
+        margin-bottom: 0;
+    }
+    .sidebar-nav .navbar-inverse + a {
+        padding-left: 0;
+    }
+    .link-nav {
 
-/*
+    }
+    .underline_text {
+        border-bottom: solid 2px #000000;
+        display: inline;
+        padding-bottom: 3px;
+    }
+    .row.vertical-divider {
+        overflow: hidden;
+    }
+    .row.vertical-divider > div[class^="col-"] {
+        padding-bottom: 100px;
+        margin-bottom: -100px;
+        border-left: 2px solid #F2F7F9;
+        border-right: 2px solid #F2F7F9;
+    }
+    .row.vertical-divider div[class^="col-"]:first-child {
+        border-left: none;
+    }
+    .row.vertical-divider div[class^="col-"]:last-child {
+        border-right: none;
+    }
+    /*
 .table{
 	height:350px;	
 }
 */
-
-div[contentEditable] {
-    cursor: pointer;
-    background-color: white;
-    padding: .2em;
-}
-div[contentEditable]:focus {
-    cursor: pointer;
-    background-color: #D0D0D0;
-    border: 1px solid red;
-    padding: .2em;
-}
-.no-gutter > [class*='col-'] {
-    padding-right: 0;
-    padding-left: 0;
-}
-.login-page {
-    margin-top: 250px!important;
-    left: 50px;
-}
-.login-page-mobile {
-    left: -30px;
-}
-.btn-expand {
-    position: absolute;
-    bottom: 30px;
-    right: 45px;
-}
-.help-block {
-    font-weight: normal;
-    font-size: 10px;
-    vertical-align: middle;
-}
-.small {
-    font-size: 50%;
-}
-.bold {
-    font-weight: 700;
-}
-.font16 {
-    font-size: 16px;
-}
-.subhead {
-    text-transform: uppercase;
-}
-#collapse-sidebarmenu:hover {
-    cursor: pointer;
-}
-
-/*- Flags -*/
-
-.flag {
-    background: #E75051;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-.flag .title h1,
-.flag .content p,
-.flag .button,
-.flag .button:hover,
-.flag .button:active {
-    color: #fff;
-}
-.flag .title hr {
-    border-top: solid 2px #fff;
-}
-
-/*- View/Read Icons -*/
-
-.lock {
-    background-image: url(../img/icon-lock.png);
-    background-repeat: no-repeat;
-    background-position: right 10px top 10px;
-    background-size: 18px;
-}
-.pencil {
-    background-image: url(../img/icon-pencil.png);
-    background-repeat: no-repeat;
-    background-position: right 10px top 10px;
-    background-size: 18px;
-}
-.colour {
-    width: 100%;
-    height: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-}
-.label-checkbox {
-    display: inline-block;
-}
-.ng-hide {
-    display: none !important;
-}
-.glyphicon-spin {
-    -webkit-animation: glyphicon-spin 2s infinite linear;
-    animation: glyphicon-spin 2s infinite linear;
-}
-@-webkit-keyframes glyphicon-spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
+    
+    div[contentEditable] {
+        cursor: pointer;
+        background-color: white;
+        padding: .2em;
     }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
+    div[contentEditable]:focus {
+        cursor: pointer;
+        background-color: #D0D0D0;
+        border: 1px solid red;
+        padding: .2em;
     }
-}
-@keyframes glyphicon-spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
+    .no-gutter > [class*='col-'] {
+        padding-right: 0;
+        padding-left: 0;
     }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
+    .login-page {
+        /*margin-top: 250px!important;*/
+        left: 0;
     }
-}
-
-/*- Sidebar Collapse Icon -*/
-
-.collapse-icon {
-    color: white;
-}
-.collapse-icon:hover {
-    cursor: pointer;
-}
-
-/*
+    .login-page-mobile {
+        left: -30px;
+    }
+    .btn-expand {
+        position: absolute;
+        bottom: 30px;
+        right: 45px;
+    }
+    .help-block {
+        font-weight: normal;
+        font-size: 10px;
+        vertical-align: middle;
+        letter-spacing: .5px;
+    }
+    .small {
+        font-size: 50%;
+    }
+    .bold {
+        font-weight: 700;
+    }
+    .font16 {
+        font-size: 16px;
+    }
+    .subhead {
+        text-transform: uppercase;
+        width: 135px;
+    }
+    #collapse-sidebarmenu:hover {
+        cursor: pointer;
+    }
+    /*- Flags -*/
+    
+    .flag {
+        background: #E75051;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .flag .title h1,
+    .flag .content p,
+    .flag .button,
+    .flag .button:hover,
+    .flag .button:active {
+        color: #fff;
+    }
+    .flag .title hr {
+        border-top: solid 2px #fff;
+    }
+    /*- View/Read Icons -*/
+    
+    .lock {
+        background-image: url(../img/icon-lock.png);
+        background-repeat: no-repeat;
+        background-position: right 10px top 10px;
+        background-size: 18px;
+    }
+    .pencil {
+        background-image: url(../img/icon-pencil.png);
+        background-repeat: no-repeat;
+        background-position: right 10px top 10px;
+        background-size: 18px;
+    }
+    .colour {
+        width: 100%;
+        height: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    }
+    .label-checkbox {
+        display: inline-block;
+    }
+    .ng-hide {
+        display: none !important;
+    }
+    .glyphicon-spin {
+        -webkit-animation: glyphicon-spin 2s infinite linear;
+        animation: glyphicon-spin 2s infinite linear;
+    }
+    @-webkit-keyframes glyphicon-spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+        }
+    }
+    @keyframes glyphicon-spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+        }
+    }
+    /*- Sidebar Collapse Icon -*/
+    
+    .collapse-icon {
+        color: white;
+    }
+    .collapse-icon:hover {
+        cursor: pointer;
+    }
+    /*
 ===============================================
 =================== 6.Form ====================
 ===============================================
 */
+    
+    .form-control {
+        border: 0 !important;
+        box-shadow: none !important;
+        border-bottom: 1px #000 solid !important;
+        border-radius: 0 !important;
+        width: 60%;
+    }
+    .form-inline {
+        padding-bottom: 40px;
+    }
+    /*- Buttons -*/
 
-.form-control {
-    border: 0 !important;
-    box-shadow: none !important;
-    border-bottom: 1px #000 solid !important;
-    border-radius: 0 !important;
-}
-.form-inline {
-    padding-bottom: 40px;
-}
-
-/*- Buttons -*/
-
-.button {
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    background: transparent;
-    font-size: 1em;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #555;
-    border: solid 2px;
-    padding: 3px 25px;
-    border-radius: 3px;
-    margin: 10px 0;
-    outline: 0 !important;
-    -webkit-appearance: none;
-    min-height: 30px;
-}
-a.button {
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-.button:hover {
-    /*
+    .button {
+        font-family: "proxima-nova",sans-serif;
+        font-weight: 700;
+        background: transparent;
+        font-size: 1em;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #555;
+        border: solid 2px;
+        padding: 3px 25px;
+        border-radius: 3px;
+        margin: 10px 0;
+        outline: 0px !important;
+        -webkit-appearance: none;
+        min-height: 30px;
+        white-space: nowrap;
+    }
+    a.button {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    .button:hover {
+        /*
     border-bottom:solid 3px;
     */
-    color: #555;
-    text-decoration: none;
-}
-.button:active {
-    /*
+        color: #555;
+        text-decoration: none;
+    }
+    .button:active {
+        /*
     border-bottom:solid 2px rgba(0,0,0,0.0);
     background: rgba(0,0,0,0.1);
     color: #555;
     text-decoration: none;
     */
-}
-.button:visited {
-    box-shadow: none;
-}
-#login-container input,
-#forget-container input {
-    background: transparent;
-    border-bottom: 1px #555 solid !important;
-    color: #555;
-}
-#login-container input::-webkit-input-placeholder,
+    }
+    .button:visited {
+        box-shadow: none;
+    }
+    #login-container input,
+    #forget-container input {
+        background: transparent;
+        border-bottom: 1px #555 solid !important;
+        color: #555;
+    }
+    #login-container input::-webkit-input-placeholder,
+    /* WebKit browsers */
 
-/* WebKit browsers */
+    #forget-container input::-webkit-input-placeholder,
+    #login-container input:-moz-placeholder,
+    /* Mozilla Firefox 4 to 18 */
 
-#forget-container input::-webkit-input-placeholder,
-#login-container input:-moz-placeholder,
+    #forget-container input:-moz-placeholder,
+    #login-container input::-moz-placeholder,
+    /* Mozilla Firefox 19+ */
 
-/* Mozilla Firefox 4 to 18 */
+    #forget-container input::-moz-placeholder,
+    #login-container input:-ms-input-placeholder,
+    /* Internet Explorer 10+ */
 
-#forget-container input:-moz-placeholder,
-#login-container input::-moz-placeholder,
-
-/* Mozilla Firefox 19+ */
-
-#forget-container input::-moz-placeholder,
-#login-container input:-ms-input-placeholder,
-
-/* Internet Explorer 10+ */
-
-#forget-container input:-ms-input-placeholder {
-    color: #555;
-}
-#login-container .card .help-block.label-checkbox {
-    color: #555;
-}
-#login-container .button,
-#forget-container .button {
-    color: #555;
-    border-color: #555;
-}
-
-/*
+    #forget-container input:-ms-input-placeholder {
+        color: #555;
+    }
+    #login-container .card .help-block.label-checkbox {
+        color: #555;
+    }
+    #login-container .button,
+    #forget-container .button {
+        color: #555;
+        border-color: #555;
+    }
+    /*
+===============================================
+================ 6.Auto Logout ================
+===============================================
+*/
+    
+    .modal-body p {
+        max-width: 100%;
+    }
+    /*
 ===============================================
 =========== media (max-width:767px) ===========
 ===============================================
 */
-
-@media (max-width:767px) {
-    /*
+    
+    @media (max-width:767px) {
+        /*
     ===============================================
     =================== 2.Header ==================
     ===============================================
     */
-    .navbar {
-        width: 75px;
-    }
-    #forgot_button {
-        display: block;
-    }
-    /*
+        .navbar {
+            width: 75px;
+        }
+        #forgot_button {
+            display: block;
+        }
+        /*
     ===============================================
     =================== 2a.Menu ===================
     ===============================================
     */
-    #navbar-height-col {
-        position: fixed;
-        top: 0;
-        height: 100%;
-        bottom: 0;
-        width: 80%;
-        left: -80%;
-        background-image: -webkit-linear-gradient(top, #3c3c3c 0, #222 100%);
-        background-image: -o-linear-gradient(top, #3c3c3c 0, #222 100%);
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
-        background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
-        filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
-        filter: progid: DXImageTransform.Microsoft.gradient(enabled=false);
-        background-repeat: repeat-x;
-        z-index: -1;
-    }
-    #navbar #slidemenu {
-        left: -100%;
-        width: 80%;
-        min-width: 0;
-        position: absolute;
-        padding-left: 0;
-        z-index: 1;
-        margin: 0;
-    }
-    .navbar.slide-active {
-        width: 80%;
-        z-index: 2;
-    }
-    #navbar .navbar-toggle.slide-active .icon-bar {
-        background: orange;
-    }
-    #navbar .navbar-brand {
-        display: none;
-    }
-    #navbar .navbar-header.slide-active .navbar-brand {
-        display: block;
-    }
-    #navbar #slidemenu.slide-active .navbar-nav {
-        margin: 7.5px 10px;
-    }
-    /*
+        #navbar-height-col {
+            position: fixed;
+            top: 0;
+            height: 100%;
+            bottom: 0;
+            width: 80%;
+            left: -80%;
+            background-image: -webkit-linear-gradient(top, #3c3c3c 0, #222 100%);
+            background-image: -o-linear-gradient(top, #3c3c3c 0, #222 100%);
+            background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
+            background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(enabled=false);
+            background-repeat: repeat-x;
+            z-index: -1;
+        }
+        #navbar #slidemenu {
+            left: -100%;
+            width: 80%;
+            min-width: 0;
+            position: absolute;
+            padding-left: 0;
+            z-index: 1;
+            margin: 0;
+        }
+        .navbar.slide-active {
+            width: 80%;
+            z-index: 2;
+        }
+        #navbar .navbar-toggle.slide-active .icon-bar {
+            background: orange;
+        }
+        #navbar .navbar-brand {
+            display: none;
+        }
+        #navbar .navbar-header.slide-active .navbar-brand {
+            display: block;
+        }
+        #navbar #slidemenu.slide-active .navbar-nav {
+            margin: 7.5px 10px;
+        }
+        /*
     ===============================================
     ================= 3.Container =================
     ===============================================
     */
-    .container-with-menu {
-        width: calc(100% - 75px);
-        margin-left: 75px;
+        .container-with-menu {
+            width: calc(100% - 75px);
+            margin-left: 75px;
+        }
     }
-}
-
-/*
+    /*
 ===============================================
 =========== media (min-width:768px) ===========
 ===============================================
 */
-
-@media (min-width:768px) {
-    /*
+    
+    @media (min-width:768px) {
+        /*
     ===============================================
     =================== 2.Header ==================
     ===============================================
     */
-    .navbar {
-        width: 15%;
-    }
-    /*
+        .navbar {
+            width: 15%;
+        }
+
+        /*
     ===============================================
     =================== 2a.Menu ===================
     ===============================================
     */
-    .custom-table {
-        width: 100%;
-        max-width: 100%;
-    }
-    .custom-table tr td {
-        padding: 1%;
-    }
-    .custom-table .border-top-bottom {
-        border-top: 1px solid black!important;
-        border-bottom: 1px solid black!important;
-    }
-    #navbar {
-        padding: 35px 10px 10px 10px;
-        border-radius: 0;
-        overflow-x: hidden;
-    }
-    .navbar-header {
-        float: none;
-    }
-    .navbar-nav {
-        float: none;
-    }
-    .navbar-right {
-        float: none !important;
-    }
-    .navbar-nav li,
-    .navbar-right li {
-        float: none;
-    }
-    .navbar-nav .dropdown-menu,
-    .navbar-right .dropdown-menu {
-        position: relative;
-        float: none;
-        background-color: transparent;
-        box-shadow: none;
-        border: 0;
-    }
-    /*
+        .custom-table {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .custom-table tr td {
+            padding: 1%;
+        }
+
+        .custom-table .border-top-bottom {
+            border-top: 1px solid black !important;
+            border-bottom: 1px solid black !important;
+        }
+
+        #navbar {
+            padding: 35px 10px 10px 10px;
+            border-radius: 0;
+            overflow-x: hidden;
+        }
+
+        .navbar-header {
+            float: none;
+        }
+
+        .navbar-nav {
+            float: none;
+        }
+
+        .navbar-right {
+            float: none !important;
+        }
+
+        .navbar-nav li,
+        .navbar-right li {
+            float: none;
+        }
+
+        .navbar-nav .dropdown-menu,
+        .navbar-right .dropdown-menu {
+            position: relative;
+            float: none;
+            background-color: transparent;
+            box-shadow: none;
+            border: 0;
+        }
+
+        /*
     ===============================================
     ================= 3.Container =================
     ===============================================
     */
-    .container-with-menu {
-        width: 85%;
-        margin-left: 15%;
-    }
-    /*
+        .container-with-menu {
+            width: 85%;
+            margin-left: 15%;
+        }
+
+        /*
+
     ===============================================
     ================== 5.Utility ==================
     ===============================================
     */
+        .login-help-link {
+            font-size: 11px;
+            top: 10px;
+            position: relative;
+        }
+
+        @media (max-height: 600px) {
+            #login-container,
+            #forget-container {
+                position: absolute;
+                /*top: 10%;*/
+                margin: 18%;
+            }
+        }
+        /**
+     Help Style
+    **/
+        /*.help p {*/
+            /*font-size: 12px;*/
+            /*font-weight: bold;*/
+            /*letter-spacing: normal;*/
+            /*width: 284px;*/
+            /*color: #858585;*/
+            /*padding-bottom: 13px;*/
+        /*}*/
+
+        .icon-sidebarmenu {
+            left: 85%;
+            top: 20px;
+            color: white;
+        }
+
+        .icon-collapse-menu {
+            position: absolute;
+            left: 30%;
+        }
+
+        .separator-content {
+            margin-bottom: 100px;
+            position: relative;
+        }
+
+        select {
+            -webkit-border-radius: 0px !important;
+            -webkit-appearance: none;
+            margin-top: 5px;
+        }
+
+        .organization_header {
+            color: white !important;
+            font-size: 1.6em;
+            margin-left: 14px;
+        }
+
+        .add-select-student {
+            width: 60% !important
+        }
+        .inline-block {
+            display: inline-block;
+        }
+
+        .login-page-title {
+            padding-bottom: 1px;
+            font-size: 16px;
+        }
+
+        .login-help-link {
+            font-size: 11px;
+        }
+
+        .confidentiality-footer,.version {
+
+            position: relative;
+            bottom: 95px;
+            margin-left: 15.8%;
+            font-size: 12px;
+
+        }
+        .version{
+            margin-top:15px;
+        }
+
+        dd,
+        dt {
+            display: inline;
+            margin: 0;
+        }
+
+        dd:before {
+            content: ' '; /* space them */
+        }
+
+        dt:before {
+            /* insert line break before <dt> */
+            /*content: "\A";*/
+            white-space: pre;
+        }
+
+        dt:first-child:before {
+            /* disable line break before the first <dt> */
+            content: none;
+        }
+
+        .forgot-password {
+            right: 50%;
+            position: relative;
+        }
+    }
+
+    .forgot-password {
+        right: 50%;
+        position: relative;
+    }
+/**
+ * LOADING STATE
+ */
+.not_ready, .retrieving, .unavailable {
+    font-weight: bold;
+    text-transform: uppercase;
 }
-@media (max-height:600px) {
-    #login-container,
-    #forget-container {
+.not_ready {
+    color: #888888;
+}
+.unavailable {
+    color: #101010;
+}
+.retrieving {
+    color: #67b168;
+}
+.on_track, .off_track {
+}
+
+.filter-selected,
+.district-filter-selected,
+.school-filter-selected
+{
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 16px;
+}
+.report-page .filter-selected
+{
+    margin-bottom: 15px;
+}
+
+    .popup {
+        margin: 0;
+        background: #fff;
+        border: 1px solid #aaa;
+        box-shadow: 0 4px 5px rgba(0,0,0,.15);
+        z-index: 1010;
+        width: 100%;
+        padding: 0px;
+        border-radius: 4px;
+        margin-top: 1px;
         position: absolute;
-        /*top: 10%;*/
-        margin: 18%;
+    }
+
+.multiselect{
+    display: inline-block;
+}
+.selected_container{
+    margin-top:10px;
+}
+.margin-bottom-general-info,
+.privacy_policy_bottom_space,
+.scholl_history_bottom_space{
+    margin-bottom: 10px;
+}
+.error-color{
+    background-color: #ED0707;
+}
+.post-abs{
+    top:3px;
+}
+.full-width{
+    width: 100%;
+}
+
+
+.report-page .card .title span
+{
+    letter-spacing: 0;
+}
+.report-page .card .select-chart
+{
+    min-width: 20%;
+}
+.report-page .card .report-page-filter
+{
+    margin-bottom: 45px;
+}
+.report-page .card .border-black
+{
+    border: 1px solid black;
+}
+.report-page .card .border-black.summary-information
+{
+    text-align: center;
+    padding: 10px 10px 20px 10px;
+    margin-bottom: 30px;
+}
+.report-page .card .border-black.summary-information .font-count
+{
+    font-size: 4rem;
+    line-height: 4rem;
+    font-weight: bolder;
+}
+.report-page .card .border-black.summary-information .font-medium
+{
+    font-size: 2rem;
+    line-height: 2rem;
+}
+.report-page .card .pie-information
+{
+    margin-bottom: 30px;
+}
+.report-page .ng-isolate-scope
+{
+    background-color: #fff;
+}
+.report-page .highcharts-container {
+    width: auto !important;
+}
+@media (min-width:768px)
+{
+    .report-page .col-md-4
+    {
+        width: 33.33333333%;
+    }
+}
+@media (max-width:767px)
+{
+    .report-page .col-md-4
+    {
+        width: 100%;
+    }
+    .report-page .card .select-chart
+    {
+        width: 100%;
+        margin-bottom: 15px;
     }
 }
