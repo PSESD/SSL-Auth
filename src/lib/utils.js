@@ -10,10 +10,14 @@ var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
+var php = require('phpjs');
 var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
       password = 'ssl-encrypted-827192';
+
+var mandrill = require('mandrill-api/mandrill');
+var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
@@ -334,6 +338,57 @@ var utils = {
     },
     /**
      *
+     * @param body
+     * @param subject
+     */
+    mailDev: function(body, subject, done){
+        var cfg = config.get('devMail');
+        var mails = [];
+        if(body instanceof Error){
+
+            body = body.stack.split("\n");
+
+        }
+
+        mandrill_client.templates.info(cfg.options, function (result) {
+
+            var html = php.str_replace('{$html}', body, result.code);
+            var message = {
+                "html": html,
+                "subject": subject || result.subject,
+                "from_email": result.publish_from_email,
+                "from_name": result.publish_from_name,
+                "to": cfg.emails,
+                "headers": cfg.headers
+
+            };
+            mandrill_client.messages.send({"message": message}, function (result) {
+
+                if (result[0].status == 'sent') {
+                    utils.log('Email was sent ' + message.subject, 'info');
+                    if(done) done();
+                } else {
+
+                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
+                    if(done) done('A mandrill error occurred: ' + result[0].reject_reason);
+                }
+
+            }, function (e) {
+                // Mandrill returns the error as an object with name and message keys
+                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
+                if(done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+            });
+
+        }, function (e) {
+            // Mandrill returns the error as an object with name and message keys
+            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
+            if(done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+            // A mandrill error occurred: Invalid_Key - Invalid API key
+        });
+    },
+    /**
+     *
      */
     preg_quote: function(str, delimiter) {
 
@@ -366,13 +421,12 @@ var utils = {
 
         }
 
-        if(rollbarAccessToken){
+        console.log(message);
 
-            rollbar.reportMessage(message, type || 'info', callback);
+        if(rollbarAccessToken){
+            rollbar.reportMessage(message, type || 'info', null, callback);
 
         }
-
-        console.log(message);
 
     },
 
