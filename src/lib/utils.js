@@ -331,7 +331,11 @@ var utils = {
      *
      * @returns {Date}
      */
-    calculateExp: function(){
+    calculateExp: function(forever){
+
+        if(forever === true){
+            return new Date(new Date().getTime() + 315360000/*(10 * 365 * 24 * 60 * 60)*/);//set 10year
+        }
 
         return new Date(new Date().getTime() + (require('config').get('token.expires_in') * 1000));
 
