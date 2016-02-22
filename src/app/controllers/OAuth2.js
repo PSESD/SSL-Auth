@@ -147,7 +147,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
 
             var refreshTokenHash = tokenHash(refreshToken);
 
-            var expired = calculateExp();
+            var expired = calculateExp(true);
 
             // Create a new access token
             var tokenModel = new Token({
