@@ -7,12 +7,12 @@
         <div class="col-xs-12 col-md-12 card ">
             <div class="col-xs-12 col-md-12">
                 <div class="title">
-                    <h1><%= __('general.change_password') %></h1>
+                    <h1><%= __('general.account_update') %></h1>
                     <hr>
                 </div>
             </div>
             <div class="col-xs-12 col-md-12">
-                <form class="form-horizontal form-signin ng-dirty ng-valid-parse ng-valid ng-valid-required" id="loginForm" name="loginForm" role="form" action="/api/user/changepassword" method="post">
+                <form class="form-horizontal form-signin ng-dirty ng-valid-parse ng-valid ng-valid-required" id="loginForm" name="loginForm" role="form" action="/api/user/accountupdate" method="post">
                     <div class="form-group">
                         <div class="col-xs-12 col-md-12">
                             <input type="text" class="form-control ng-dirty ng-valid-parse ng-valid ng-valid-required ng-touched" name="first_name" placeholder="<%= __('general.first_name') %>" autofocus="autofocus" style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QsPDigO/bwqsQAAAfNJREFUOMvNkz1ok2EQx3/39umHmpZWMUVaUEEUpWlQ0QyiCDooFhwcFN2lgqhTEMKTDwsZCw4SQQNOLh20KBgQRZ0kIK2LlBaqtNKhfkRqbHnfvOEc0kCbD0Enb/vD8bu7/93BfxfRaLTfWnuoqq21EWttqFm+s1ZYa692dHRMiUgWEEBEJCMiE/F4PN0IYGq0JyKbgJC19ryq+iKyH0BVZxoBpFbH4/HXInIUmFbVsojsBV6mUqkTTQGxWGy74zhdpVJpxRizw3GcnIi0rFYuA+dUdVFEAr7vf0mn05PrRjDG3ASG29vb6ytUQI9FKs0aY+4Bl2tNdP51a7Lq/kFV3aqqP0QkaIwZ/yvA2kgkEs9F5CQEiAydYbC/i6VPeR7l3uM1ALTU3MEFEYmKCJFLNzg1sA186NsVZl/nAvnp738+JGA34EOQPTs3UP6YY/T2KC8WymwJHaYHgABDw9c5G+6pB4yMjNzyPC8My/zyoKVvkEj4OAO9lUZbAdjI5t5ugp2tzY1JJpOavv9M55ZcVd9VV1XVndE3s8u6Plxtsr42jp0+QvfPCTJ3xvkKeHNT5J88IJsdY74M3yafksncrfuF6kvw9tUHDlyMcOVaBFbmeTj2jqIHxUIJF3A/z7K4WKhfY3WEaieBnjaKhWLTcX8DATq/EhizV6kAAAAASUVORK5CYII=); background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;" autocomplete="off">
@@ -43,11 +43,11 @@
                         <input type="hidden" name="authCode" value="<%= session.authCode %>" />
                         <input type="hidden" name="redirectTo" value="<%= session.redirectTo %>" />
                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <button type="submit" value="Submit" class="button"><%= __('general.change') %></button>
+                        <button type="submit" value="Submit" class="button"><%= __('general.activate') %></button>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12 col-md-12">
-                            <div class="login-help-link"><%= __('general.help_change_password_link') %><a href="mailto:help@studentsuccesslink.org"> help@studentsuccesslink.org.</a></div>
+                            <div class="login-help-link"><%= __('general.help_account_update_link') %><a href="mailto:help@studentsuccesslink.org"> help@studentsuccesslink.org.</a></div>
                         </div>
                     </div>
                 </form>
