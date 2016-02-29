@@ -1,20 +1,38 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Authorization Needed</title>
-  </head>
-  <body>
-    <p>Hi <%= user.email %>!</p>
-    <p><b><%= client.name %></b> is requesting <b>full access</b> to your account.</p>
-    <p>Do you approve?</p>
+<% layout('layout') -%>
+<div class="row  login-container">
+    <div class="login-form col-xs-12 col-md-offset-4 col-md-4">
+        <div class="col-xs-12 col-md-12">
+            <div class="login-page-title text-center"><h1><%= __('general.ssl') %></h1></div>
+        </div>
+        <div class="col-xs-12 col-md-12 card ">
+            <div class="col-xs-12 col-md-12">
+                <div class="title">
+                    <h1><%= __('general.authorize') %></h1>
+                    <hr>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-12">
+                <form class="form-horizontal form-signin ng-dirty ng-valid-parse ng-valid ng-valid-required" id="loginForm" name="loginForm" role="form" action="/api/oauth2/authorize" method="post">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <p class="form-control-static">Hi <%= user.email %>!</p>
+                            <p class="form-control-static"><b><%= client.name %></b> is requesting <b>full access</b> to your account.</p>
+                            <p class="form-control-static">Do you approve?</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input name="transaction_id" type="hidden" value="<%= transactionID %>">
+                        <button type="submit" value="Allow" class="button"><%= __('general.allow') %></button>
+                        <button type="submit" value="Deny" class="button"><%= __('general.deny') %></button>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12 col-md-12">
+                            <div class="login-help-link"><%= __('general.help_dialog_link') %><a href="mailto:help@studentsuccesslink.org"> help@studentsuccesslink.org.</a></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <form action="/api/oauth2/authorize" method="post">
-      <input name="transaction_id" type="hidden" value="<%= transactionID %>">
-      <div>
-      <input type="submit" value="Allow" id="allow">
-      <input type="submit" value="Deny" name="cancel" id="deny">
-      </div>
-    </form>
-
-  </body>
-</html>

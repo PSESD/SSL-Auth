@@ -55,9 +55,13 @@ Rest.prototype.handleRoutes = function () {
 
     this.router.get('/user/changepassword', this.Api.csrfProtection, this.userController.changePassword);
 
+    this.router.get('/user/accountupdate', this.Api.csrfProtection, this.userController.accountUpdate);
+
     this.router.get('/500', this.userController.page500);
 
     this.router.post('/user/changepassword', this.Api.parseForm, this.Api.csrfProtection, this.userController.processChangePassword);
+
+    this.router.post('/user/accountupdate', this.Api.parseForm, this.Api.csrfProtection, this.userController.processAccountUpdate);
 
     this.router.get('/user/forgotpassword', this.Api.csrfProtection, this.userController.formForgotPassword);
 

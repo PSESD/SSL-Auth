@@ -263,6 +263,11 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(methodOverride());
 
+    app.use(function(err, req, res, next) {
+        console.log('TYPEOF: ', typeof err);
+        next();
+    });
+
     // Set view engine to ejs
     app.engine('ejs', engine);
     app.set('view engine', 'ejs');

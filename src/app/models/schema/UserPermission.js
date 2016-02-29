@@ -14,7 +14,10 @@ var UserPermissionSchema   = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true },
     students: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Student' } ],
     permissions: [ Permission ],
-    role: { type: String, default: 'case-worker-restricted' }
+    role: { type: String, default: 'case-worker-restricted' },
+    activate: { type: Boolean, default: false },
+    activateStatus: { type: String },
+    activateDate: { type: Date }
 });
 
 // Export the Mongoose model

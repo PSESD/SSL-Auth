@@ -151,7 +151,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
 
         console.log('IP TOKEN: ', token.ip, ' => CLIENT IP: ', clientIp);
 
-        callback(null, false, { message: 'Token not virified' });
+        callback(null, false, { message: 'Token not verified' });
 
       } else if (new Date() > token.expired) {//check for expired token
 

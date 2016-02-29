@@ -1,14 +1,14 @@
-    /*
+/*
 ===============================================
 ==================== INDEX ====================
 ===============================================
 I ALL
 1.Body
 2.Header
-  2a.Menu
+2a.Menu
 3.Container
-  3a.Login/Forget Form
-  3b.Table
+3a.Login/Forget Form
+3b.Table
 4.Footer
 5.Utility
 6.Form
@@ -22,1050 +22,1135 @@ II MEDIA
 1.Header
 
 */
-    /*
+/*
 ===============================================
 ==================== 1.Body ===================
 ===============================================
 */
+#button-close-open{
+    color: white;
+    background: black;
+    outline: none;
+    border: none;
+    padding: 15px;
+    position: fixed;
+    top: 0;
+    left: 175px;
+    z-index: 2;
+}
+.general-spacing{
+    padding-bottom: 30px!important;
+}
 
-    .form-search{
-        width: 25%;
-        margin: 0;
-        padding: 0;
-    }
-    .form-search.user{
-        width: 40%;
-    }
-    .form-search>.glass{
-        position: absolute;
-        top:158px;
-        left: 190px;
-    }
-    .form-search>.glass.user{
+.login-container {
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
 
-        top:176px;
+.login-form {
+    position: relative;
+    top: 50%;
+    transform: translateY(20%);
+}
+.title.detail{
+    position: relative;
+    top: 20px;
+}
+hr.rainbow{
+    width: 100%;
+    margin: 10px 0px;
+    height: 2px;
+    background: transparent linear-gradient(135deg, #EF7700 0%, #F2A900 37%, #F2CC10 69%, #FCE623 100%) repeat scroll 0% 0%;
+}
+.search-btn:before {
+    content: "\e003";
+    font-family: "Glyphicons Halflings";
+    line-height: 1;
+    margin: 0 5px 0 0;
+    position: absolute;
+    line-height: 32px;
+}
 
-    }
-    .popover{
-        font-size: 12px;
-        font-size: 1.2rem;
-    }
-    .panel-title{
-        font-size: 12px;
-        font-size: 1.2rem;
-    }
-    .last_update_date{
-        margin-left:10px;
-    }
-    .nav-tabs h1{
-        margin-top: 10px;
-    }
+.extra-space{
+    margin-top: 13px;
+    margin-bottom: 13px;
+}
 
-    form{
-        padding-top:20px;
-    }
+.remove-center-panel-margin{
+    margin-left:0!important;
+}
 
-    .form-horizontal,.control-label{
-        padding-top: 9px;
-    }
-    .form-control{
-        font-size: 12px;
-        line-height: 1.35em;
-    }
-    ul.tagit{
-        margin-top: 5px;
-    }
-    select{
-        color: black;
-        background: url(../img/arrow.png) no-repeat 96%;
-        border: 1px solid black;
-        padding: 7px 22px 7px 7px;
-    }
+.input-search {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    padding-left: 20px;
+    line-height: 32px;
+}
 
-    .dropdown-label{
-        padding-top: 12px;
-    }
+#sidebar-open-btn{
+    position: fixed;
+    top: -1em;
+    padding: 10px;
+    background: black none repeat scroll 0% 0% !important;
+    color: white !important;
+}
 
-    .help p {
+.popover{
+    font-size: 12px;
+    font-size: 1.2rem;
+}
+.panel-title{
+    font-size: 12px;
+    font-size: 1.2rem;
+}
+.last_update_date{
+
+    position: relative;
+    top: -15px;
+
+}
+.nav-tabs h1{
+    margin-top: 10px;
+}
+
+form{
+    padding-top:20px;
+}
+
+.form-horizontal,.control-label{
+    padding-top: 9px;
+}
+.form-control{
+    font-size: 12px;
+    line-height: 1.35em;
+}
+ul.tagit{
+    margin-top: 5px;
+}
+select{
+    color: black;
+    background: url(../img/arrow.png) no-repeat 98%;
+    border: 1px solid black;
+    padding: 7px 22px 7px 7px;
+}
+
+.dropdown-label{
+    padding-top: 12px;
+}
+
+.help p {
     color:#555;
-    }
-    /*a{*/
-        /*color: #337AB7;*/
-    /*}*/
+}
 
-    html {
-        font-weight: 300;
-        font-size: 10px;
+html {
+    font-weight: 300;
+    font-size: 10px;
 
-    }
-    body {
-        line-height: 1.35em; /* note we are using em here for the line-height */
-        font-size: 12px;
-        font-size: 1.2rem;
-        font-family: 'Source Sans Pro', sans-serif;
-    }
-    h1, h2, h3, .futura {
-        font-weight: 700;
-    }
-    h4, h5, h6 {
-        font-weight: 700;
-    }
-    h1 {
-        font-size: 18px;
-        font-size: 1.8rem;
-        letter-spacing: 0.2em; /* note we are using em here for letter spacing */
-        text-transform: uppercase;
-    }
-    h2 {
-        font-size: 16px;
-        font-size: 1.6rem;
-    }
-    h3 {
-        font-size: 14px;
-        font-size: 1.4rem;
-    }
-    h4 {
-        font-size: 16px;
-        font-size: 1.6rem;
-    }
-    h5 {
-        font-size: 14px;
-        font-size: 1.4rem;
-    }
-    h6 {
-        font-size: 12px;
-        font-size: 1.2rem;
-    }
-    .btn {
-        font-size: 14px;
-        font-size: 1.4rem;
-        letter-spacing: 0.1em;
-        outline: 0px !important;
-        border-radius: 0 0 0 0;
-        padding: 3px 25px;
-        margin: 1em 0;
-        white-space: nowrap;
-        text-shadow: none;
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        text-transform: uppercase;
-    }
-    .btn-default,.btn-secondary {
-        background: #fff!important;
-        background-image: none!important;
-        font-weight: bold!important;;
-        color: #000!important;;
-        border: 2px solid #000!important;;
-    }
-    .btn-default:hover,.btn-secondary:hover {
-        background: #000!important;
-        background-image: none!important;
-        font-weight: bold!important;;
-        color: #fff!important;;
-        border: 2px solid #000!important;;
-    }
-    .btn-primary {
-        background: #fff;
-        border: 2px solid #209920;
-        color: #209920;
-    }
-    .btn-primary:hover {
-        background: #209920;
-        color: #fff;
-        border-color: #209920;
-    }
-    .red{
-        color: #992020;
-    }
-    .btn-danger{
-        background: #fff;
-        border: 2px solid #992020;
-        color: #992020;
-    }
-    .btn-danger:hover {
-        background: #992020;
-        color: #fff!important;
-        border-color:#992020 ;
-    }
-    .title h1{
-        float: left;
-    }
-    .title hr{
-        clear: both;
-    }
-    .title span.title-lastupdate{
-        float: left;
-        margin-top: 23px;
-        margin-left: 20px;
-    }
-    .title a.btn{
-        float: right;
-    }
-    .sidemenu{
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-    a.sidemenu{
-        color: #9d9d9d;
-        font-size: 16px;
-        font-size: 1.6rem;
-    }
-    a.sidemenu:hover{
-        color: white;
-        background-color:transparent;
-    }
+}
+body {
+    /*line-height: 1.35em; /!* note we are using em here for the line-height *!/*/
+    font-size: 12px;
+    font-size: 1.2rem;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+h1, h2, h3, .futura {
+    font-weight: 700;
+}
+h4, h5, h6 {
+    font-weight: 700;
+}
+h1 {
+    font-size: 18px;
+    font-size: 1.8rem;
+    letter-spacing: 0.2em; /* note we are using em here for letter spacing */
+    text-transform: uppercase;
+}
+h2 {
+    font-size: 16px;
+    font-size: 1.6rem;
+}
+h3 {
+    font-size: 14px;
+    font-size: 1.4rem;
+}
+h4 {
+    font-size: 16px;
+    font-size: 1.6rem;
+}
+h5 {
+    font-size: 14px;
+    font-size: 1.4rem;
+}
+h6 {
+    font-size: 12px;
+    font-size: 1.2rem;
+}
+.btn {
+    font-size: 14px;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    outline: 0px !important;
+    border-radius: 0 0 0 0;
+    padding: 3px 25px;
+    margin: 1em 0;
+    white-space: nowrap;
+    text-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    text-transform: uppercase;
+}
+.btn-default,.btn-secondary {
+    background: #fff!important;
+    background-image: none!important;
+    font-weight: bold!important;;
+    color: #000!important;;
+    border: 2px solid #000!important;;
+}
+.btn-default:hover,.btn-secondary:hover {
+    background: #000!important;
+    background-image: none!important;
+    font-weight: bold!important;;
+    color: #fff!important;;
+    border: 2px solid #000!important;;
+}
+.modal.fade.ng-isolate-scope.in{
+    background-color: initial!important;
+}
+.panel-footer.delete-confirmation{
+    padding: initial;
+}
+.panel.delete-confirmation{
+    margin-bottom: initial;
+}
+.btn-primary {
+    background: #fff;
+    border: 2px solid #209920;
+    color: #209920;
+}
+.btn-primary:hover {
+    background: #209920;
+    color: #fff;
+    border-color: #209920;
+}
+.red{
+    color: #992020;
+}
+.btn-danger{
+    background: #fff;
+    border: 2px solid #992020;
+    color: #992020;
+}
+.btn-danger:hover {
+    background: #992020;
+    color: #fff!important;
+    border-color:#992020 ;
+}
+.title h1{
+    float: left;
+}
+.title hr{
+    clear: both;
+}
+.title span.title-lastupdate{
+    float: left;
+    margin-top: 23px;
+    margin-left: 20px;
+}
+.title a.btn{
+    float: right;
+}
+.sidemenu{
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #9d9d9d;
+    padding: 10px 15px;
+}
+.top-space{
+    position: relative;
+    top:23px;
+}
+a.sidemenu.organization_name:hover,
+a.sidemenu.link-nav.username:hover,
+a.sidemenu.beta{
+    cursor:default;
+    background:transparent;
+    color:#9D9D9D!important;
+}
+a.sidemenu{
+    color: #9d9d9d;
+    font-size: 16px;
+    font-size: 1.6rem;
+}
+a.sidemenu.organization_name{
+    font-size:24px;
+    font-size: 2.4rem;
+}
+a.sidemenu:hover{
+    color: white;
+    background-color:transparent;
+}
 
-    #border{
-        position: relative;
-        border-top: 2px solid #555;
-        width: 30px;
-        left: 15px;
-    }
-    .link-nav.sidemenu:hover,.sidebar_selected{
-        background-color: #eeeeee;
-        color: #ef7700 !important;
-    }
+.border{
+    position: relative;
+    border-top: 2px solid #555;
+    width: 30px;
+    left: 15px;
+}
+.link-nav.sidemenu:hover,.sidebar_selected,
+li.vertical-menu-item a:hover{
+    background-color: #eeeeee;
+    color: #ef7700 !important;
+}
 
-    body {
-        overflow: auto;
-        padding-bottom: 50px;
-        background: #DADFDC;
-        height: 100vh;
-        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
-        background: rgb(252, 230, 35);
-        /* Old browsers */
-        background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-        /* FF3.6+ */
-        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
-        /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-        /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-        /* Opera 11.10+ */
-        background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-        /* IE10+ */
-        background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
-        /* W3C */
-        filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
-        /* IE6-9 fallback on horizontal gradient */
-        background-attachment: fixed;
-    }
-    li {
-        list-style: none;
-    }
-    /*a,*/
-    /*a:focus,*/
-    /*a:hover {*/
-        /*color : #ef7700;*/
-    /*}*/
-    /*a, a:focus, a:hover {*/
-        /*color: #29B6D8;*/
-    /*}*/
+body {
+    overflow: auto;
+    padding-bottom: 50px;
+    background: #DADFDC;
+    height: 100vh;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+    background: rgb(252, 230, 35);
+    /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(252, 230, 35, 1)), color-stop(37%, rgba(242, 204, 16, 1)), color-stop(69%, rgba(242, 169, 0, 1)), color-stop(100%, rgba(239, 119, 0, 1)));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(135deg, rgba(252, 230, 35, 1) 0%, rgba(242, 204, 16, 1) 37%, rgba(242, 169, 0, 1) 69%, rgba(239, 119, 0, 1) 100%);
+    /* W3C */
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
+    background-attachment: fixed;
+}
+li {
+    list-style: none;
+}
+/*a,*/
+/*a:focus,*/
+/*a:hover {*/
+/*color : #ef7700;*/
+/*}*/
+/*a, a:focus, a:hover {*/
+/*color: #29B6D8;*/
+/*}*/
 
-    /*a:hover {*/
-        /*text-decoration: none;*/
-        /*color: #3572b0;*/
-        /*cursor: pointer;*/
-    /*}*/
-    a{
-        color: #29B6D8;
-    }
-    a:hover {
-        text-decoration: none;
-        color : #ef7700;
-        cursor: pointer;
-    }
-    a h1{
-        color: #555;
-    }
-    .jumbotron h1{
-        font-size: 2rem;
-    }
-    /*- Typography -*/
+/*a:hover {*/
+/*text-decoration: none;*/
+/*color: #3572b0;*/
+/*cursor: pointer;*/
+/*}*/
+a{
+    color: #29B6D8;
+}
+a:hover
+{
+    text-decoration: none;
+    color : #ef7700;
+    cursor: pointer;
+}
+a h1{
+    color: #555;
+}
+.jumbotron h1{
+    font-size: 2rem;
+}
+/*- Typography -*/
 
-    /*h1 {*/
-        /*font-size: 1.6em;*/
-        /*letter-spacing: .2em;*/
-        /*color: #555;*/
-        /*text-transform: uppercase;*/
-        /*font-family: "futura-pt",sans-serif;*/
-        /*font-weight: 700;*/
-    /*}*/
+/*h1 {*/
+/*font-size: 1.6em;*/
+/*letter-spacing: .2em;*/
+/*color: #555;*/
+/*text-transform: uppercase;*/
+/*font-family: "futura-pt",sans-serif;*/
+/*font-weight: 700;*/
+/*}*/
 
-    /*b,*/
-    /*strong {*/
-        /*color: #999 !important;*/
-        /*padding: 0 10px 10px 0 !important;*/
-    /*}*/
-    .bold{
-        color: #999 !important;
-    }
-    .bold-title{
-        padding: 0 10px 10px 0 !important;
-    }
-    /*
+/*b,*/
+/*strong {*/
+/*color: #999 !important;*/
+/*padding: 0 10px 10px 0 !important;*/
+/*}*/
+.bold{
+    color: #999 !important;
+}
+.bold-title{
+    padding: 0 10px 10px 0 !important;
+}
+/*
 ===============================================
 ================== 2.Header ===================
 ===============================================
 */
-    
-    .navbar {
-        position: fixed;
-        margin-bottom: 0;
-        height: 100%;
-        left: 0;
-        overflow: auto;
+
+/*.navbar {*/
+/*position: fixed;*/
+/*margin-bottom: 0;*/
+/*height: 100%;*/
+/*left: 0;*/
+/*overflow: auto;*/
+/*}*/
+/*
+===============================================
+=================== 2a.Menu ===================
+===============================================
+*/
+
+.navbar-nav .dropdown-menu > li > a,
+.navbar-right .dropdown-menu > li > a {
+    color: #9d9d9d;
+}
+.navbar-nav .dropdown-menu > li > a:hover,
+.navbar-right .dropdown-menu > li > a:hover {
+    background: transparent;
+    background-image: none;
+    color: #FFFFFF;
+}
+.navbar-inverse .navbar-nav>.active>a,
+.navbar-inverse .navbar-nav>.active>a:focus,
+.navbar-inverse .navbar-nav>.active>a:hover,
+.navbar-inverse .navbar-nav>.open>a,
+.navbar-inverse .navbar-nav>.open>a:focus,
+.navbar-inverse .navbar-nav>.open>a:hover {
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+#desktop .navbar-inverse .navbar-nav .active>a {
+    text-decoration: none;
+    border-bottom: 3px solid white;
+}
+#mobile .navbar-inverse .navbar-nav .active>a {
+    text-decoration: none;
+    border-bottom: 3px solid white;
+}
+/*a:hover {*/
+/*text-decoration: none;*/
+/*color: #3572b0;*/
+/*cursor: pointer;*/
+/*}*/
+/*
+===============================================
+================= 3.Container =================
+===============================================
+*/
+
+.container-fluid {}
+#center-panel {
+    background-color: initial !important;
+}
+/*- Cards -*/
+
+.card {
+    background: #fff;
+    /*padding: 24px 50px;*/
+    padding: 10px 30px;
+    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    margin: 10px 0;
+}
+.col-md-3 .card {
+    min-height: 300px;
+}
+.col-md-6 .card {
+    min-height: 620px;
+}
+.card .title hr {
+    width: 100%;
+    /*border-top: solid 2px #555;*/
+    margin: 10px 0 10px 0;
+    height: 2px;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
+    background: rgb(252, 230, 35);
+    /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(239, 119, 0, 1)), color-stop(37%, rgba(242, 169, 0, 1)), color-stop(69%, rgba(242, 204, 16, 1)), color-stop(100%, rgba(252, 230, 35, 1)));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(135deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
+    /* W3C */
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
+}
+.flexible-card {
+    background: #fff;
+    padding: 24px 50px;
+    border-bottom: solid 5px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    margin: 10px 0;
+    margin-left: 100px;
+}
+table h1 {
+    font-size: 16px;
+    font-weight: bold;
+}
+/*
+===============================================
+============= 3a.Login/Forget Form ============
+===============================================
+*/
+
+#login-container,
+#forget-container {
+    position: absolute;
+    top: 15%;
+    /*margin: 25%;*/
+}
+#login-container,
+#login-container .card,
+#forget-container,
+#forget-container .card {
+    color: #555;
+}
+#login-container .card h1,
+#forget-container .card h1,
+#login-container .card p,
+#forget-container .card p {
+    color: #555;
+}
+#login-container .card .title hr,
+#forget-container .card .title hr {}
+/*
+select{
+-webkit-appearance: none;
+}
+*/
+/*
+===============================================
+=================== 3b.Table ==================
+===============================================
+*/
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: none !important;
+}
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>thead>tr>th {
+    border-top: none !important;
+    /*padding: 16px 8px !important;*/
+}
+/*
+===============================================
+=================== 4.Footer ==================
+===============================================
+*/
+/*
+===============================================
+================== 5.Utility ==================
+===============================================
+*/
+
+.panel-border {
+    border: 2px solid black;
+}
+.top-border {
+    border-top: 2px solid black;
+}
+.days-field {
+    width: 10%;
+    font-weight: bolder;
+}
+.align-top-left {
+    vertical-align: top;
+    text-align: left
+}
+.header-period {
+    width: 15%;
+    font-weight: bold;
+}
+.presence-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #8CECFF;
+}
+.late-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #0080FF;
+}
+.excused-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #5C9EE0;
+}
+.unexcused-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: red;
+}
+.holiday-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #8B4A94;
+}
+.late-field {
+    width: 10%;
+    font-weight: bolder;
+    background-color: #0080FF
+}
+/*.last-update {*/
+/*margin-left: 2%;*/
+/*font-size: 14px;*/
+/*color: #aaa;*/
+/*}*/
+.attendance-card {
+    background-color: #ededed;
+    height: 5%;
+    overflow: auto;
+}
+.attendance-header {
+    font-weight: bold;
+    margin-left: 3%
+}
+.header-attendance-table {
+    margin-bottom: 0;
+}
+.sidebar-nav .navbar-inverse + a {
+    padding-left: 0;
+}
+.link-nav {
+
+}
+.underline_text {
+    border-bottom: solid 2px #000000;
+    display: inline;
+    padding-bottom: 3px;
+}
+.row.vertical-divider {
+    overflow: hidden;
+}
+.row.vertical-divider > div[class^="col-"] {
+    padding-bottom: 100px;
+    margin-bottom: -100px;
+    border-left: 2px solid #F2F7F9;
+    border-right: 2px solid #F2F7F9;
+}
+.row.vertical-divider div[class^="col-"]:first-child {
+    border-left: none;
+}
+.row.vertical-divider div[class^="col-"]:last-child {
+    border-right: none;
+}
+/*
+.table{
+height:350px;
+}
+*/
+
+div[contentEditable] {
+    cursor: pointer;
+    background-color: white;
+    padding: .2em;
+}
+div[contentEditable]:focus {
+    cursor: pointer;
+    background-color: #D0D0D0;
+    border: 1px solid red;
+    padding: .2em;
+}
+.no-gutter > [class*='col-'] {
+    padding-right: 0;
+    padding-left: 0;
+}
+.login-page {
+    /*margin-top: 250px!important;*/
+    left: 0;
+}
+.login-page-mobile {
+    left: -30px;
+}
+.btn-expand {
+    position: absolute;
+    bottom: 30px;
+    right: 45px;
+}
+.help-block {
+    font-weight: normal;
+    font-size: 10px;
+    vertical-align: middle;
+    letter-spacing: .5px;
+}
+.small {
+    font-size: 50%;
+}
+.bold {
+    font-weight: 700;
+}
+.font16 {
+    font-size: 16px;
+}
+.subhead {
+    text-transform: uppercase;
+    width: 90px;
+}
+#collapse-sidebarmenu:hover {
+    cursor: pointer;
+}
+/*- Flags -*/
+
+.flag {
+    background: #E75051;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.flag .title h1,
+.flag .content p,
+.flag .button,
+.flag .button:hover,
+.flag .button:active {
+    color: #fff;
+}
+.flag .title hr {
+    border-top: solid 2px #fff;
+}
+/*- View/Read Icons -*/
+
+.lock {
+    background-image: url(../img/icon-lock.png);
+    background-repeat: no-repeat;
+    background-position: right 10px top 10px;
+    background-size: 18px;
+}
+.pencil {
+    background-image: url(../img/icon-pencil.png);
+    background-repeat: no-repeat;
+    background-position: right 10px top 10px;
+    background-size: 18px;
+}
+.colour {
+    width: 100%;
+    height: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+}
+.label-checkbox {
+    display: inline-block;
+}
+.ng-hide {
+    display: none !important;
+}
+.glyphicon-spin {
+    -webkit-animation: glyphicon-spin 2s infinite linear;
+    animation: glyphicon-spin 2s infinite linear;
+}
+@-webkit-keyframes glyphicon-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes glyphicon-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+/*- Sidebar Collapse Icon -*/
+
+.collapse-icon {
+    color: white;
+}
+.collapse-icon:hover {
+    cursor: pointer;
+}
+/*
+===============================================
+=================== 6.Form ====================
+===============================================
+*/
+
+.form-control {
+    border: 0 !important;
+    box-shadow: none !important;
+    border-bottom: 1px #000 solid !important;
+    border-radius: 0 !important;
+    /*width: 60%;*/
+}
+.form-inline {
+    padding-bottom: 40px;
+}
+/*- Buttons -*/
+
+.button {
+    font-family: "proxima-nova",sans-serif;
+    font-weight: 700;
+    background: transparent;
+    font-size: 1em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #555;
+    border: solid 2px;
+    padding: 3px 25px;
+    border-radius: 3px;
+    margin: 10px 0;
+    outline: 0px !important;
+    -webkit-appearance: none;
+    min-height: 30px;
+    white-space: nowrap;
+}
+a.button {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.button:hover {
+    /*
+border-bottom:solid 3px;
+*/
+    color: #555;
+    text-decoration: none;
+}
+.button:active {
+    /*
+border-bottom:solid 2px rgba(0,0,0,0.0);
+background: rgba(0,0,0,0.1);
+color: #555;
+text-decoration: none;
+*/
+}
+.button:visited {
+    box-shadow: none;
+}
+#login-container input,
+#forget-container input {
+    background: transparent;
+    border-bottom: 1px #555 solid !important;
+    color: #555;
+}
+#login-container input::-webkit-input-placeholder,
+    /* WebKit browsers */
+
+#forget-container input::-webkit-input-placeholder,
+#login-container input:-moz-placeholder,
+    /* Mozilla Firefox 4 to 18 */
+
+#forget-container input:-moz-placeholder,
+#login-container input::-moz-placeholder,
+    /* Mozilla Firefox 19+ */
+
+#forget-container input::-moz-placeholder,
+#login-container input:-ms-input-placeholder,
+    /* Internet Explorer 10+ */
+
+#forget-container input:-ms-input-placeholder {
+    color: #555;
+}
+#login-container .card .help-block.label-checkbox {
+    color: #555;
+}
+#login-container .button,
+#forget-container .button {
+    color: #555;
+    border-color: #555;
+}
+/*
+===============================================
+================ 6.Auto Logout ================
+===============================================
+*/
+
+.modal-body p {
+    max-width: 100%;
+}
+/*
+===============================================
+=========== media (max-width:767px) ===========
+===============================================
+*/
+
+@media (max-width:767px) {
+    /*
+===============================================
+=================== 2.Header ==================
+===============================================
+*/
+    /*.navbar {*/
+    /*width: 75px;*/
+    /*}*/
+    #forgot_button {
+        display: block;
     }
     /*
 ===============================================
 =================== 2a.Menu ===================
 ===============================================
 */
-    
-    .navbar-nav .dropdown-menu > li > a,
-    .navbar-right .dropdown-menu > li > a {
-        color: #9d9d9d;
+    #navbar-height-col {
+        position: fixed;
+        top: 0;
+        height: 100%;
+        bottom: 0;
+        width: 80%;
+        left: -80%;
+        background-image: -webkit-linear-gradient(top, #3c3c3c 0, #222 100%);
+        background-image: -o-linear-gradient(top, #3c3c3c 0, #222 100%);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
+        background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
+        filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+        filter: progid: DXImageTransform.Microsoft.gradient(enabled=false);
+        background-repeat: repeat-x;
+        z-index: -1;
     }
-    .navbar-nav .dropdown-menu > li > a:hover,
-    .navbar-right .dropdown-menu > li > a:hover {
-        background: transparent;
-        background-image: none;
-        color: #FFFFFF;
+    #navbar #slidemenu {
+        left: -100%;
+        width: 80%;
+        min-width: 0;
+        position: absolute;
+        padding-left: 0;
+        z-index: 1;
+        margin: 0;
     }
-    .navbar-inverse .navbar-nav>.active>a,
-    .navbar-inverse .navbar-nav>.active>a:focus,
-    .navbar-inverse .navbar-nav>.active>a:hover,
-    .navbar-inverse .navbar-nav>.open>a,
-    .navbar-inverse .navbar-nav>.open>a:focus,
-    .navbar-inverse .navbar-nav>.open>a:hover {
-        background: transparent;
-        background-color: transparent;
-        background-image: none;
-        box-shadow: none;
+    .navbar.slide-active {
+        width: 80%;
+        z-index: 2;
     }
-    #desktop .navbar-inverse .navbar-nav .active>a {
-        text-decoration: none;
-        border-bottom: 3px solid white;
+    #navbar .navbar-toggle.slide-active .icon-bar {
+        background: orange;
     }
-    #mobile .navbar-inverse .navbar-nav .active>a {
-        text-decoration: none;
-        border-bottom: 3px solid white;
+    #navbar .navbar-brand {
+        display: none;
     }
-    /*a:hover {*/
-        /*text-decoration: none;*/
-        /*color: #3572b0;*/
-        /*cursor: pointer;*/
-    /*}*/
+    #navbar .navbar-header.slide-active .navbar-brand {
+        display: block;
+    }
+    #navbar #slidemenu.slide-active .navbar-nav {
+        margin: 7.5px 10px;
+    }
     /*
 ===============================================
 ================= 3.Container =================
 ===============================================
 */
-    
-    .container-fluid {}
-    #center-panel {
-        background-color: initial !important;
+    .container-with-menu {
+        width: calc(100% - 75px);
+        margin-left: 75px;
     }
-    /*- Cards -*/
-    
-    .card {
-        background: #fff;
-        padding: 24px 50px;
-        border-bottom: solid 5px rgba(0, 0, 0, 0.1);
-        border-radius: 2px;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-        margin: 10px 0;
-    }
-    .col-md-3 .card {
-        min-height: 300px;
-    }
-    .col-md-6 .card {
-        min-height: 620px;
-    }
-    .card .title hr {
-        width: 100%;
-        /*border-top: solid 2px #555;*/
-        margin: 10px 0 10px 0;
-        height: 2px;
-        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fce623+0,f2cc10+37,f2a900+69,ef7700+100 */
-        background: rgb(252, 230, 35);
-        /* Old browsers */
-        background: -moz-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
-        /* FF3.6+ */
-        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(239, 119, 0, 1)), color-stop(37%, rgba(242, 169, 0, 1)), color-stop(69%, rgba(242, 204, 16, 1)), color-stop(100%, rgba(252, 230, 35, 1)));
-        /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
-        /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
-        /* Opera 11.10+ */
-        background: -ms-linear-gradient(-45deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
-        /* IE10+ */
-        background: linear-gradient(135deg, rgba(239, 119, 0, 1) 0%, rgba(242, 169, 0, 1) 37%, rgba(242, 204, 16, 1) 69%, rgba(252, 230, 35, 1) 100%);
-        /* W3C */
-        filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#fce623', endColorstr='#ef7700', GradientType=1);
-        /* IE6-9 fallback on horizontal gradient */
-    }
-    .flexible-card {
-        background: #fff;
-        padding: 24px 50px;
-        border-bottom: solid 5px rgba(0, 0, 0, 0.1);
-        border-radius: 2px;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-        margin: 10px 0;
-        margin-left: 100px;
-    }
-    table h1 {
-        font-size: 16px;
-        font-weight: bold;
-    }
-    /*
-===============================================
-============= 3a.Login/Forget Form ============
-===============================================
-*/
-    
-    #login-container,
-    #forget-container {
-        position: absolute;
-        top: 15%;
-        /*margin: 25%;*/
-    }
-    #login-container,
-    #login-container .card,
-    #forget-container,
-    #forget-container .card {
-        color: #555;
-    }
-    #login-container .card h1,
-    #forget-container .card h1,
-    #login-container .card p,
-    #forget-container .card p {
-        color: #555;
-    }
-    #login-container .card .title hr,
-    #forget-container .card .title hr {}
-    /*
-select{
--webkit-appearance: none;
 }
-*/
-    /*
-===============================================
-=================== 3b.Table ==================
-===============================================
-*/
-    
-    .table-striped>tbody>tr:nth-of-type(odd) {
-        background-color: none !important;
-    }
-    .table>tbody>tr>td,
-    .table>tbody>tr>th,
-    .table>tfoot>tr>td,
-    .table>tfoot>tr>th,
-    .table>thead>tr>td,
-    .table>thead>tr>th {
-        border-top: none !important;
-        padding: 16px 8px !important;
-    }
-    /*
-===============================================
-=================== 4.Footer ==================
-===============================================
-*/
-    /*
-===============================================
-================== 5.Utility ==================
-===============================================
-*/
-    
-    .panel-border {
-        border: 2px solid black;
-    }
-    .top-border {
-        border-top: 2px solid black;
-    }
-    .days-field {
-        width: 10%;
-        font-weight: bolder;
-    }
-    .align-top-left {
-        vertical-align: top;
-        text-align: left
-    }
-    .header-period {
-        width: 15%;
-        font-weight: bold;
-    }
-    .presence-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: #8CECFF;
-    }
-    .late-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: #0080FF;
-    }
-    .excused-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: #5C9EE0;
-    }
-    .unexcused-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: red;
-    }
-    .holiday-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: #8B4A94;
-    }
-    .late-field {
-        width: 10%;
-        font-weight: bolder;
-        background-color: #0080FF
-    }
-    /*.last-update {*/
-        /*margin-left: 2%;*/
-        /*font-size: 14px;*/
-        /*color: #aaa;*/
-    /*}*/
-    .attendance-card {
-        background-color: #ededed;
-        height: 5%;
-        overflow: auto;
-    }
-    .attendance-header {
-        font-weight: bold;
-        margin-left: 3%
-    }
-    .header-attendance-table {
-        margin-bottom: 0;
-    }
-    .sidebar-nav .navbar-inverse + a {
-        padding-left: 0;
-    }
-    .link-nav {
-
-    }
-    .underline_text {
-        border-bottom: solid 2px #000000;
-        display: inline;
-        padding-bottom: 3px;
-    }
-    .row.vertical-divider {
-        overflow: hidden;
-    }
-    .row.vertical-divider > div[class^="col-"] {
-        padding-bottom: 100px;
-        margin-bottom: -100px;
-        border-left: 2px solid #F2F7F9;
-        border-right: 2px solid #F2F7F9;
-    }
-    .row.vertical-divider div[class^="col-"]:first-child {
-        border-left: none;
-    }
-    .row.vertical-divider div[class^="col-"]:last-child {
-        border-right: none;
-    }
-    /*
-.table{
-	height:350px;	
-}
-*/
-    
-    div[contentEditable] {
-        cursor: pointer;
-        background-color: white;
-        padding: .2em;
-    }
-    div[contentEditable]:focus {
-        cursor: pointer;
-        background-color: #D0D0D0;
-        border: 1px solid red;
-        padding: .2em;
-    }
-    .no-gutter > [class*='col-'] {
-        padding-right: 0;
-        padding-left: 0;
-    }
-    .login-page {
-        /*margin-top: 250px!important;*/
-        left: 0;
-    }
-    .login-page-mobile {
-        left: -30px;
-    }
-    .btn-expand {
-        position: absolute;
-        bottom: 30px;
-        right: 45px;
-    }
-    .help-block {
-        font-weight: normal;
-        font-size: 10px;
-        vertical-align: middle;
-        letter-spacing: .5px;
-    }
-    .small {
-        font-size: 50%;
-    }
-    .bold {
-        font-weight: 700;
-    }
-    .font16 {
-        font-size: 16px;
-    }
-    .subhead {
-        text-transform: uppercase;
-        width: 135px;
-    }
-    #collapse-sidebarmenu:hover {
-        cursor: pointer;
-    }
-    /*- Flags -*/
-    
-    .flag {
-        background: #E75051;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    .flag .title h1,
-    .flag .content p,
-    .flag .button,
-    .flag .button:hover,
-    .flag .button:active {
-        color: #fff;
-    }
-    .flag .title hr {
-        border-top: solid 2px #fff;
-    }
-    /*- View/Read Icons -*/
-    
-    .lock {
-        background-image: url(../img/icon-lock.png);
-        background-repeat: no-repeat;
-        background-position: right 10px top 10px;
-        background-size: 18px;
-    }
-    .pencil {
-        background-image: url(../img/icon-pencil.png);
-        background-repeat: no-repeat;
-        background-position: right 10px top 10px;
-        background-size: 18px;
-    }
-    .colour {
-        width: 100%;
-        height: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-    }
-    .label-checkbox {
-        display: inline-block;
-    }
-    .ng-hide {
-        display: none !important;
-    }
-    .glyphicon-spin {
-        -webkit-animation: glyphicon-spin 2s infinite linear;
-        animation: glyphicon-spin 2s infinite linear;
-    }
-    @-webkit-keyframes glyphicon-spin {
-        0% {
-            -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-        }
-        100% {
-            -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-        }
-    }
-    @keyframes glyphicon-spin {
-        0% {
-            -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-        }
-        100% {
-            -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-        }
-    }
-    /*- Sidebar Collapse Icon -*/
-    
-    .collapse-icon {
-        color: white;
-    }
-    .collapse-icon:hover {
-        cursor: pointer;
-    }
-    /*
-===============================================
-=================== 6.Form ====================
-===============================================
-*/
-    
-    .form-control {
-        border: 0 !important;
-        box-shadow: none !important;
-        border-bottom: 1px #000 solid !important;
-        border-radius: 0 !important;
-        width: 60%;
-    }
-    .form-inline {
-        padding-bottom: 40px;
-    }
-    /*- Buttons -*/
-
-    .button {
-        font-family: "proxima-nova",sans-serif;
-        font-weight: 700;
-        background: transparent;
-        font-size: 1em;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        color: #555;
-        border: solid 2px;
-        padding: 3px 25px;
-        border-radius: 3px;
-        margin: 10px 0;
-        outline: 0px !important;
-        -webkit-appearance: none;
-        min-height: 30px;
-        white-space: nowrap;
-    }
-    a.button {
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-    .button:hover {
-        /*
-    border-bottom:solid 3px;
-    */
-        color: #555;
-        text-decoration: none;
-    }
-    .button:active {
-        /*
-    border-bottom:solid 2px rgba(0,0,0,0.0);
-    background: rgba(0,0,0,0.1);
-    color: #555;
-    text-decoration: none;
-    */
-    }
-    .button:visited {
-        box-shadow: none;
-    }
-    #login-container input,
-    #forget-container input {
-        background: transparent;
-        border-bottom: 1px #555 solid !important;
-        color: #555;
-    }
-    #login-container input::-webkit-input-placeholder,
-    /* WebKit browsers */
-
-    #forget-container input::-webkit-input-placeholder,
-    #login-container input:-moz-placeholder,
-    /* Mozilla Firefox 4 to 18 */
-
-    #forget-container input:-moz-placeholder,
-    #login-container input::-moz-placeholder,
-    /* Mozilla Firefox 19+ */
-
-    #forget-container input::-moz-placeholder,
-    #login-container input:-ms-input-placeholder,
-    /* Internet Explorer 10+ */
-
-    #forget-container input:-ms-input-placeholder {
-        color: #555;
-    }
-    #login-container .card .help-block.label-checkbox {
-        color: #555;
-    }
-    #login-container .button,
-    #forget-container .button {
-        color: #555;
-        border-color: #555;
-    }
-    /*
-===============================================
-================ 6.Auto Logout ================
-===============================================
-*/
-    
-    .modal-body p {
-        max-width: 100%;
-    }
-    /*
-===============================================
-=========== media (max-width:767px) ===========
-===============================================
-*/
-    
-    @media (max-width:767px) {
-        /*
-    ===============================================
-    =================== 2.Header ==================
-    ===============================================
-    */
-        .navbar {
-            width: 75px;
-        }
-        #forgot_button {
-            display: block;
-        }
-        /*
-    ===============================================
-    =================== 2a.Menu ===================
-    ===============================================
-    */
-        #navbar-height-col {
-            position: fixed;
-            top: 0;
-            height: 100%;
-            bottom: 0;
-            width: 80%;
-            left: -80%;
-            background-image: -webkit-linear-gradient(top, #3c3c3c 0, #222 100%);
-            background-image: -o-linear-gradient(top, #3c3c3c 0, #222 100%);
-            background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
-            background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
-            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
-            filter: progid: DXImageTransform.Microsoft.gradient(enabled=false);
-            background-repeat: repeat-x;
-            z-index: -1;
-        }
-        #navbar #slidemenu {
-            left: -100%;
-            width: 80%;
-            min-width: 0;
-            position: absolute;
-            padding-left: 0;
-            z-index: 1;
-            margin: 0;
-        }
-        .navbar.slide-active {
-            width: 80%;
-            z-index: 2;
-        }
-        #navbar .navbar-toggle.slide-active .icon-bar {
-            background: orange;
-        }
-        #navbar .navbar-brand {
-            display: none;
-        }
-        #navbar .navbar-header.slide-active .navbar-brand {
-            display: block;
-        }
-        #navbar #slidemenu.slide-active .navbar-nav {
-            margin: 7.5px 10px;
-        }
-        /*
-    ===============================================
-    ================= 3.Container =================
-    ===============================================
-    */
-        .container-with-menu {
-            width: calc(100% - 75px);
-            margin-left: 75px;
-        }
-    }
-    /*
+/*
 ===============================================
 =========== media (min-width:768px) ===========
 ===============================================
 */
-    
-    @media (min-width:768px) {
-        /*
-    ===============================================
-    =================== 2.Header ==================
-    ===============================================
-    */
-        .navbar {
-            width: 15%;
-        }
 
-        /*
-    ===============================================
-    =================== 2a.Menu ===================
-    ===============================================
-    */
-        .custom-table {
-            width: 100%;
-            max-width: 100%;
-        }
+@media (min-width:768px) {
+    /*
+===============================================
+=================== 2.Header ==================
+===============================================
+*/
 
-        .custom-table tr td {
-            padding: 1%;
-        }
 
-        .custom-table .border-top-bottom {
-            border-top: 1px solid black !important;
-            border-bottom: 1px solid black !important;
-        }
+    /*
+===============================================
+=================== 2a.Menu ===================
+===============================================
+*/
+    .custom-table {
+        width: 100%;
+        max-width: 100%;
+    }
 
-        #navbar {
-            padding: 35px 10px 10px 10px;
-            border-radius: 0;
-            overflow-x: hidden;
-        }
+    .custom-table tr td {
+        padding: 1%;
+    }
 
-        .navbar-header {
-            float: none;
-        }
+    .custom-table .border-top-bottom {
+        border-top: 1px solid black !important;
+        border-bottom: 1px solid black !important;
+    }
 
-        .navbar-nav {
-            float: none;
-        }
+    #navbar {
+        padding: 35px 10px 10px 10px;
+        border-radius: 0;
+        overflow-x: hidden;
+    }
 
-        .navbar-right {
-            float: none !important;
-        }
+    /*.navbar-header {*/
+    /*float: none;*/
+    /*}*/
 
-        .navbar-nav li,
-        .navbar-right li {
-            float: none;
-        }
+    /*.navbar-nav {*/
+    /*float: none;*/
+    /*}*/
 
-        .navbar-nav .dropdown-menu,
-        .navbar-right .dropdown-menu {
-            position: relative;
-            float: none;
-            background-color: transparent;
-            box-shadow: none;
-            border: 0;
-        }
+    .navbar-right {
+        float: none !important;
+    }
 
-        /*
-    ===============================================
-    ================= 3.Container =================
-    ===============================================
-    */
-        .container-with-menu {
-            width: 85%;
-            margin-left: 15%;
-        }
+    /*.navbar-nav li,*/
+    /*.navbar-right li {*/
+    /*float: none;*/
+    /*}*/
 
-        /*
+    .navbar-nav .dropdown-menu,
+    .navbar-right .dropdown-menu {
+        position: relative;
+        float: none;
+        background-color: transparent;
+        box-shadow: none;
+        border: 0;
+    }
 
-    ===============================================
-    ================== 5.Utility ==================
-    ===============================================
-    */
-        .login-help-link {
-            font-size: 11px;
-            top: 10px;
-            position: relative;
-        }
+    /*
+===============================================
+================= 3.Container =================
+===============================================
+*/
+    .container-with-menu {
+        width: 85%;
+        margin-left: 15%;
+    }
 
-        @media (max-height: 600px) {
-            #login-container,
-            #forget-container {
-                position: absolute;
-                /*top: 10%;*/
-                margin: 18%;
-            }
-        }
-        /**
-     Help Style
-    **/
-        /*.help p {*/
-            /*font-size: 12px;*/
-            /*font-weight: bold;*/
-            /*letter-spacing: normal;*/
-            /*width: 284px;*/
-            /*color: #858585;*/
-            /*padding-bottom: 13px;*/
-        /*}*/
+    /*
 
-        .icon-sidebarmenu {
-            left: 85%;
-            top: 20px;
-            color: white;
-        }
+===============================================
+================== 5.Utility ==================
+===============================================
+*/
+    .login-help-link {
+        font-size: 11px;
+        top: 10px;
+        position: relative;
+    }
 
-        .icon-collapse-menu {
+    @media (max-height: 600px) {
+        #login-container,
+        #forget-container {
             position: absolute;
-            left: 30%;
+            /*top: 10%;*/
+            margin: 18%;
         }
+    }
+    /**
+ Help Style
+**/
+    /*.help p {*/
+    /*font-size: 12px;*/
+    /*font-weight: bold;*/
+    /*letter-spacing: normal;*/
+    /*width: 284px;*/
+    /*color: #858585;*/
+    /*padding-bottom: 13px;*/
+    /*}*/
 
-        .separator-content {
-            margin-bottom: 100px;
-            position: relative;
-        }
+    .icon-sidebarmenu {
+        left: 85%;
+        top: 20px;
+        color: white;
+    }
 
-        select {
-            -webkit-border-radius: 0px !important;
-            -webkit-appearance: none;
-            margin-top: 5px;
-        }
+    .icon-collapse-menu {
+        position: absolute;
+        left: 30%;
+    }
 
-        .organization_header {
-            color: white !important;
-            font-size: 1.6em;
-            margin-left: 14px;
-        }
+    .separator-content {
+        margin-bottom: 100px;
+        position: relative;
+    }
 
-        .add-select-student {
-            width: 60% !important
-        }
-        .inline-block {
-            display: inline-block;
-        }
+    select {
+        -webkit-border-radius: 0px !important;
+        -webkit-appearance: none;
+        margin-top: 5px;
+    }
+    .last-update-position{
+        position: relative;
+        top: 20px;
+    }
+    .organization_header {
+        color: white !important;
+        font-size: 1.6em;
+        margin-left: 14px;
+    }
 
-        .login-page-title {
-            padding-bottom: 1px;
-            font-size: 16px;
-        }
+    .add-select-student,
+    .invite-user-email{
+        width: 60% !important
+    }
+    .inline-block {
+        display: inline-block;
+    }
 
-        .login-help-link {
-            font-size: 11px;
-        }
+    .login-page-title {
+        padding-bottom: 1px;
+        font-size: 16px;
+    }
 
-        .confidentiality-footer,.version {
+    .login-help-link {
+        font-size: 11px;
+    }
 
-            position: relative;
-            bottom: 95px;
-            margin-left: 15.8%;
-            font-size: 12px;
+    .confidentiality-footer,.version {
 
-        }
-        .version{
-            margin-top:15px;
-        }
+        position: relative;
+        bottom: 95px;
+        /*margin-left: 15.4%;*/
 
-        dd,
-        dt {
-            display: inline;
-            margin: 0;
-        }
+    }
+    .confidentiality-footer.card{
+        padding: 24px 15px;
+        margin-top: 0px;
+    }
+    .version{
+        margin-top:15px;
+    }
 
-        dd:before {
-            content: ' '; /* space them */
-        }
+    dd,
+    dt {
+        display: inline;
+        margin: 0;
+    }
 
-        dt:before {
-            /* insert line break before <dt> */
-            /*content: "\A";*/
-            white-space: pre;
-        }
+    dd:before {
+        content: ' '; /* space them */
+    }
 
-        dt:first-child:before {
-            /* disable line break before the first <dt> */
-            content: none;
-        }
+    dt:before {
+        /* insert line break before <dt> */
+        /*content: "\A";*/
+        white-space: pre;
+    }
 
-        .forgot-password {
-            right: 50%;
-            position: relative;
-        }
+    dt:first-child:before {
+        /* disable line break before the first <dt> */
+        content: none;
     }
 
     .forgot-password {
         right: 50%;
         position: relative;
     }
+}
+
+.forgot-password {
+    right: 50%;
+    position: relative;
+}
 /**
  * LOADING STATE
  */
@@ -1098,18 +1183,18 @@ select{
     margin-bottom: 15px;
 }
 
-    .popup {
-        margin: 0;
-        background: #fff;
-        border: 1px solid #aaa;
-        box-shadow: 0 4px 5px rgba(0,0,0,.15);
-        z-index: 1010;
-        width: 100%;
-        padding: 0px;
-        border-radius: 4px;
-        margin-top: 1px;
-        position: absolute;
-    }
+.popup {
+    margin: 0;
+    background: #fff;
+    border: 1px solid #aaa;
+    box-shadow: 0 4px 5px rgba(0,0,0,.15);
+    z-index: 1010;
+    width: 100%;
+    padding: 0px;
+    border-radius: 4px;
+    margin-top: 1px;
+    position: absolute;
+}
 
 .multiselect{
     display: inline-block;
@@ -1119,7 +1204,8 @@ select{
 }
 .margin-bottom-general-info,
 .privacy_policy_bottom_space,
-.scholl_history_bottom_space{
+.scholl_history_bottom_space,
+{
     margin-bottom: 10px;
 }
 .error-color{
@@ -1145,28 +1231,33 @@ select{
 {
     margin-bottom: 45px;
 }
-.report-page .card .border-black
+/*.report-page .card */
+.border-black
 {
     border: 1px solid black;
 }
-.report-page .card .border-black.summary-information
+/*.report-page .card */
+.border-black.summary-information
 {
     text-align: center;
     padding: 10px 10px 20px 10px;
     margin-bottom: 30px;
 }
-.report-page .card .border-black.summary-information .font-count
+/*.report-page .card*/
+.border-black.summary-information .font-count
 {
     font-size: 4rem;
     line-height: 4rem;
     font-weight: bolder;
 }
-.report-page .card .border-black.summary-information .font-medium
+/*.report-page .card */
+.border-black.summary-information .font-medium
 {
     font-size: 2rem;
     line-height: 2rem;
 }
-.report-page .card .pie-information
+/*.report-page .card */
+.pie-information
 {
     margin-bottom: 30px;
 }
@@ -1195,4 +1286,22 @@ select{
         width: 100%;
         margin-bottom: 15px;
     }
+}
+.card .report-page{
+    padding: 10px 20px!important;
+}
+.glyphicon.glyphicon-refresh.glyphicon-spin{
+    top: 2px;
+}
+h1>.glyphicon.glyphicon-refresh.glyphicon-spin {
+    top: 2px;
+    width: 20px;
+    height: 20px;
+}
+
+.student-loading-circle{
+    position: absolute;
+    margin-top: 1.2em;
+    font-size: 1.5em;
+    right: 6.4em;
 }

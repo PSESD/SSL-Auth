@@ -10,10 +10,10 @@
     font-weight: bold;
     color: black;
 }
-.ng-isolate-scope {
-    background-color: #00B4BC;
-    border-radius: initial;
-}
+/*.ng-isolate-scope {*/
+/*background-color: #00B4BC;*/
+/*border-radius: initial;*/
+/*}*/
 .nav-tabs.nav-justified>li>a {
     border-bottom: 1px solid #ddd;
     border-radius: 0 0 0 0;

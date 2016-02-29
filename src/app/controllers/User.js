@@ -99,7 +99,10 @@ exports.sendInvite = function (req, res) {
 
         if (!organization) return res.sendError('Organization not found!');
 
-        User.update({email: email}, {$set: user}, {safe: true, upsert: true}, function (err, raw) {
+        User.update({email: email}, {
+            $set: user,
+            $push: { permissions: { organization: organization._id, permissions: [], students: [], role: role, activate: false, activateStatus: 'Pending' }}
+        }, {safe: true, upsert: true}, function (err, raw) {
 
             if (err) return res.sendError(err);
 
@@ -140,8 +143,6 @@ exports.sendInvite = function (req, res) {
                 user.authCode = authCode;
 
                 user.role = role;
-
-                user.pending.push(organization._id);
 
                 user.saveWithRole(req.user, organization._id, function (err) {
 
@@ -186,7 +187,7 @@ exports.sendInvite = function (req, res) {
 
                                 if (result[0].status == 'sent') {
 
-                                    return res.sendSuccess("Email was sent", isTester ? testerInfo : null);
+                                    return res.sendSuccess("Email was sent", isTester ? testerInfo : testerInfo.user );
 
                                 } else {
 
@@ -219,6 +220,145 @@ exports.sendInvite = function (req, res) {
 
         });
     });
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+exports.activate = function (req, res) {
+
+    var email = req.query.email;
+
+    var authCode = req.query.authCode;
+
+    var redirectTo = req.query.redirectTo;
+
+    var isNew = (req.query.__n == '1');
+
+    var callback = function (err, user) {
+
+        if (err) {
+            return errorNotFound(err, req, res);
+        }
+
+        if(isNew){
+
+            var sessionData = {
+                email: email,
+                authCode: authCode,
+                redirectTo: redirectTo
+            };
+
+            console.log("SESSION DATA: ", sessionData);
+
+            req.session.data = sessionData;
+
+            return res.redirect(config.get('auth.url') + '/api/user/accountupdate');
+
+        }
+
+        if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+
+        return res.redirect(redirectTo);
+
+    };
+
+    var parse_url = php.parse_url(redirectTo), curl = null;
+
+    if (parse_url.host) {
+
+        curl = parse_url.host;
+
+    } else {
+
+        curl = parse_url.path;
+
+    }
+
+    Organization.findOne({url: curl}, function (err, organization) {
+
+        if (err) { return callback(err); }
+
+        if (!organization) return callback('Organization not found!');
+
+
+        User.findOne({email: email}, function (err, user) {
+
+            if (err) { return callback(err); }
+
+            // No user found with that username
+            if (!user) return callback('User not found', false);
+
+            //console.log(user.organizationId, organization._id.toString(), user.organizationId.indexOf(organization._id.toString()));
+
+            var indexOf = user.organizationId.indexOf(organization._id.toString());
+
+            if(indexOf === -1) {
+                return callback('Activate failed. Invalid token', false);
+            }
+
+            if(indexOf in user.permissions && user.permissions[indexOf].activate === true) {
+                return callback('You have already used this link to activate your user.', false);
+            }
+
+            // Make sure the password is correct
+            user.verifyAuthCode(authCode, function (err, isMatch) {
+
+                if (err) { return callback(err); }
+
+                // Password did not match
+                if (!isMatch) {
+
+                    return callback('Invalid token', false);
+
+                }
+
+                Invite.findOne({ authCode: authCode }, function(err, invite){
+
+                    if (err) { return callback(err); }
+
+                    if(!invite) return callback('Invalid token', false);
+
+                    // Success
+                    User.where({_id: user._id}).update({
+                        $unset: {hashedAuthCode: ""}
+                        //$push: { permissions: { organization: organization._id, permissions: [], students: [], role: invite.role, activate: true, activateDate: new Date(), activateStatus: 'Active' }},
+                    }, function (err, updated) {
+
+                        if (err) return res.sendError(err);
+
+                        User.findOne({_id: user._id}, function(err, updateUser) {
+
+                            if (err) return res.sendError(err);
+
+                            updateUser.saveWithRole(user, organization._id.toString(), { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
+
+                                if (err) return res.sendError(err);
+
+                                Invite.remove({_id: invite._id}, function (err) {
+
+                                    if (err) return res.sendError(err);
+
+                                    callback(null, updated[0]);
+
+                                });
+
+                            });
+
+                        });
+
+                    });
+
+                });
+
+
+            });
+
+        });
+
+    });
+
 };
 
 exports.sendForgotPassword = function (req, res) {
@@ -324,133 +464,6 @@ exports.sendForgotPassword = function (req, res) {
 
 };
 
-exports.activate = function (req, res) {
-
-    var email = req.query.email;
-
-    var authCode = req.query.authCode;
-
-    var redirectTo = req.query.redirectTo;
-
-    var isNew = (req.query.__n == '1');
-
-    var callback = function (err, user) {
-
-        if (err) {
-            return errorNotFound(err, req, res);
-        }
-
-        if(isNew){
-
-            var sessionData = {
-                email: email,
-                authCode: authCode,
-                redirectTo: redirectTo
-            };
-
-            console.log("SESSION DATA: ", sessionData);
-
-            req.session.data = sessionData;
-
-            return res.redirect(config.get('auth.url') + '/api/user/changepassword');
-
-        }
-
-        if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
-
-        return res.redirect(redirectTo);
-
-    };
-
-    var parse_url = php.parse_url(redirectTo), curl = null;
-
-    if (parse_url.host) {
-
-        curl = parse_url.host;
-
-    } else {
-
-        curl = parse_url.path;
-
-    }
-
-    Organization.findOne({url: curl}, function (err, organization) {
-
-        if (err) { return callback(err); }
-
-        if (!organization) return callback('Organization not found!');
-
-
-        User.findOne({email: email}, function (err, user) {
-
-            if (err) { return callback(err); }
-
-            // No user found with that username
-            if (!user) return callback('User not found', false);
-
-            console.log(user.organizationId, organization._id.toString(), user.organizationId.indexOf(organization._id.toString()));
-
-            if(user.organizationId.indexOf(organization._id.toString()) !== -1) return callback('You have already used this link to activate your user.', false);
-
-            // Make sure the password is correct
-            user.verifyAuthCode(authCode, function (err, isMatch) {
-
-                if (err) { return callback(err); }
-
-                // Password did not match
-                if (!isMatch) {
-
-                    return callback('Invalid token', false);
-
-                }
-
-                Invite.findOne({ authCode: authCode }, function(err, invite){
-
-                    if (err) { return callback(err); }
-
-                    if(!invite) return callback('Invalid token', false);
-
-                    // Success
-                    User.where({_id: user._id}).update({
-                        $unset: {hashedAuthCode: ""},
-                        $push: {permissions: {organization: organization._id, permissions: [], students: [], role: invite.role}},
-                        $pull: { pending: organization._id }
-                    }, function (err, updated) {
-
-                        if (err) return res.sendError(err);
-
-                        User.findOne({_id: user._id}, function(err, updateUser) {
-
-                            if (err) return res.sendError(err);
-
-                            updateUser.saveWithRole(user, organization._id.toString(), invite.role, function (err) {
-
-                                if (err) return res.sendError(err);
-
-                                Invite.remove({_id: invite._id}, function (err) {
-
-                                    if (err) return res.sendError(err);
-
-                                    callback(null, updated[0]);
-
-                                });
-
-                            });
-
-                        });
-
-                    });
-
-                });
-                
-
-            });
-
-        });
-
-    });
-
-};
 
 exports.formForgotPassword = function (req, res) {
 
@@ -541,8 +554,26 @@ function errorNotFound(message, req, res){
 }
 
 
-exports.changePassword = function(req, res){
+exports.accountUpdate = function(req, res){
+    //req.session.data = { email: null};
+    if(!req.session.data){
+        errorNotFound(null, req, res);
+    } else{
+        res.render('../app/views/accountUpdate', {
+            errors: [],
+            session: req.session.data,
+            csrfToken: req.csrfToken()
+        });
+    }
 
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+exports.changePassword = function(req, res){
+    //req.session.data = { email: null};
     if(!req.session.data){
         errorNotFound(null, req, res);
     } else{
@@ -557,8 +588,142 @@ exports.changePassword = function(req, res){
 
 exports.page500 = function(req, res){
     errorNotFound('Somethings error', req, res);
-}
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+exports.processAccountUpdate = function(req, res){
 
+    var password = req.body.password;
+
+    var confirmPassword = req.body.confirm_password;
+
+    var first_name = req.body.first_name;
+
+    var middle_name = req.body.middle_name;
+
+    var last_name = req.body.last_name;
+
+    var authCode = req.body.authCode;
+
+    var email = req.body.email;
+
+    var redirectTo = req.body.redirectTo;
+
+    var errors = [];
+
+    function renderError(){
+
+        var sessionData = {
+            email: email,
+            authCode: authCode,
+            redirectTo: redirectTo
+        };
+
+        console.log("SESSION DATA: ", sessionData);
+
+        req.session.data = sessionData;
+
+        res.render('../app/views/accountUpdate', {
+            errors: errors,
+            session: req.session.data,
+            csrfToken: req.csrfToken()
+        });
+
+    }
+
+    var isError = (function(){
+
+        if(password !== confirmPassword){
+
+            errors.push("Password did not match");
+
+            return false;
+
+        }
+
+        if(!last_name){
+
+            errors.push('Last Name is required');
+
+            return false;
+
+        }
+
+        var where = {
+
+            email: email
+
+        };
+
+        var parse_url = php.parse_url(redirectTo), curl = null;
+
+        if (parse_url.host) {
+
+            curl = parse_url.host;
+
+        } else {
+
+            curl = parse_url.path;
+
+        }
+
+        Organization.findOne({url: curl}, function (err, organization) {
+
+            if (err) { return errorNotFound(err, req, res); }
+
+            if (!organization) {
+                return errorNotFound('Organization not found!', req, res);
+            }
+
+            User.findOne(where, function (err, user) {
+
+                if (err) {
+
+                    errors.push(err.message);
+
+                    return renderError();
+
+                }
+
+                user.password = password;
+
+                if (first_name) user.first_name = first_name;
+
+                if (middle_name) user.middle_name = middle_name;
+
+                user.last_name = last_name;
+
+                user.save(function (err) {
+
+                    if (err) {
+
+                        errors.push(err.message);
+
+                        return renderError();
+
+                    }
+
+                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+
+                    return res.redirect(redirectTo);
+
+                });
+
+            });
+        });
+
+    })();
+
+    if(errors.length > 0){
+
+        renderError();
+
+    }
+
+};
 exports.processChangePassword = function(req, res){
 
     var password = req.body.password;

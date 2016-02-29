@@ -1,13 +1,22 @@
 {
     "general": {
+        "ssl": "Student Success Link",
         "close": "Close",
+        "allow": "Allow",
+        "deny": "Deny",
         "change": "Change",
+        "authorize": "Authorization Needed",
+        "activate": "Activate",
         "change_password": "Change Password",
         "new_password": "New Password",
         "confirm_password": "Confirm Password",
         "first_name": "First Name",
         "middle_name": "Middle Name",
         "last_name": "Last Name",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "help_change_password_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
+        "help_account_update_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
+        "help_dialog_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
+        "account_update": "Activate your User Account"
     }
 }
