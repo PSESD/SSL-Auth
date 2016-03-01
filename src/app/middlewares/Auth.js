@@ -129,29 +129,31 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
 
     Token.findOne({ token: accessTokenHash }, function (err, token) {
 
-      if (err) { return callback(err); }
+      if (err) {
+
+        return callback(err);
+
+      }
 
       // No token found
       if (!token) {
+
         return callback(null, false);
-      }
-      /**
-       * Skipped email
-       * @type {string}
-       */
-      var hackIp = 'x-cbo-ip-skipped';
-
-      if(hackIp in req.headers && req.headers[hackIp]){
-
-        clientIp = token.ip;
 
       }
+
+      if(typeof token.ip === 'undefined' && clientIp === '127.0.0.1'){
+
+          clientIp = token.ip;
+
+      }
+
       //check for ip token
-      if(token.ip !== clientIp){
+      if(token.ip !== clientIp && (token.app_name + '') === ''){
 
         console.log('IP TOKEN: ', token.ip, ' => CLIENT IP: ', clientIp);
 
-        callback(null, false, { message: 'Token not virified' });
+        callback(null, false, { message: 'Token not verified' });
 
       } else if (new Date() > token.expired) {//check for expired token
 
@@ -174,7 +176,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
           if (!user) { return callback(null, false); }
 
           // Simple example with no scope
-          callback(null, user, { scope: '*' });
+          callback(null, user, { scope: '*', token: token });
 
         });
 
