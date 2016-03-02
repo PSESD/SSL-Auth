@@ -281,8 +281,6 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, 
 
     var expired = new Date(moment().add(100, 'years').valueOf()); // set 100th from now
 
-    console.log(expired);
-
     var tokenModel = new Token({
         token: tokenHash(token),
         clientId: client.id,
