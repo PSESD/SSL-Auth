@@ -4,7 +4,16 @@
  */
 var crypto = require('crypto');
 var justlog = require('justlog');
-var config = require('config');
+/**
+ *
+ * @returns {Config|exports|module.exports}
+ */
+function getConfig() {
+    //return require('config-uncached')(true);
+    return require('config');
+}
+
+var config = getConfig();
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
@@ -14,7 +23,7 @@ var php = require('phpjs');
 var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
-      password = 'ssl-encrypted-827192';
+    password = 'ssl-encrypted-827192';
 
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
@@ -29,7 +38,7 @@ var utils = {
      * @param text
      * @returns {*}
      */
-    encrypt: function(text){
+    encrypt: function (text) {
         return text;
         //try{
         //    var cipher  = crypto.createCipher(algorithm, password);
@@ -45,7 +54,7 @@ var utils = {
      * @param text
      * @returns {*}
      */
-    decrypt: function(text){
+    decrypt: function (text) {
         return text;
         //try{
         //    var decipher = crypto.createDecipher(algorithm, password);
@@ -61,7 +70,7 @@ var utils = {
      *
      * @returns cache-manager
      */
-    cache: function(){
+    cache: function () {
 
         var cache = config.get('cache');
 
@@ -69,7 +78,7 @@ var utils = {
 
         var options = {};
 
-        if(!cache.enable){
+        if (!cache.enable) {
 
             var self = {};
             /**
@@ -79,7 +88,7 @@ var utils = {
              * @param {string} key
              * @param {function} cb
              */
-            self.getAndPassUp = function(key, cb) {
+            self.getAndPassUp = function (key, cb) {
 
                 cb(null, false);
 
@@ -100,7 +109,7 @@ var utils = {
              * @param {object} [options] - options passed to `set` function
              * @param {function} cb
              */
-            self.wrap = function(key, work, options, cb) {
+            self.wrap = function (key, work, options, cb) {
 
                 if (typeof options === 'function') {
 
@@ -125,7 +134,7 @@ var utils = {
              * @param {object} [options] to pass to underlying set function.
              * @param {function} [cb]
              */
-            self.set = function(key, value, options, cb) {
+            self.set = function (key, value, options, cb) {
 
                 cb(null);
 
@@ -141,7 +150,7 @@ var utils = {
              * @param {object} [options] to pass to underlying get function.
              * @param {function} cb
              */
-            self.get = function(key, options, cb) {
+            self.get = function (key, options, cb) {
 
                 if (typeof options === 'function') {
 
@@ -165,7 +174,7 @@ var utils = {
              * @param {object} [options] to pass to underlying del function.
              * @param {function} cb
              */
-            self.del = function(key, options, cb) {
+            self.del = function (key, options, cb) {
 
                 if (typeof options === 'function') {
 
@@ -182,7 +191,7 @@ var utils = {
             return self;
         }
 
-        var getCache = function(name) {
+        var getCache = function (name) {
 
             switch (name) {
 
@@ -224,11 +233,11 @@ var utils = {
      * @param data
      * @param options
      */
-    js2xml: function(data, options){
+    js2xml: function (data, options) {
 
         var root = 'response';
 
-        if(_.isString(options)){
+        if (_.isString(options)) {
 
             root = options;
 
@@ -244,7 +253,7 @@ var utils = {
      * @param body
      * @param callback
      */
-    xml2js: function(body, callback){
+    xml2js: function (body, callback) {
         parseString(body, {
             normalize: true,
             explicitArray: false,
@@ -259,11 +268,17 @@ var utils = {
      *
      * @param value
      */
-    md5: function(value){
+    md5: function (value) {
 
         return crypto.createHash('md5').update(value).digest('hex');
 
     },
+    /**
+     *
+     * @param useCache
+     * @returns {*}
+     */
+    config: getConfig,
     /**
      * Return a unique identifier with the given `len`.
      *
@@ -331,13 +346,13 @@ var utils = {
      *
      * @returns {Date}
      */
-    calculateExp: function(forever){
+    calculateExp: function(forever) {
 
         if(forever === true){
             return new Date(new Date().getTime() + 315360000/*(10 * 365 * 24 * 60 * 60)*/);//set 10year
         }
 
-        return new Date(new Date().getTime() + (require('config').get('token.expires_in') * 1000));
+        return new Date(new Date().getTime() + (config.get('token.expires_in') * 1000));
 
     },
     /**
@@ -345,10 +360,10 @@ var utils = {
      * @param body
      * @param subject
      */
-    mailDev: function(body, subject, done){
+    mailDev: function (body, subject, done) {
         var cfg = config.get('devMail');
         var mails = [];
-        if(body instanceof Error){
+        if (body instanceof Error) {
 
             body = body.stack.split("\n");
 
@@ -370,31 +385,31 @@ var utils = {
 
                 if (result[0].status == 'sent') {
                     utils.log('Email was sent ' + message.subject, 'info');
-                    if(done) done();
+                    if (done) done();
                 } else {
 
                     utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                    if(done) done('A mandrill error occurred: ' + result[0].reject_reason);
+                    if (done) done('A mandrill error occurred: ' + result[0].reject_reason);
                 }
 
             }, function (e) {
                 // Mandrill returns the error as an object with name and message keys
                 utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                if(done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                if (done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                 // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
             });
 
         }, function (e) {
             // Mandrill returns the error as an object with name and message keys
             utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-            if(done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+            if (done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
             // A mandrill error occurred: Invalid_Key - Invalid API key
         });
     },
     /**
      *
      */
-    preg_quote: function(str, delimiter) {
+    preg_quote: function (str, delimiter) {
 
         //  discuss at: http://phpjs.org/functions/preg_quote/
         // original by: booeyOH
@@ -415,11 +430,11 @@ var utils = {
     /**
      * Logging to API
      */
-    log: function(message, type, callback){
+    log: function (message, type, callback) {
 
         var rollbarAccessToken = config.get('rollbar.access_token');
 
-        if(message instanceof Error){
+        if (message instanceof Error) {
 
             message = message.stack.split("\n");
 
@@ -427,24 +442,55 @@ var utils = {
 
         console.log(message);
 
-        if(rollbarAccessToken){
+        if (rollbarAccessToken) {
             rollbar.reportMessage(message, type || 'info', null, callback);
 
         }
 
     },
 
-    benchmark: function(){
+    benchmark: function () {
         var log = justlog({
-            file : {
-                pattern : '{fulltime} [{level}] {msg}' // use custom pattern
+            file: {
+                pattern: '{fulltime} [{level}] {msg}' // use custom pattern
             },
-            stdio : {
+            stdio: {
                 //pattern : '{fulltime} [{level}] {msg} {timestamp} {mstimestamp}' // use predefined pattern
-                pattern : 'color' // use predefined pattern
+                pattern: 'color' // use predefined pattern
             }
         });
         return log;
+    },
+    /**
+     *
+     * Get current URI Client
+     */
+    getOrganizationUri: function (req) {
+
+        var clientUrl = req.headers.origin;
+
+        var hackUrl = 'x-cbo-client-url';
+
+        var redirectUri = '';
+
+        if (hackUrl in req.headers) {
+
+            clientUrl = req.headers[hackUrl];
+
+        }
+
+        var parse_url = php.parse_url(clientUrl);
+
+        if (parse_url.host) {
+
+            redirectUri = parse_url.host;
+
+        } else {
+
+            redirectUri = parse_url.path;
+
+        }
+        return redirectUri;
     }
 
 };
