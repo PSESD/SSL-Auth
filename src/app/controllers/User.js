@@ -78,7 +78,9 @@ exports.sendInvite = function (req, res) {
         email: req.body.email
     };
 
-    if (!req.body.redirect_url) return res.sendError('Redirect Url is empty');
+    if (!req.body.redirect_url) {
+        return res.sendError('Redirect Url is empty');
+    }
 
 
     var parse_url = php.parse_url(req.body.redirect_url), curl = null;

@@ -1,6 +1,7 @@
 'use strict';
 // Load required packages
 var oauth2orize = require('oauth2orize');
+var moment = require('moment');
 var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
@@ -275,13 +276,17 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
  * application issues an access token on behalf of the client who authorized the code.
  */
 server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, callback) {
+
     var token = uid(256);
 
-    var expired = calculateExp();
+    var expired = new Date(moment().add(100, 'years').valueOf()); // set 100th from now
+
+    console.log(expired);
 
     var tokenModel = new Token({
         token: tokenHash(token),
         clientId: client.id,
+        ip: '*',
         userId: client.userId,
         scope: scope,
         expired: expired
@@ -292,7 +297,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, scope, 
 
         if (err) { return callback(err); }
 
-        callback(null, token, null, {expires_in: expiresIn});
+        callback(null, token, null, {});
 
     });
 
