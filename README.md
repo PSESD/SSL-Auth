@@ -195,7 +195,7 @@ $ http -a test:your_password -f POST http://localhost:3000/api/oauth2/authorize 
 #### Use access code to get a token
 
 ```
-$ http -a client:secret -f POST http://localhost:3000/api/oauth2/token code=<accessCode> grant_type=authorization_code redirect_uri=http://localhost:3000
+$ http -a <clientKey>:<secretKey> -f POST http://localhost:3000/api/oauth2/token code=<accessCode> grant_type=authorization_code redirect_uri=http://localhost:3000
 ```
 ###### Response:
 ```
@@ -223,21 +223,72 @@ $ http -a client:secret -f POST http://localhost:3000/api/oauth2/token grant_typ
 }
 ```
 
+### For application, we can use client credentials to request a token:
+#### Client Credentials to get a token
+Here I'll show how to test Authorization Server with the grant type of Client Credentials.
+References from the RFC:
+[Client Credentials](http://tools.ietf.org/html/rfc6749#section-1.3.4)
+[Client Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.4)
+```
+$ http -a <clientKey>:<secretKey> -f POST http://localhost:3000/api/oauth2/token grant_type=client_credentials
+```
+###### Response:
+```
+{
+    "access_token": "3AF0u9-45VsWqALaaY7TomzW6zbU17Bl0J.2s5D62pd406yX8IF9zzt5vIoFWL3EGhKQgBO", 
+    "token_type": "Bearer"
+}
+
+```
 #### Use access token to get a user api end point
 
 ```
-$ http POST http://localhost:4000/user authorization:"Bearer <access_token>" grant_type=refresh_token refresh_token=<refresh_token>
+$ http GET http://localhost:4000/organizations x-cbo-client-url:http://<organizationUri> authorization:"Bearer <access_token>"
 
 ```
 ###### Response:
 ```
-{ email: 'test',
-    last_name: 'test',
-  _id: '5564657e1afd13446cc4871c',
-  __v: 0,
-  last_updated: '2015-05-26T12:22:22.823Z',
-  created: '2015-05-26T12:22:22.823Z',
-  permissions: [] }
+{
+    "_links": {
+        "self": {
+            "href": "/organizations"
+        }
+    }, 
+    "data": [
+        {
+            "__v": 0, 
+            "_id": "<organizationId>", 
+            "addresses": [
+                {
+                    "_id": "<addressId>", 
+                    "address_line": "<address_line>", 
+                    "address_type": "<address_type>", 
+                    "city": "<city>", 
+                    "country": "<country>", 
+                    "location": {
+                        "accuracy": "<accuracy>", 
+                        "latitude": <latitude>, 
+                        "longitude": <longitude>
+                    }, 
+                    "state": "<state>", 
+                    "venue": "<venue>", 
+                    "zip": "<zip>"
+                }
+            ], 
+            "authorizedEntityId": 2, 
+            "created": "2016-03-04T08:58:32.457Z", 
+            "description": null, 
+            "externalServiceId": 5, 
+            "last_updated": "2016-03-04T08:58:32.457Z", 
+            "name": "Organization Name", 
+            "personnelId": null, 
+            "url": "<organizationUri>", 
+            "website": "<organizationUri>"
+        }
+    ], 
+    "success": true, 
+    "total": 1
+}
 ```
 
 

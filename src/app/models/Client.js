@@ -4,12 +4,15 @@ var mongoose = require('mongoose');
 
 // Define our Client schema
 var ClientSchema = new mongoose.Schema({
-  name: { type: String, unique: true, required: true },
-  id: { type: String, required: true },
-  secret: String,
-  userId: { type: String, required: true },
-  redirectUri: { type: String, required: true }
+    name: { type: String, unique: true, required: true },
+    id: { type: String, required: true },
+    secret: String,
+    userId: { type: String, required: true },
+    redirectUri: { type: String, required: true },
+    created: {type: Date, required: true, default: Date.now},
+    created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
+
 ClientSchema.virtual('clientId')
     .get(function(){
       return this._id;
