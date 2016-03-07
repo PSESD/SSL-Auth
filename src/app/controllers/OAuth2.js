@@ -71,25 +71,30 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 
         if(!cln) return callback('Url not match!');
 
-        try{
+        if((''+cln.redirectUri) === redirectUri){
+            console.log('URL MATCH');
+        } else{
 
-            var uri = require('url');
+            try{
 
-            var parser = uri.parse(redirectUri);
+                var uri = require('url');
 
-            var uriRegex = (''+cln.redirectUri);
-                
-            var regex = new RegExp(uriRegex, 'i');
+                var parser = uri.parse(redirectUri);
 
-            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));
-            if(!parser.host.match(regex)) return callback('Url not match!');
+                var uriRegex = ('' + cln.redirectUri);
 
-        } catch(e){
+                var regex = new RegExp(uriRegex, 'i');
 
-            console.log(e);
+                //console.log(regex, redirectUri, parser.host, parser.host.match(regex));
+                if(!parser.host.match(regex)) return callback('Url not match!');
 
-            return callback('Url not match!');
+            } catch(e){
 
+                console.log(e);
+
+                return callback('Url not match!');
+
+            }
         }
 
         var code = new Code({
