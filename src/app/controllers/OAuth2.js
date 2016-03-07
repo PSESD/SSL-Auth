@@ -134,6 +134,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
         }
 
         if (redirectUri !== authCode.redirectUri) {
+            console.log(redirectUri, JSON.stringify(authCode));
             return callback(null, false);
         }
 
@@ -153,6 +154,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
             // Create a new access token
             var tokenModel = new Token({
                 token: tokenHash(token),
+                ip: '*',
                 clientId: authCode.clientId,
                 userId: authCode.userId,
                 expired: expired
@@ -371,6 +373,20 @@ exports.authorization = [
         });
 
     }),
+
+    function(err, req, res, next){
+        if(err){
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.sendError(err);
+            } else {
+                return res.render('../app/views/500', {
+                    message: err.message
+                });
+            }
+
+        }
+        next();
+    },
 
     function (req, res) {
 

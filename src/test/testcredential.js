@@ -109,7 +109,7 @@ describe( 'OAuth2', function () {
 
         var rfParam = {
             grant_type  : 'refresh_token',
-            refresh_token: refreshToken,
+            refresh_token: refreshToken
         };
 
         var out = [];
