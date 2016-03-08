@@ -15,15 +15,17 @@
                 <form class="form-horizontal form-signin ng-dirty ng-valid-parse ng-valid ng-valid-required" id="loginForm" name="loginForm" role="form" action="/api/oauth2/authorize" method="post">
                     <div class="form-group">
                         <div class="col-sm-12">
-                            <p class="form-control-static">Hi <%= user.email %>!</p>
-                            <p class="form-control-static"><b><%= client.name %></b> is requesting <b>full access</b> to your account.</p>
-                            <p class="form-control-static">Do you approve?</p>
+                            <p class="form-control-static"><%= __('general.Dear', user.email) %>,</p>
+                            <p class="form-control-static"><b><%= client.name %></b> <%= __('general.request_access') %></p>
+                            <p class="form-control-static"><%= __('general.authorize_confirm') %></p>
                         </div>
                     </div>
                     <div class="form-group">
                         <input name="transaction_id" type="hidden" value="<%= transactionID %>">
-                        <button type="submit" value="Allow" class="button"><%= __('general.allow') %></button>
-                        <button type="submit" value="Deny" class="button"><%= __('general.deny') %></button>
+                        <div class="col-xs-12 col-md-12 text-center">
+                            <button type="submit" value="Allow" class="btn btn-default"><%= __('general.allow') %></button>
+                            <button type="submit" value="Deny" class="btn btn-default"><%= __('general.deny') %></button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12 col-md-12">
