@@ -1,11 +1,13 @@
 {
     "general": {
         "ssl": "Student Success Link",
+        "Dear": "Dear %s",
         "close": "Close",
         "allow": "Allow",
         "deny": "Deny",
         "change": "Change",
         "authorize": "Authorization Needed",
+        "authorize_confirm": "Do you authorize this request?",
         "activate": "Activate",
         "change_password": "Change Password",
         "new_password": "New Password",
@@ -14,6 +16,7 @@
         "middle_name": "Middle Name",
         "last_name": "Last Name",
         "unknown": "Unknown",
+        "request_access": "is requesting full access to your Student Success Link account.",
         "help_change_password_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
         "help_account_update_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
         "help_dialog_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
