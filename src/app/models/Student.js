@@ -23,13 +23,13 @@ var Address = require('./schema/Address');
 // TODO: On read, update, need to ensure the user have permission to the Student.
 // TODO: On read, need to pull Student backpack data from HZB/Elasticache for serving.
 var StudentSchema = new mongoose.Schema({
-    organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
+    organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', index: true, unique: true, required: true },
     first_name: { type: String, component: 'settings' },
     last_name: { type: String, required: true, index: true },
     middle_name: { type: String },
-    district_student_id: { type: String },
+    district_student_id: { type: String, index: true, unique: true, required: true },
     addresses: [ Address ],
-    school_district: { type: String },
+    school_district: { type: String, index: true, unique: true, required: true },
     programs: [ StudentProgram ],
     college_bound: { type: String, index: true, trim: true, enum: [ 'Yes', 'No' ] },
     phone: { type: String, trim: true },
