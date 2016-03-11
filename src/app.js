@@ -121,7 +121,9 @@ Api.prototype.sendMessage = function (type, message, cb) {
 
     rollbar.reportMessage(message, type || 'debug', function (rollbarErr) {
 
-        if (cb) cb(rollbarErr);
+        if (cb) {
+            cb(rollbarErr);
+        }
 
     });
 
@@ -263,11 +265,6 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(methodOverride());
 
-    app.use(function(err, req, res, next) {
-        console.log('TYPEOF: ', typeof err);
-        next();
-    });
-
     // Set view engine to ejs
     app.engine('ejs', engine);
     app.set('view engine', 'ejs');
@@ -324,7 +321,6 @@ Api.prototype.configureExpress = function (db) {
                     //}
 
                     return res.send(xmlmodel(data, res.xmlOptions || 'response'));
-
 
             }
 
@@ -435,6 +431,15 @@ Api.prototype.configureExpress = function (db) {
             if(err === 'Access Denied' || err === 'Permission Denied') {
 
                 return res.errUnauthorized();
+
+            }
+
+            /**
+             * Mongoose error duplicate
+             */
+            if(err.code && (err.code === 11000 || 11001)){
+
+                err.message = 'Duplicate data should not be allowed';
 
             }
 

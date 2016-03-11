@@ -48,6 +48,7 @@ Rest.prototype.handleRoutes = function () {
         .get(this.auth.isAuthenticated, this.userController.getUsers);
 
     this.router.route('/user/invite')
+        .put(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.sendReInvite)
         .post(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.sendInvite);
 
     this.router.route('/user/send/forgotpassword')
