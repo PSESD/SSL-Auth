@@ -437,9 +437,12 @@ Api.prototype.configureExpress = function (db) {
             /**
              * Mongoose error duplicate
              */
-            if(err.code && (err.code === 11000 || 11001)){
+            if(err.code && (err.code === 11000 || err.code === 11001)){
 
-                err.message = 'Duplicate data should not be allowed';
+                err = {
+                    code: err.code,
+                    message: res.__('errors.' + err.code)
+                };
 
             }
 
