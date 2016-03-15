@@ -109,7 +109,7 @@ The following examples configuration in JSON format.
 
 **Use configs in your code:**
 
-    var config = require('config');
+    var config = require('./lib/utils').config();
     ...
     var dbConfig = config.get('db.mongo.host');
     db.connect(dbConfig, ...);

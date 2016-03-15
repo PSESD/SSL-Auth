@@ -1,11 +1,13 @@
 {
     "general": {
         "ssl": "Student Success Link",
+        "Dear": "Dear %s",
         "close": "Close",
         "allow": "Allow",
         "deny": "Deny",
         "change": "Change",
-        "authorize": "Authorization Needed",
+        "authorize": "YOUR AUTHORIZATION IS REQUIRED",
+        "authorize_confirm": "Do you want to allow this access?",
         "activate": "Activate",
         "change_password": "Change Password",
         "new_password": "New Password",
@@ -14,9 +16,12 @@
         "middle_name": "Middle Name",
         "last_name": "Last Name",
         "unknown": "Unknown",
+        "request_access": "is requesting full access to your Student Success Link account.",
         "help_change_password_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
         "help_account_update_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
         "help_dialog_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
-        "account_update": "Activate your User Account"
+        "account_update": "Activate your User Account",
+        "errors.11000": "Duplicate data should not be allowed",
+        "errors.11001": "Duplicate data should not be allowed"
     }
 }

@@ -536,6 +536,7 @@ UserSchema.method('toJSON', function(){
     delete user.allStudents;
     delete user.organizationId;
     delete user.hashedForgotPasswordExpire;
+    delete user.hashedForgotPassword;
     delete user.hashedAuthCode;
     delete user.__v;
     delete user.is_super_admin;

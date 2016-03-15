@@ -67,7 +67,12 @@ exports.getUsers = function (req, res) {
     });
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.sendInvite = function (req, res) {
 
     var email = req.body.email;
@@ -153,7 +158,8 @@ exports.sendInvite = function (req, res) {
                     var invite = new Invite({
                         authCode: authCode,
                         organization: organization._id,
-                        role: role
+                        role: role,
+                        user: user._id.toString()
                     });
 
                     var testerInfo = {
@@ -216,6 +222,176 @@ exports.sendInvite = function (req, res) {
 
                     }); 
 
+                });
+
+            });
+
+        });
+    });
+};
+/**
+ *
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+exports.sendReInvite = function (req, res) {
+
+    var email = req.body.email;
+
+    var user = {
+        email: req.body.email
+    };
+
+    if (!req.body.redirect_url) {
+        return res.sendError('Redirect Url is empty');
+    }
+
+
+    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+    if (parse_url.host) {
+
+        curl = parse_url.host;
+
+    } else {
+
+        curl = parse_url.path;
+
+    }
+
+    Organization.findOne({url: curl}, function(err, organization) {
+
+        if (err) return res.sendError(err);
+
+        if (!organization) return res.sendError('Organization not found!');
+
+        User.findOne({email: email,
+            permissions: {
+                $elemMatch: {
+                    organization: organization._id,
+                    activate: false
+                }
+            }
+        }, function (err, user) {
+
+            if (err) return res.sendError(err);
+
+            var base = config.get('auth.url');
+
+            var authCode = crypto.randomBytes(16).toString('base64');
+
+            var isTester = false;
+
+            if(email === 'cbo_test@upwardstech.com'){
+
+                isTester = true;
+
+            }
+
+            var hackUrl = 'x-invite-test';
+
+            if(hackUrl in req.headers && req.headers[hackUrl] === email){
+
+                isTester = true;
+
+            }
+
+            var activateUrl = base + "/api/user/activate?email=" + encodeURIComponent(user.email) + "&authCode=" + encodeURIComponent(authCode) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
+
+            var isNew = true;
+
+            if (isNew) {
+
+                activateUrl += '&__n=1';
+
+            }
+
+            user.getCurrentPermission(organization._id.toString());
+
+            var oldAuthCode = user.authCode;
+
+            console.log('OLD AUTH CODE: ', oldAuthCode, user.role);
+
+            Invite.remove({ user: user._id.toString() }, function(err) {
+
+                var invite = new Invite({
+                    authCode: authCode,
+                    organization: organization._id,
+                    role: user.role,
+                    user: user._id.toString()
+                });
+
+
+                user.authCode = authCode;
+
+                user.saveWithRole(req.user, organization._id, function (err) {
+
+                    if (err) {
+                        return res.sendError(err);
+                    }
+
+                    var testerInfo = {
+                        user: user.toJSON(),
+                        activateUrl: activateUrl
+                    };
+
+                    invite.save(function (err) {
+
+                        if (err) {
+                            return res.sendError(err);
+                        }
+
+                        var async = false;
+
+                        var ip_pool = "Main Pool";
+
+                        var send_at = new Date();
+
+                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
+
+                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                            var message = {
+                                "html": html,
+                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                                "from_email": result.publish_from_email,
+                                "from_name": result.publish_from_name,
+                                "to": [{email: user.email, name: user.last_name, type: "to"}],
+                                "headers": {
+                                    "Reply-To": "no-replay@studentsuccesslink.org"
+                                }
+
+                            };
+                            mandrill_client.messages.send({"message": message}, function (result) {
+
+                                if (result[0].status == 'sent') {
+
+                                    return res.sendSuccess("Email was sent", isTester ? testerInfo : testerInfo.user);
+
+                                } else {
+
+                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
+                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
+
+                                }
+
+                            }, function (e) {
+                                // Mandrill returns the error as an object with name and message keys
+                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
+                                return res.sendError("Email not sent");
+                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+                            });
+
+                        }, function (e) {
+                            // Mandrill returns the error as an object with name and message keys
+                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
+                            // A mandrill error occurred: Invalid_Key - Invalid API key
+                            return res.sendError("Email not sent");
+                        });
+
+                    });
                 });
 
             });

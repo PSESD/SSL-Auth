@@ -71,25 +71,30 @@ server.grant(oauth2orize.grant.code(function (client, redirectUri, user, ares, c
 
         if(!cln) return callback('Url not match!');
 
-        try{
+        if((''+cln.redirectUri) === redirectUri){
+            console.log('URL MATCH');
+        } else{
 
-            var uri = require('url');
+            try{
 
-            var parser = uri.parse(redirectUri);
+                var uri = require('url');
 
-            var uriRegex = (''+cln.redirectUri);
-                
-            var regex = new RegExp(uriRegex, 'i');
+                var parser = uri.parse(redirectUri);
 
-            // console.log(regex, redirectUri, parser.host, parser.host.match(regex));
-            if(!parser.host.match(regex)) return callback('Url not match!');
+                var uriRegex = ('' + cln.redirectUri);
 
-        } catch(e){
+                var regex = new RegExp(uriRegex, 'i');
 
-            console.log(e);
+                //console.log(regex, redirectUri, parser.host, parser.host.match(regex));
+                if(!parser.host.match(regex)) return callback('Url not match!');
 
-            return callback('Url not match!');
+            } catch(e){
 
+                console.log(e);
+
+                return callback('Url not match!');
+
+            }
         }
 
         var code = new Code({
@@ -134,6 +139,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
         }
 
         if (redirectUri !== authCode.redirectUri) {
+            console.log(redirectUri, JSON.stringify(authCode));
             return callback(null, false);
         }
 
@@ -153,6 +159,7 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
             // Create a new access token
             var tokenModel = new Token({
                 token: tokenHash(token),
+                ip: '*',
                 clientId: authCode.clientId,
                 userId: authCode.userId,
                 expired: expired
@@ -371,6 +378,20 @@ exports.authorization = [
         });
 
     }),
+
+    function(err, req, res, next){
+        if(err){
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.sendError(err);
+            } else {
+                return res.render('../app/views/500', {
+                    message: err.message
+                });
+            }
+
+        }
+        next();
+    },
 
     function (req, res) {
 
