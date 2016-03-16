@@ -6,7 +6,7 @@ var Index = {
 
     index: function(req, res){
 
-        res.json({ "test": "Welcome To Auth Server"});
+        res.json({ "test": res.__('welcome')});
 
     }
 
