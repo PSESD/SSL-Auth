@@ -193,7 +193,7 @@ exports.sendInvite = function (req, res) {
                             };
                             mandrill_client.messages.send({"message": message}, function (result) {
 
-                                if (result[0].status == 'sent') {
+                                if (result[0].status === 'sent') {
 
                                     return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
 
