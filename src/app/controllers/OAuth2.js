@@ -216,7 +216,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
             // Password did not match
             if (!isMatch) {
-                return callback(new Error('Password did not match'), false);
+                return callback('Password did not match', false);
             }
 
             var token = uid(256);
@@ -429,7 +429,14 @@ exports.token = [
 
     server.token(),
 
-    server.errorHandler()
+    server.errorHandler({ mode: 'indirect' }),
+
+    function(err, req, res, next){
+        if(err){
+            return res.sendError(err);
+        }
+        next();
+    }
 
 ];
 

@@ -7,6 +7,7 @@ var InviteSchema   = new mongoose.Schema({
   authCode: { type: String, unique: true, required: true, index: true },
   role: { type: String, required: true },
   organization: { type: String, required: true },
+  user: { type: String, required: true },
   created: {
     type: Date,
     default: Date.now

@@ -10,7 +10,7 @@ function errorClient(err, res) {
 
     return (err.code && err.code === 11000) ? res.send({
         code: err.code,
-        message: 'Client already exists'
+        message: res.__('record_exists', 'Client')
     }) : res.send(err);
 
 }
