@@ -86,8 +86,8 @@ module.exports = function(options, issue) {
             , passwd = req.body.password
             , scope = req.body.scope;
 
-        if (!username) { return next(new TokenError('Missing required parameter: username', 'invalid_request')); }
-        if (!passwd) { return next(new TokenError('Missing required parameter: password', 'invalid_request')); }
+        if (!username) { return next(new TokenError('The username you entered is incorrect.', 'invalid_request')); }
+        if (!passwd) { return next(new TokenError('The password you entered is incorrect.', 'invalid_request')); }
 
         if (scope) {
             for (var i = 0, len = separators.length; i < len; i++) {
@@ -104,7 +104,8 @@ module.exports = function(options, issue) {
 
         function issued(err, accessToken, refreshToken, params) {
             if (err) { return next(err); }
-            if (!accessToken) { return next(new TokenError('Invalid resource owner credentials', 'invalid_grant')); }
+            //if (!accessToken) { return next(new TokenError('Invalid resource owner credentials', 'invalid_grant')); }
+            if (!accessToken) { return next(new TokenError('The username or password you entered is incorrect.', 'invalid_grant')); }
             if (refreshToken && typeof refreshToken == 'object') {
                 params = refreshToken;
                 refreshToken = null;
