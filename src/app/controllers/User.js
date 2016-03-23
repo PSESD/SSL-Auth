@@ -581,7 +581,7 @@ exports.sendForgotPassword = function (req, res) {
             }
 
             if(!user) {
-                return res.sendError(res.__('record_not_found', 'User'));
+                return res.sendError(res.__('field_incorrect', 'email'));
             }
 
             user.forgotPassword = forgotPassword;
@@ -698,7 +698,7 @@ exports.formForgotPassword = function (req, res) {
             if (err) { return callback(err); }
 
             // No user found with that username
-            if (!user) return callback(res.__('record_not_found', 'User'), false);
+            if (!user) return callback(res.__('field_incorrect', 'email'), false);
 
             // Make sure the password is correct
             user.verifyForgotPassword(code, function (err, isMatch) {

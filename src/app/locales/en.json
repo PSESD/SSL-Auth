@@ -46,6 +46,7 @@
         "help_dialog_link": "Never share your password with anyone. If you need help accessing Student Success Link, send an email to",
         "account_update": "Activate your User Account",
         "errors.11000": "Duplicate data should not be allowed",
-        "errors.11001": "Duplicate data should not be allowed"
+        "errors.11001": "Duplicate data should not be allowed",
+        "field_incorrect": "The %s you entered is incorrect."
     }
 }
