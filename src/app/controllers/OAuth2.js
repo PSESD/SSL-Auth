@@ -202,21 +202,21 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
     //Validate the user
     User.findOne({email: username}, function (err, user) {
 
-        if (err) { return callback(err); }
+        if (err) { return callback('The username you entered is incorrect.'); }
 
         // No user found with that username
         if (!user) {
-            return callback(null, false);
+            return callback('The username you entered is incorrect.', false);
         }
 
         // Make sure the password is correct
         user.verifyPassword(password, function (err, isMatch) {
 
-            if (err) { return callback(err); }
+            if (err) { return callback('The password you entered is incorrect.'); }
 
             // Password did not match
             if (!isMatch) {
-                return callback('Password did not match', false);
+                return callback('The password you entered is incorrect.', false);
             }
 
             var token = uid(256);
