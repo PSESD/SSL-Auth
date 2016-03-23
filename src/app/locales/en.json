@@ -47,6 +47,8 @@
         "account_update": "Activate your User Account",
         "errors.11000": "Duplicate data should not be allowed",
         "errors.11001": "Duplicate data should not be allowed",
-        "field_incorrect": "The %s you entered is incorrect."
+        "field_incorrect": "The %s you entered is incorrect.",
+        "login_incorrect": "The username or password you entered is incorrect.",
+        "forgot_success": "You will receive a reset link in your e-mail if your e-mail is in our system"
     }
 }

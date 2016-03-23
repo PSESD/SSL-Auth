@@ -567,17 +567,17 @@ exports.sendForgotPassword = function (req, res) {
     Organization.findOne({url: curl}, function(err, organization){
 
         if(err) {
-            return res.sendError(err);
+            return res.sendError(res.__('field_incorrect', 'email'));
         }
 
         if(!organization) {
-            return res.sendError(res.__('record_not_found', 'Organization'));
+            return res.sendError(res.__('field_incorrect', 'email'));
         }
 
         User.findOne({email: email}, function (err, user) {
 
             if (err) {
-                return res.sendError(err);
+                return res.sendError(res.__('field_incorrect', 'email'));
             }
 
             if(!user) {
@@ -589,7 +589,7 @@ exports.sendForgotPassword = function (req, res) {
             user.save(function (err) {
 
                 if (err) {
-                    return res.sendError(err);
+                    return res.sendError(res.__('field_incorrect', 'email'));
                 }
 
                 var async = false;
@@ -616,22 +616,23 @@ exports.sendForgotPassword = function (req, res) {
 
                         mandrill_client.messages.send({"message": message}, function (result) {
 
-                            if (result[0].status == 'sent') {
+                            if (result[0].status === 'sent') {
 
-                                return res.sendSuccess(res.__('email_success'));
+                                return res.sendSuccess(res.__('forgot_success'));
 
                             } else {
 
                                 utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
 
-                                return res.sendError(result[0].reject_reason);
+                                //return res.sendError(result[0].reject_reason);
+                                return res.sendError(res.__('field_incorrect', 'email'));
 
                             }
                         }, function (e) {
                             // Mandrill returns the error as an object with name and message keys
                             console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                             utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            return res.sendError(res.__('email_unsuccess'));
+                            return res.sendError(res.__('forgot_success'));
                             // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                         });
 
@@ -641,7 +642,7 @@ exports.sendForgotPassword = function (req, res) {
                     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                     utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
                     // A mandrill error occurred: Invalid_Key - Invalid API key
-                    return res.sendError(res.__('email_unsuccess'));
+                    return res.sendError(res.__('forgot_success'));
                 });
 
             });
