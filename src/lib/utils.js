@@ -19,7 +19,7 @@ var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
-var php = require('phpjs');
+var _funct = require(__dirname + '/function');
 var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
@@ -319,7 +319,7 @@ var utils = {
      */
     tokenHash: function (token) {
 
-        return crypto.pbkdf2Sync(token, saltStatic, 4096, 100, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(token, saltStatic, 10000, 100, 'sha256').toString('hex');
 
     },
     /**
@@ -329,7 +329,7 @@ var utils = {
      */
     secretHash: function (secret) {
 
-        return crypto.pbkdf2Sync(secret, saltStatic, 4096, 30, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(secret, saltStatic, 10000, 30, 'sha256').toString('hex');
 
     },
     /**
@@ -339,7 +339,7 @@ var utils = {
      */
     codeHash: function (code) {
 
-        return crypto.pbkdf2Sync(code, saltStatic, 4096, 60, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(code, saltStatic, 10000, 60, 'sha256').toString('hex');
 
     },
     /**
@@ -371,7 +371,7 @@ var utils = {
 
         mandrill_client.templates.info(cfg.options, function (result) {
 
-            var html = php.str_replace('{$html}', body, result.code);
+            var html = _funct.str_replace('{$html}', body, result.code);
             var message = {
                 "html": html,
                 "subject": subject || result.subject,
@@ -479,7 +479,7 @@ var utils = {
 
         }
 
-        var parse_url = php.parse_url(clientUrl);
+        var parse_url = _funct.parse_url(clientUrl);
 
         if (parse_url.host) {
 

@@ -437,12 +437,25 @@ Api.prototype.configureExpress = function (db) {
             /**
              * Mongoose error duplicate
              */
-            if(err.code && (err.code === 11000 || err.code === 11001)){
+            if(typeof err === 'object' && err.code && (err.code === 11000 || err.code === 11001)){
 
                 err = {
                     code: err.code,
                     message: res.__('errors.' + err.code)
                 };
+
+            }
+
+            if(typeof err !== 'string'){
+
+                for(var o in err){
+
+                    if(o !== 'code' && o !== 'message'){
+
+                        delete err[o];
+
+                    }
+                }
 
             }
 

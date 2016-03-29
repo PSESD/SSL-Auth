@@ -7,7 +7,7 @@ var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 var crypto = require('crypto');
-var php = require('phpjs');
+var _funct = require('../../lib/function');
 var url = require('url');
 var csurf = require('csurf');
 var cookieParser = require('cookie-parser');
@@ -88,7 +88,7 @@ exports.sendInvite = function (req, res) {
     }
 
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -179,10 +179,10 @@ exports.sendInvite = function (req, res) {
 
                         mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
 
-                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                            var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
                             var message = {
                                 "html": html,
-                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                                "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
                                 "from_email": result.publish_from_email,
                                 "from_name": result.publish_from_name,
                                 "to": [{email: user.email, name: user.last_name, type: "to"}],
@@ -248,7 +248,7 @@ exports.sendReInvite = function (req, res) {
     }
 
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -350,10 +350,10 @@ exports.sendReInvite = function (req, res) {
 
                         mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
 
-                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
+                            var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
                             var message = {
                                 "html": html,
-                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                                "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
                                 "from_email": result.publish_from_email,
                                 "from_name": result.publish_from_name,
                                 "to": [{email: user.email, name: user.last_name, type: "to"}],
@@ -442,7 +442,7 @@ exports.activate = function (req, res) {
 
     };
 
-    var parse_url = php.parse_url(redirectTo), curl = null;
+    var parse_url = _funct.parse_url(redirectTo), curl = null;
 
     if (parse_url.host) {
 
@@ -538,15 +538,22 @@ exports.activate = function (req, res) {
     });
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 exports.sendForgotPassword = function (req, res) {
 
     var email = req.body.email;
 
 
-    if (!req.body.redirect_url) return res.sendError(res.__('require_field', 'Redirect Url'));
+    if (!req.body.redirect_url) {
+        //return res.sendError(res.__('require_field', 'Redirect Url'));
+        return res.sendError(res.__('forgot_success'));
+    }
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -567,21 +574,25 @@ exports.sendForgotPassword = function (req, res) {
     Organization.findOne({url: curl}, function(err, organization){
 
         if(err) {
-            return res.sendError(res.__('field_incorrect', 'email'));
+            //return res.sendError(res.__('field_incorrect', 'email'));
+            return res.sendError(res.__('forgot_success'));
         }
 
         if(!organization) {
-            return res.sendError(res.__('field_incorrect', 'email'));
+            //return res.sendError(res.__('field_incorrect', 'email'));
+            return res.sendError(res.__('forgot_success'));
         }
 
         User.findOne({email: email}, function (err, user) {
 
             if (err) {
-                return res.sendError(res.__('field_incorrect', 'email'));
+                //return res.sendError(res.__('field_incorrect', 'email'));
+                return res.sendError(res.__('forgot_success'));
             }
 
             if(!user) {
-                return res.sendError(res.__('field_incorrect', 'email'));
+                //return res.sendError(res.__('field_incorrect', 'email'));
+                return res.sendError(res.__('forgot_success'));
             }
 
             user.forgotPassword = forgotPassword;
@@ -589,7 +600,8 @@ exports.sendForgotPassword = function (req, res) {
             user.save(function (err) {
 
                 if (err) {
-                    return res.sendError(res.__('field_incorrect', 'email'));
+                    //return res.sendError(res.__('field_incorrect', 'email'));
+                    return res.sendError(res.__('forgot_success'));
                 }
 
                 var async = false;
@@ -600,11 +612,11 @@ exports.sendForgotPassword = function (req, res) {
 
                 mandrill_client.templates.info({ name: 'cbo_forgot_password'}, function(result) {
 
-                    var html = php.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
+                    var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
 
                         var message = {
                             "html": html,
-                            "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
+                            "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
                             "from_email": result.publish_from_email,
                             "from_name": result.publish_from_name,
                             "to": [{email: user.email, name: user.last_name, type: "to"}],
@@ -625,7 +637,8 @@ exports.sendForgotPassword = function (req, res) {
                                 utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
 
                                 //return res.sendError(result[0].reject_reason);
-                                return res.sendError(res.__('field_incorrect', 'email'));
+                                //return res.sendError(res.__('field_incorrect', 'email'));
+                                return res.sendError(res.__('forgot_success'));
 
                             }
                         }, function (e) {
@@ -676,7 +689,7 @@ exports.formForgotPassword = function (req, res) {
         });
 
     };
-    var parse_url = php.parse_url(redirectTo), curl = null;
+    var parse_url = _funct.parse_url(redirectTo), curl = null;
 
     if (parse_url.host) {
 
@@ -851,7 +864,7 @@ exports.processAccountUpdate = function(req, res){
 
         };
 
-        var parse_url = php.parse_url(redirectTo), curl = null;
+        var parse_url = _funct.parse_url(redirectTo), curl = null;
 
         if (parse_url.host) {
 
@@ -981,7 +994,7 @@ exports.processChangePassword = function(req, res){
 
         };
 
-        var parse_url = php.parse_url(redirectTo), curl = null;
+        var parse_url = _funct.parse_url(redirectTo), curl = null;
 
         if (parse_url.host) {
 
