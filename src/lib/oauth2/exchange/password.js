@@ -62,7 +62,7 @@ module.exports = function(options, issue) {
     }
     options = options || {};
 
-    if (!issue) { throw new TypeError('oauth2orize.password exchange requires an issue callback'); }
+    if (!issue) { throw new TypeError('Wrong email or password'); }
 
     var userProperty = options.userProperty || 'user';
 
@@ -77,7 +77,7 @@ module.exports = function(options, issue) {
     }
 
     return function password(req, res, next) {
-        if (!req.body) { return next(new Error('OAuth2orize requires body parsing. Did you forget app.use(express.bodyParser())?')); }
+        if (!req.body) { return next(new Error('Wrong email or password')); }
 
         // The 'user' property of `req` holds the authenticated user.  In the case
         // of the token endpoint, the property will contain the OAuth 2.0 client.
@@ -86,8 +86,8 @@ module.exports = function(options, issue) {
             , passwd = req.body.password
             , scope = req.body.scope;
 
-        if (!username) { return next(new TokenError('The username you entered is incorrect.', 'invalid_request')); }
-        if (!passwd) { return next(new TokenError('The password you entered is incorrect.', 'invalid_request')); }
+        if (!username) { return next(new TokenError('Wrong email or password', 'invalid_request')); }
+        if (!passwd) { return next(new TokenError('Wrong email or password', 'invalid_request')); }
 
         if (scope) {
             for (var i = 0, len = separators.length; i < len; i++) {
@@ -105,7 +105,7 @@ module.exports = function(options, issue) {
         function issued(err, accessToken, refreshToken, params) {
             if (err) { return next(err); }
             //if (!accessToken) { return next(new TokenError('Invalid resource owner credentials', 'invalid_grant')); }
-            if (!accessToken) { return next(new TokenError('The username or password you entered is incorrect.', 'invalid_grant')); }
+            if (!accessToken) { return next(new TokenError('Wrong email or password', 'invalid_grant')); }
             if (refreshToken && typeof refreshToken == 'object') {
                 params = refreshToken;
                 refreshToken = null;
