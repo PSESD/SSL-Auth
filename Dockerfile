@@ -31,7 +31,7 @@ ADD /config/default.conf /etc/nginx/sites-available/default
 RUN useradd -M node
 ADD /src /src
 RUN chown -R node:node /src
-RUN chown -R node:node /config
+
 WORKDIR /src
 RUN wget nodejs.org/dist/v0.10.45/node-v0.10.45-linux-x64.tar.gz
 RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.45-linux-x64.tar.gz
