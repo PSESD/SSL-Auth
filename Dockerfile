@@ -29,8 +29,8 @@ RUN useradd -M node
 ADD /src /src
 RUN chown -R node:node /src
 WORKDIR /src
-RUN wget nodejs.org/dist/v0.10.36/node-v0.10.36-linux-x64.tar.gz
-RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.36-linux-x64.tar.gz
+RUN wget nodejs.org/dist/v0.10.45/node-v0.10.45-linux-x64.tar.gz
+RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.45-linux-x64.tar.gz
 RUN ln -s /usr/local/bin/node /usr/bin/node
 RUN ln -s /usr/local/bin/npm /usr/bin/npm
 #RUN npm -g update npm
