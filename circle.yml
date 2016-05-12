@@ -1,0 +1,4 @@
+notify:
+  webhooks:
+    # The Trigger URL from the test settings that looks like this example
+    - url: https://api.runscope.com/radar/bucket/1fb51eee-7c9e-480d-9af5-0386b5b1fa24/trigger
