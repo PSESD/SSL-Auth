@@ -228,16 +228,11 @@ Api.prototype.registerRoute = function (cb) {
 Api.prototype.connectDb = function () {
 
 
-    var configDbMonggo = this.config.get('db.mongo');
-    var dbUri = '';
-
-    if(_.isObject(configDbMonggo)){
+    var dbUri = this.config.get('db.mongo');
+    if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
         dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
-    } else if(_.isString(configDbMonggo)) {
-        dbUri = 'mongodb://' + configDbMonggo;
     }
-
-    this.mongo.connect(dbUri, this.config.get('db.mongo_options') || {});
+    this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
 
     this.mongo.connection.once('open', function (callback) {
 
