@@ -13,8 +13,12 @@ ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptools libkrb5-dev
-RUN ln -s /usr/bin/nodejs /usr/bin/node
+RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev build-essential
+#RUN curl -sL https://deb.nodesource.com/setup_0.10 | bash -
+#RUN apt-get install -y nodejs
+#RUN apt-get install -y npm
+#RUN ln -s /usr/bin/nodejs /usr/bin/node
+RUN export TERM=xterm
 
 # Setup Nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
@@ -27,7 +31,12 @@ ADD /config/default.conf /etc/nginx/sites-available/default
 RUN useradd -M node
 ADD /src /src
 RUN chown -R node:node /src
+
 WORKDIR /src
+RUN wget nodejs.org/dist/v0.10.45/node-v0.10.45-linux-x64.tar.gz
+RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.45-linux-x64.tar.gz
+RUN ln -s /usr/local/bin/node /usr/bin/node
+RUN ln -s /usr/local/bin/npm /usr/bin/npm
 RUN npm -g update npm
 RUN npm install
 
@@ -37,8 +46,8 @@ RUN /usr/bin/easy_install supervisor-stdout
 RUN /usr/bin/easy_install superlance
 ADD /config/supervisord.conf /etc/supervisord.conf
 
+
 # Publish port
 EXPOSE 443
 
 CMD ["/usr/local/bin/supervisord","-n"]
-
