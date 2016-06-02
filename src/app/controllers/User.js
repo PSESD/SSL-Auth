@@ -5,7 +5,6 @@ var Invite = require('../models/Invite');
 var utils = require('../../lib/utils');
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
-var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 var crypto = require('crypto');
 var _funct = require('../../lib/function');
 var url = require('url');
@@ -177,47 +176,26 @@ exports.sendInvite = function (req, res) {
 
                         var send_at = new Date();
 
-                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
-
-                            var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
-                            var message = {
-                                "html": html,
-                                "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
-                                "from_email": result.publish_from_email,
-                                "from_name": result.publish_from_name,
-                                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                                "headers": {
-                                    "Reply-To": "no-replay@studentsuccesslink.org"
-                                }
-
-                            };
-                            mandrill_client.messages.send({"message": message}, function (result) {
-
-                                if (result[0].status === 'sent') {
-
-                                    return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
-
-                                } else {
-
-                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
-
-                                }
-
-                            }, function (e) {
-                                // Mandrill returns the error as an object with name and message keys
-                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                                return res.sendError(res.__('email_unsuccess'));
-                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                            });
-
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            // A mandrill error occurred: Invalid_Key - Invalid API key
-                            return res.sendError(res.__('email_unsuccess'));
+                        var mailer = utils.mail();
+                        mailer.template('cbo_invite_user');
+                        mailer.bindParam({
+                            userId: user._id+'',
+                            link: activateUrl
+                        });
+                        mailer.to({email: user.email, name: user.last_name});
+                        mailer.header({
+                           'Reply-To': "no-replay@studentsuccesslink.org"
+                        });
+                        mailer.send({
+                            substitution_data: {
+                                organizationName: organization.name
+                            }
+                        }, function(err, info){
+                            console.log(err, info);
+                            if(!err){
+                                return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
+                            }
+                            return res.sendError(isTester ? testerInfo : info);
                         });
 
                     }); 
@@ -348,47 +326,25 @@ exports.sendReInvite = function (req, res) {
 
                         var send_at = new Date();
 
-                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
-
-                            var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
-                            var message = {
-                                "html": html,
-                                "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
-                                "from_email": result.publish_from_email,
-                                "from_name": result.publish_from_name,
-                                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                                "headers": {
-                                    "Reply-To": "no-replay@studentsuccesslink.org"
-                                }
-
-                            };
-                            mandrill_client.messages.send({"message": message}, function (result) {
-
-                                if (result[0].status == 'sent') {
-
-                                    return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user);
-
-                                } else {
-
-                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
-
-                                }
-
-                            }, function (e) {
-                                // Mandrill returns the error as an object with name and message keys
-                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                                return res.sendError(res.__('email_unsuccess'));
-                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                            });
-
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            // A mandrill error occurred: Invalid_Key - Invalid API key
-                            return res.sendError(res.__('email_unsuccess'));
+                        var mailer = utils.mail();
+                        mailer.template('cbo_invite_user');
+                        mailer.bindParam({
+                            userId: user._id+'',
+                            link: activateUrl
+                        });
+                        mailer.to({email: user.email, name: user.last_name});
+                        mailer.header({
+                            'Reply-To': "no-replay@studentsuccesslink.org"
+                        });
+                        mailer.send({
+                            substitution_data: {
+                                organizationName: organization.name
+                            }
+                        }, function(err, info){
+                            if(!err){
+                                return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
+                            }
+                            return res.sendError(isTester ? testerInfo : info);
                         });
 
                     });
@@ -422,15 +378,11 @@ exports.activate = function (req, res) {
 
         if(isNew){
 
-            var sessionData = {
+            req.session.data = {
                 email: email,
                 authCode: authCode,
                 redirectTo: redirectTo
             };
-
-            //console.log("SESSION DATA: ", sessionData);
-
-            req.session.data = sessionData;
 
             return res.redirect(config.get('auth.url') + '/api/user/accountupdate');
 
@@ -610,51 +562,24 @@ exports.sendForgotPassword = function (req, res) {
 
                 var send_at = new Date();
 
-                mandrill_client.templates.info({ name: 'cbo_forgot_password'}, function(result) {
-
-                    var html = _funct.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
-
-                        var message = {
-                            "html": html,
-                            "subject": _funct.str_replace('{$organization.name}', organization.name, result.subject),
-                            "from_email": result.publish_from_email,
-                            "from_name": result.publish_from_name,
-                            "to": [{email: user.email, name: user.last_name, type: "to"}],
-                            "headers": {
-                                "Reply-To": "no-replay@studentsuccesslink.org"
-                            }
-
-                        };
-
-                        mandrill_client.messages.send({"message": message}, function (result) {
-
-                            if (result[0].status === 'sent') {
-
-                                return res.sendSuccess(res.__('forgot_success'));
-
-                            } else {
-
-                                utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-
-                                //return res.sendError(result[0].reject_reason);
-                                //return res.sendError(res.__('field_incorrect', 'email'));
-                                return res.sendError(res.__('forgot_success'));
-
-                            }
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            return res.sendError(res.__('forgot_success'));
-                            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                        });
-
-
-                }, function(e) {
-                    // Mandrill returns the error as an object with name and message keys
-                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                    utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                    // A mandrill error occurred: Invalid_Key - Invalid API key
+                var mailer = utils.mail();
+                mailer.template('cbo_forgot_password');
+                mailer.bindParam({
+                    userId: user._id+'',
+                    link: forgotPasswordUrl
+                });
+                mailer.to({email: user.email, name: user.last_name});
+                mailer.header({
+                    'Reply-To': "no-replay@studentsuccesslink.org"
+                });
+                mailer.send({
+                    substitution_data: {
+                        organizationName: organization.name
+                    }
+                }, function(err, info){
+                    if(!err){
+                        return res.sendSuccess(res.__('forgot_success'));
+                    }
                     return res.sendError(res.__('forgot_success'));
                 });
 
