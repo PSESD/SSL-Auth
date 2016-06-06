@@ -58,6 +58,7 @@
     "request-ip": "~1.2.2",
     "rollbar": "^0.5.16",
     "should": "^8.3.0",
+    "simple-ssh": "^0.9.0",
     "slug": "^0.9.1",
     "supertest": "^1.2.0",
     "underscore": "^1.8.3",
@@ -66,10 +67,12 @@
     "xmldom": "~0.1.22",
     "xmlify": "~1.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "ssh-exec": "^2.0.0"
+  },
   "scripts": {
     "start": "node app.js",
-    "test": "NODE_ENV=test node app.js"
+    "test": "NODE_ENV=test mocha ./tests/test.js -t300000"
   },
   "repository": {
     "type": "git",
