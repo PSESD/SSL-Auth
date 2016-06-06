@@ -19,25 +19,25 @@ if(process.env.CIRCLE_BRANCH === 'develop'){
         pass: SSH_PASSWORD
     });
     ssh
-        .exec('cd /home/cbo/docker/api', {
+        .exec('cd /home/cbo/docker/auth', {
             out: console.log.bind(console)
         })
         .exec('git pull origin develop', {
             out: console.log.bind(console)
         })
-        .exec('docker rm -f api', {
+        .exec('docker rm -f auth', {
             out: console.log.bind(console)
         })
-        .exec('docker build -t psesd/ssl-api:develop .', {
+        .exec('docker build -t psesd/ssl-auth:develop .', {
             out: console.log.bind(console)
         })
-        .exec('docker run -d --name api --link redis:redis -p 104.192.103.12:443:443 -e NODE_ENV=development -e NODE_CONFIG_DIR=/config -v /config:/config psesd/ssl-api:develop', {
+        .exec('docker run -d --name auth -p 104.192.103.13:443:443 -e "NODE_ENV=development" -e "NODE_CONFIG_DIR=/config" -v /config:/config psesd/ssl-auth:develop', {
             out: console.log.bind(console)
         })
         .exec('docker login -e "'+DOCKER_EMAIL+'" -u "'+DOCKER_USER+'" -p "'+DOCKER_PASS+'"', {
             out: console.log.bind(console)
         })
-        .exec('docker push psesd/ssl-api:develop', {
+        .exec('docker push psesd/ssl-auth:develop', {
             out: console.log.bind(console)
         })
         .exec('echo "DONE"', {
