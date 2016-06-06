@@ -36,10 +36,10 @@ describe('All-Test', function () {
 
         var grantToken = null;
 
-        it('GET /heartbeat', function (done) {
-            http_build_query({}, api_endpoint + '/heartbeat', grantToken);
+        it('GET /api', function (done) {
+            http_build_query({}, url + '/api', grantToken);
             request(api_endpoint)
-                .get('/heartbeat')
+                .get('/api')
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', url)
                 .expect(function (res) {
