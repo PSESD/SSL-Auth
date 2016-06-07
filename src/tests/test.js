@@ -38,7 +38,7 @@ describe('All-Test', function () {
 
         it('GET /api', function (done) {
             http_build_query({}, url + '/api', grantToken);
-            request(api_endpoint)
+            request(url)
                 .get('/api')
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', url)

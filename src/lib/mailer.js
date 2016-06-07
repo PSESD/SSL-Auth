@@ -242,7 +242,7 @@ Mailer.prototype.sparkpost = function(options, done){
         "options": {
             "open_tracking": true,
             "click_tracking": true,
-            "transactional": true
+            "transactional": false
         }
     };
 
