@@ -25,7 +25,8 @@ notify:
 
 test:
   override:
-    - cd /home/ubuntu/CBO-Portal-Auth/src && npm update && npm test
+    - cd /home/ubuntu/CBO-Portal-Auth/src && npm update && npm run test
+    - if [[ -e test-results.xml ]]; then cp test-results.xml $CIRCLE_TEST_REPORTS/test-results.xml; fi
 
 deployment:
   develop:

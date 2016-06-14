@@ -4,7 +4,7 @@
  */
 var User = require('./../models/User');
 var Organization = require('./../models/Organization');
-var _funct = require('../../lib/function');
+var _funct = require('./../../lib/function');
 var _ = require('underscore');
 var ObjectId = require('mongoose').Types.ObjectId;
 
