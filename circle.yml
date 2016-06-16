@@ -1,4 +1,35 @@
+general:
+  branches:
+    only:
+      - develop # list of branches to build
+      - staging # list of branches to build
+      - production # list of branches to build
+machine:
+  node:
+    version: 0.10.45
+  post:
+    - npm update -g
+
+checkout:
+  post:
+    - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
+
+dependencies:
+  pre:
+    - sudo apt-get install curl
+
 notify:
   webhooks:
     # The Trigger URL from the test settings that looks like this example
-    - url: https://api.runscope.com/radar/bucket/1fb51eee-7c9e-480d-9af5-0386b5b1fa24/trigger
+    - url: https://api.runscope.com/radar/bucket/15b14a82-a4a3-4620-a777-6ba7b522c42f/trigger
+
+test:
+  override:
+    - cd /home/ubuntu/CBO-Portal-Auth/src && npm update && npm run test
+    - if [[ -e test-results.xml ]]; then cp test-results.xml $CIRCLE_TEST_REPORTS/test-results.xml; fi
+
+deployment:
+  develop:
+      branch: develop
+      commands:
+        - ./bin/$CIRCLE_BRANCH/deploy
