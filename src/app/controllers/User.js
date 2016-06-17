@@ -177,7 +177,7 @@ exports.sendInvite = function (req, res) {
                         var send_at = new Date();
 
                         var mailer = utils.mail();
-                        mailer.template('cbo_invite_user');
+                        mailer.template('cbo-invite-user');
                         mailer.bindParam({
                             userId: user._id+'',
                             link: activateUrl
@@ -327,7 +327,7 @@ exports.sendReInvite = function (req, res) {
                         var send_at = new Date();
 
                         var mailer = utils.mail();
-                        mailer.template('cbo_invite_user');
+                        mailer.template('cbo-invite-user');
                         mailer.bindParam({
                             userId: user._id+'',
                             link: activateUrl
@@ -563,7 +563,7 @@ exports.sendForgotPassword = function (req, res) {
                 var send_at = new Date();
 
                 var mailer = utils.mail();
-                mailer.template('cbo_forgot_password');
+                mailer.template('cbo-forgot-password');
                 mailer.bindParam({
                     userId: user._id+'',
                     link: forgotPasswordUrl
