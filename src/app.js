@@ -22,10 +22,7 @@ var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 var compress = require('compression');
-i18n.configure({
-    locales:['en'],
-    directory: __dirname + '/resource/lang'
-});
+
 app.use(compress());
 
 if (rollbarAccessToken) {
@@ -84,7 +81,7 @@ function Api() {
         cookie: '__lang',
 
         // where to store json files - defaults to './locales' relative to modules directory
-        directory: __dirname + '/app/locales',
+        directory: __dirname + '/resource/lang',
 
         // whether to write new locale information to disk - defaults to true
         updateFiles: false,
@@ -96,7 +93,7 @@ function Api() {
         extension: '.json',
 
         // setting prefix of json files name - default to none '' (in case you use different locale files naming scheme (webapp-en.json), rather then just en.json)
-        prefix: 'lang-',
+        // prefix: 'lang-',
 
         // enable object notation
         objectNotation: true
