@@ -25,7 +25,7 @@ if(process.env.CIRCLE_BRANCH === 'develop'){
             .exec('cd /home/cbo/docker/auth', {
                 out: console.log.bind(console)
             })
-            .exec('git pull origin develop', {
+            .exec('git fetch && git reset --hard origin/develop', {
                 out: console.log.bind(console)
             })
             .exec('docker rm -f auth', {
