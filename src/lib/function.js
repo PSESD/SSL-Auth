@@ -251,11 +251,23 @@ function nl2br(str, is_xhtml) {
 }
 /**
  *
+ * @param replaceThis
+ * @param withThis
+ * @param inThis
+ * @returns {void|string|*|{example}|XML}
+ */
+var replaceAll = function (replaceThis, withThis, inThis) {
+    withThis = withThis.replace(/\$/g,"$$$$");
+    return inThis.replace(new RegExp(replaceThis.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|<>\-\&])/g,"\\$&"),"g"), withThis);
+};
+/**
+ *
  * @type {{http_build_query: http_build_query, parse_url: parse_url, str_replace: str_replace, nl2br: nl2br}}
  */
 module.exports = {
     http_build_query: http_build_query,
     parse_url: parse_url,
     str_replace: str_replace,
-    nl2br: nl2br
+    nl2br: nl2br,
+    replaceAll: replaceAll
 };

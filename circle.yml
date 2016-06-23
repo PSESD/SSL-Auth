@@ -13,15 +13,12 @@ machine:
 checkout:
   post:
     - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
+    - sudo chmod u+x ./bin/$CIRCLE_BRANCH/build
+    - ./bin/$CIRCLE_BRANCH/build
 
 dependencies:
   pre:
     - sudo apt-get install curl
-
-notify:
-  webhooks:
-    # The Trigger URL from the test settings that looks like this example
-    - url: https://api.runscope.com/radar/bucket/15b14a82-a4a3-4620-a777-6ba7b522c42f/trigger
 
 test:
   override:
