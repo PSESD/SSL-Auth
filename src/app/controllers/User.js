@@ -521,7 +521,10 @@ exports.sendForgotPassword = function (req, res) {
 
     var forgotPassword = crypto.randomBytes(16).toString('base64');
 
-    var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
+    var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword)
+        + "&redirectTo=" + encodeURIComponent(req.body.redirect_url)
+        + "&callbackUrl=" + encodeURIComponent(req.body.callback_url)
+        ;
 
     Organization.findOne({url: curl}, function(err, organization){
 
@@ -532,19 +535,19 @@ exports.sendForgotPassword = function (req, res) {
 
         if(!organization) {
             //return res.sendError(res.__('field_incorrect', 'email'));
-            return res.sendError(res.__('forgot_success'));
+            return res.sendError(res.__('forgot_failed'));
         }
 
         User.findOne({email: email}, function (err, user) {
 
             if (err) {
                 //return res.sendError(res.__('field_incorrect', 'email'));
-                return res.sendError(res.__('forgot_success'));
+                return res.sendError(res.__('forgot_failed'));
             }
 
             if(!user) {
                 //return res.sendError(res.__('field_incorrect', 'email'));
-                return res.sendError(res.__('forgot_success'));
+                return res.sendError(res.__('forgot_failed'));
             }
 
             user.forgotPassword = forgotPassword;
@@ -552,15 +555,8 @@ exports.sendForgotPassword = function (req, res) {
             user.save(function (err) {
 
                 if (err) {
-                    //return res.sendError(res.__('field_incorrect', 'email'));
-                    return res.sendError(res.__('forgot_success'));
+                    return res.sendError(res.__('forgot_failed'));
                 }
-
-                var async = false;
-
-                var ip_pool = "Main Pool";
-
-                var send_at = new Date();
 
                 var mailer = utils.mail();
                 mailer.template('cbo-forgot-password');
@@ -577,10 +573,11 @@ exports.sendForgotPassword = function (req, res) {
                         organizationName: organization.name
                     }
                 }, function(err, info){
+
                     if(!err){
                         return res.sendSuccess(res.__('forgot_success'));
                     }
-                    return res.sendError(res.__('forgot_success'));
+                    return res.sendError(res.__('forgot_failed'));
                 });
 
             });
@@ -600,18 +597,36 @@ exports.formForgotPassword = function (req, res) {
 
     var redirectTo = req.query.redirectTo;
 
+    var callbackUrl = req.query.callbackUrl;
+
     var callback = function (err) {
 
-        if (err) return errorNotFound(err, req, res);
+        if (err) {
+            return errorNotFound(err, req, res);
+        }
 
-        res.render('../app/views/forgotPassword', {
-            errors: [],
-            session: {
-                email: email,
-                redirectTo: redirectTo
-            },
-            csrfToken: req.csrfToken()
-        });
+        // res.render('../app/views/forgotPassword', {
+        //     errors: [],
+        //     session: {
+        //         email: email,
+        //         redirectTo: redirectTo
+        //     },
+        //     csrfToken: req.csrfToken()
+        // });
+
+        var redirectCallback = callbackUrl;
+
+        if(redirectCallback.indexOf('?') !== -1){
+            redirectCallback += '&';
+        } else {
+            redirectCallback += '?';
+        }
+
+        redirectCallback += "csrfToken=" + encodeURIComponent(req.csrfToken());
+        redirectCallback += "&redirectTo=" + encodeURIComponent(redirectTo);
+        redirectCallback += "&email=" + encodeURIComponent(email);
+
+        res.redirect(redirectCallback);
 
     };
     var parse_url = _funct.parse_url(redirectTo), curl = null;
@@ -655,7 +670,9 @@ exports.formForgotPassword = function (req, res) {
                     $unset: {hashedForgotPassword: ""}
                 }, function (err, updated) {
 
-                    if (err) return res.sendError(err);
+                    if (err) {
+                        return res.sendError(res.__('forgot_failed'));
+                    }
 
                     callback(null, updated[0]);
 
@@ -985,7 +1002,11 @@ exports.processChangePassword = function(req, res){
     }
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 exports.processForgotPassword = function(req, res){
 
     var password = req.body.password;
@@ -1005,7 +1026,7 @@ exports.processForgotPassword = function(req, res){
             redirectTo: redirectTo
         };
 
-        res.render('../app/views/forgotPassword', {
+        res.sendError({
             errors: errors,
             session: sessionData,
             csrfToken: req.csrfToken()
@@ -1061,7 +1082,8 @@ exports.processForgotPassword = function(req, res){
 
                 if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
-                return res.redirect(redirectTo);
+                // return res.redirect(redirectTo);
+                return res.sendSuccess(res.__('data_updated'));
 
             });
 

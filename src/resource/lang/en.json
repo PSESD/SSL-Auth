@@ -1,5 +1,4 @@
 {
-  "general": {
     "welcome": "Welcome To Auth SSL :)",
     "ssl": "Student Success Link",
     "Dear": "Dear %s",
@@ -48,6 +47,6 @@
     "errors.11001": "Duplicate data should not be allowed",
     "field_incorrect": "The %s you entered is incorrect.",
     "login_incorrect": "Wrong email or password",
-    "forgot_success": "You will receive a reset link in your e-mail if your e-mail is in our system"
-  }
+    "forgot_success": "You will receive a reset link in your e-mail if your e-mail is in our system",
+    "forgot_failed": "Oops! Something went wrong. Please try again"
 }
