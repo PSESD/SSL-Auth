@@ -3,6 +3,8 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var Invite = require('../models/Invite');
 var utils = require('../../lib/utils');
+var cache = utils.cache();
+var md5 = utils.md5;
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
 var crypto = require('crypto');
@@ -622,11 +624,18 @@ exports.formForgotPassword = function (req, res) {
             redirectCallback += '?';
         }
 
-        redirectCallback += "csrfToken=" + encodeURIComponent(req.csrfToken());
+        var tokens = utils.uid(24);
+
+        redirectCallback += "csrfToken=" + encodeURIComponent(tokens);
         redirectCallback += "&redirectTo=" + encodeURIComponent(redirectTo);
         redirectCallback += "&email=" + encodeURIComponent(email);
 
-        res.redirect(redirectCallback);
+        cache.set('email_password_' + md5(email), tokens, { ttl: 60 }, function(){
+
+            res.redirect(redirectCallback);
+
+        });
+
 
     };
     var parse_url = _funct.parse_url(redirectTo), curl = null;
@@ -1011,6 +1020,8 @@ exports.processForgotPassword = function(req, res){
 
     var password = req.body.password;
 
+    var _csrf = req.body._csrf;
+
     var confirmPassword = req.body.confirm_password;
 
     var email = req.body.email;
@@ -1019,58 +1030,65 @@ exports.processForgotPassword = function(req, res){
 
     var errors = [];
 
-    function renderError(){
+    var key = 'email_password_' + md5(email);
 
-        var sessionData = {
-            email: email,
-            redirectTo: redirectTo
-        };
+    cache.get(key, function (err, token) {
 
-        res.sendError({
-            errors: errors,
-            session: sessionData,
-            csrfToken: req.csrfToken()
-        });
+        if(err){
+            console.log(err);
+            return res.status(403).end('Unauthorized');
+        }
 
-    }
+        if(!token || ( token && token !== _csrf)){
+            console.log(token, ' ---> ', _csrf);
+            return res.status(403).end('Unauthorized');
+        }
 
-    var isError = (function(){
+        function renderError(){
 
-        if(''+password === ''){
+            var sessionData = {
+                email: email,
+                redirectTo: redirectTo
+            };
 
-            errors.push(res.__('require_field', "Password"));
+            var tokens = utils.uid(24);
 
-            return false;
+            cache.set(key, tokens, { ttl: 60 }, function(){
+                res.sendError({
+                    errors: errors,
+                    session: sessionData,
+                    csrfToken: tokens
+                });
+            });
+
 
         }
 
-        if(password !== confirmPassword){
+        var isError = (function(){
 
-            errors.push(res.__('password_not_match'));
+            if(''+password === ''){
 
-            return false;
+                errors.push(res.__('require_field', "Password"));
 
-        }
-
-        var where = {
-
-            email: email
-
-        };
-
-        User.findOne(where, function(err, user){
-
-            if(err){
-
-                errors.push(err.message);
-
-                return renderError();
+                return false;
 
             }
 
-            user.password = password;
+            if(password !== confirmPassword){
 
-            user.save(function(err){
+                errors.push(res.__('password_not_match'));
+
+                return false;
+
+            }
+
+            var where = {
+
+                email: email
+
+            };
+
+            User.findOne(where, function(err, user){
 
                 if(err){
 
@@ -1080,21 +1098,39 @@ exports.processForgotPassword = function(req, res){
 
                 }
 
-                if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+                user.password = password;
 
-                // return res.redirect(redirectTo);
-                return res.sendSuccess(res.__('data_updated'));
+                user.save(function(err){
+
+                    if(err){
+
+                        errors.push(err.message);
+
+                        return renderError();
+
+                    }
+
+                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+
+                    cache.del(key, function () {
+
+                        // return res.redirect(redirectTo);
+                        return res.sendSuccess(res.__('data_updated'));
+
+                    });
+
+                });
 
             });
 
-        });
+        })();
 
-    })();
+        if(errors.length > 0){
 
-    if(errors.length > 0){
+            renderError();
 
-        renderError();
+        }
 
-    }
+    });
 
 };

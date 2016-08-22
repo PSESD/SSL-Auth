@@ -256,6 +256,14 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    app.use(function (err, req, res, next) {
+        if (err.code !== 'EBADCSRFTOKEN') return next(err);
+
+        res.statusCode = 403;
+
+        return res.end('Session has expired or tampered with');
+    });
+
     app.use(cookieParser());
 
     app.use(i18n.init);
