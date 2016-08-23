@@ -226,12 +226,18 @@ Api.prototype.connectDb = function () {
 
 
     var dbUri = this.config.get('db.mongo');
+
     if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
         dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
     }
+
+    if(global && global.Promise) {
+        this.mongo.Promise = global.Promise;
+    }
+
     this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
 
-    this.mongo.connection.once('open', function (callback) {
+    this.mongo.connection.once('open', function () {
 
         console.log("[%s] DB URI: " + dbUri, app.get('env'));
 

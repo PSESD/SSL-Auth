@@ -630,7 +630,7 @@ exports.formForgotPassword = function (req, res) {
         redirectCallback += "&redirectTo=" + encodeURIComponent(redirectTo);
         redirectCallback += "&email=" + encodeURIComponent(email);
 
-        cache.set('email_password_' + md5(email), tokens, { ttl: 60 }, function(){
+        cache.set('email_password_' + md5(email), tokens, { ttl: 3600 }, function(){
 
             res.redirect(redirectCallback);
 
@@ -1053,7 +1053,7 @@ exports.processForgotPassword = function(req, res){
 
             var tokens = utils.uid(24);
 
-            cache.set(key, tokens, { ttl: 60 }, function(){
+            cache.set(key, tokens, { ttl: 3600 }, function(){
                 res.sendError({
                     errors: errors,
                     session: sessionData,
@@ -1109,8 +1109,6 @@ exports.processForgotPassword = function(req, res){
                         return renderError();
 
                     }
-
-                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
                     cache.del(key, function () {
 
