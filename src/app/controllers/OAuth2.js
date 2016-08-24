@@ -6,6 +6,7 @@ var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
+var Organization = require('../models/Organization');
 var RefreshToken = require('../models/RefreshToken');
 var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
@@ -198,6 +199,57 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  */
 //server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
 server.exchange(exchangePassword(function (client, username, password, scope, params, callback) {
+    /**
+     *
+     * @param params
+     * @param expiresIn
+     * @param token
+     * @param refreshToken
+     * @param currentUser
+     */
+    function loginEmbeded(params, expiresIn, token, refreshToken, currentUser){
+        Organization.findOne({ url: params.organizationUrl }, function(err, organization){
+
+            var embeded = {
+                expires_in: expiresIn,
+                embeded: {
+                    organization: organization,
+                    users: {
+                        data: [],
+                        total: 0
+                    }
+                }
+            };
+
+            var criteria = { permissions: { $elemMatch: { organization: organization._id, activate: true }}};
+
+            User.find(criteria, function (err, users) {
+
+                if (err)  {
+                    return callback(null, token, refreshToken, embeded);
+                }
+
+                users.forEach(function(user){
+
+                    var obj = user.toJSON();
+
+                    if(obj._id.toString() !== currentUser.userId){
+
+                        delete obj.permissions;
+
+                    }
+
+                    embeded.embeded.users.data.push(obj);
+                    embeded.embeded.users.total++;
+
+                });
+
+                callback(null, token, refreshToken, embeded);
+
+            });
+
+        });
+    }
 
     //Validate the user
     User.findOne({email: username}, function (err, user) {
@@ -232,7 +284,6 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                 scope: scope,
                 expired: expired
             });
-
             // Save the access token and check for errors
             tokenModel.save(function (err) {
 
@@ -255,7 +306,8 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
                         if (err) { return callback(err); }
 
-                        callback(null, token, refreshToken, {expires_in: expiresIn});
+                        // callback(null, token, refreshToken, {expires_in: expiresIn});
+                        loginEmbeded(params, expired, token, refreshToken, user);
 
                     });
 
@@ -263,8 +315,8 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
                     refreshToken = null;
 
-                    callback(null, token, refreshToken, {expires_in: expiresIn});
-
+                    // callback(null, token, refreshToken, {expires_in: expiresIn});
+                    loginEmbeded(params, expired, token, refreshToken, user);
                 }
 
             });

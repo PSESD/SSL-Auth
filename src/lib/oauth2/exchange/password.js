@@ -3,6 +3,7 @@
  * Modified by Zaenal M
  */
 var utils = require('oauth2orize/lib/utils'), TokenError = require('oauth2orize/lib/errors/tokenerror');
+var _funct = require('./../../function');
 var requestIp = require('request-ip');
 
 /**
@@ -134,6 +135,20 @@ module.exports = function(options, issue) {
                  * @type {*|string}
                  */
                 req.body.clientIp = requestIp.getClientIp(req);
+                var curl = null;
+                var clientUrl = req.headers.origin;
+                var hackUrl = 'x-cbo-client-url';
+                if(hackUrl in req.headers){
+                    clientUrl = req.headers[hackUrl];
+                }
+                var parse_url = _funct.parse_url(clientUrl);
+
+                if (parse_url.host) {
+                    curl = parse_url.host;
+                } else {
+                    curl = parse_url.path;
+                }
+                req.body.organizationUrl = curl;
                 issue(client, username, passwd, scope, req.body, issued);
             } else if (arity == 5) {
                 issue(client, username, passwd, scope, issued);

@@ -25,13 +25,16 @@ if(process.env.CIRCLE_BRANCH === 'develop'){
             .exec('cd /home/cbo/docker/auth', {
                 out: console.log.bind(console)
             })
-            .exec('git fetch && git reset --hard origin/develop', {
+            .exec('git fetch', {
                 out: console.log.bind(console)
             })
-            .exec('docker rm -f auth', {
+            .exec('git reset --hard origin/develop', {
                 out: console.log.bind(console)
             })
             .exec('docker build -t psesd/ssl-auth:develop .', {
+                out: console.log.bind(console)
+            })
+            .exec('docker rm -f auth', {
                 out: console.log.bind(console)
             })
             .exec('docker run -d --name auth -p 104.192.103.13:443:443 -e "NODE_ENV=development" -e "NODE_CONFIG_DIR=/config" -v /config:/config psesd/ssl-auth:develop', {
