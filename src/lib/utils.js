@@ -25,7 +25,7 @@ var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
     password = 'ssl-encrypted-827192';
-const HASH_LENGTH = 500;
+var HASH_LENGTH = 500;
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
