@@ -328,7 +328,8 @@ UserSchema.methods.getCurrentPermission = function(organizationId){
             role: undefined,
             organization: undefined,
             students: [],
-            permissions: []
+            permissions: [],
+            activate: false
         };
     }
     return this._currentPermission[this.orgId];

@@ -25,6 +25,7 @@ var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
     password = 'ssl-encrypted-827192';
+const HASH_LENGTH = 500;
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
@@ -323,7 +324,7 @@ var utils = {
      */
     tokenHash: function (token) {
 
-        return crypto.pbkdf2Sync(token, saltStatic, 10000, 100, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(token, saltStatic, HASH_LENGTH, 50, 'sha256').toString('hex');
 
     },
     /**
@@ -333,7 +334,7 @@ var utils = {
      */
     secretHash: function (secret) {
 
-        return crypto.pbkdf2Sync(secret, saltStatic, 10000, 30, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(secret, saltStatic, HASH_LENGTH, 30, 'sha256').toString('hex');
 
     },
     /**
@@ -343,7 +344,7 @@ var utils = {
      */
     codeHash: function (code) {
 
-        return crypto.pbkdf2Sync(code, saltStatic, 10000, 60, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(code, saltStatic, HASH_LENGTH, 60, 'sha256').toString('hex');
 
     },
     /**

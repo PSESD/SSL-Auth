@@ -199,6 +199,8 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  */
 //server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
 server.exchange(exchangePassword(function (client, username, password, scope, params, callback) {
+    var errorLogin = 'Wrong email or password';
+
     /**
      *
      * @param params
@@ -206,118 +208,143 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
      * @param token
      * @param refreshToken
      * @param currentUser
+     * @param organization
      */
-    function loginEmbeded(params, expiresIn, token, refreshToken, currentUser){
-        Organization.findOne({ url: params.organizationUrl }, function(err, organization){
+    function loginEmbeded(params, expiresIn, token, refreshToken, currentUser, organization){
 
-            var embeded = {
-                expires_in: expiresIn,
-                embeded: {
-                    organization: organization,
-                    users: {
-                        data: [],
-                        total: 0
-                    }
+        var embeded = {
+            expires_in: expiresIn,
+            embeded: {
+                organization: organization,
+                users: {
+                    data: [],
+                    total: 0
                 }
-            };
+            }
+        };
 
-            var criteria = { permissions: { $elemMatch: { organization: organization._id, activate: true }}};
+        var criteria = { permissions: { $elemMatch: { organization: organization._id, activate: true }}};
 
-            User.find(criteria, function (err, users) {
+        User.find(criteria, function (err, users) {
 
-                if (err)  {
-                    return callback(null, token, refreshToken, embeded);
-                }
-
-                users.forEach(function(user){
-
-                    var obj = user.toJSON();
-
-                    if(obj._id.toString() !== currentUser.userId){
-
-                        delete obj.permissions;
-
-                    }
-
-                    embeded.embeded.users.data.push(obj);
-                    embeded.embeded.users.total++;
-
-                });
-
-                callback(null, token, refreshToken, embeded);
-
-            });
-
-        });
-    }
-
-    //Validate the user
-    User.findOne({email: username}, function (err, user) {
-
-        if (err) { return callback('Wrong email or password'); }
-
-        // No user found with that username
-        if (!user) {
-            return callback('Wrong email or password', false);
-        }
-
-        // Make sure the password is correct
-        user.verifyPassword(password, function (err, isMatch) {
-
-            if (err) { return callback('Wrong email or password'); }
-
-            // Password did not match
-            if (!isMatch) {
-                return callback('Wrong email or password', false);
+            if (err)  {
+                return callback(null, token, refreshToken, embeded);
             }
 
-            var token = uid(256);
+            users.forEach(function(user){
 
-            var expired = calculateExp();
+                var obj = user.toJSON();
 
-            // Create a new access token
-            var tokenModel = new Token({
-                token: tokenHash(token),
-                ip: params.clientIp,
-                clientId: client.id,
-                userId: user.userId,
-                scope: scope,
-                expired: expired
+                if(obj._id.toString() !== currentUser.userId){
+
+                    delete obj.permissions;
+
+                }
+
+                embeded.embeded.users.data.push(obj);
+                embeded.embeded.users.total++;
+
             });
-            // Save the access token and check for errors
-            tokenModel.save(function (err) {
 
-                if (err) { return callback(err); }
+            callback(null, token, refreshToken, embeded);
 
-                var refreshToken = uid(256);
+        });
 
-                var refreshTokenHash = tokenHash(refreshToken);
+    }
+    Organization.findOne({ url: params.organizationUrl }, function(err, organization) {
 
-                //Refresh Token Code
-                var refreshTokenModel = new RefreshToken({
-                    refreshToken: refreshTokenHash,
+        if (err) {
+            return callback(errorLogin);
+        }
+
+        // No user found with that username
+        if (!organization) {
+            return callback(errorLogin, false);
+        }
+
+        //Validate the user
+        User.findOne({email: username}, function (err, user) {
+
+            if (err) {
+                return callback(errorLogin);
+            }
+
+            // No user found with that username
+            if (!user) {
+                return callback(errorLogin, false);
+            }
+
+            // Make sure the password is correct
+            user.verifyPassword(password, function (err, isMatch) {
+
+                if (err) {
+                    return callback(errorLogin);
+                }
+
+                // Password did not match
+                if (!isMatch) {
+                    return callback(errorLogin, false);
+                }
+
+                var permission = user.getCurrentPermission(organization._id.toString());
+
+                if (!permission.role || !permission.activate) {
+                    return callback(errorLogin, false);
+                }
+
+                var token = uid(256);
+
+                var expired = calculateExp();
+
+                // Create a new access token
+                var tokenModel = new Token({
+                    token: tokenHash(token),
+                    ip: params.clientIp,
                     clientId: client.id,
-                    userId: user.userId
+                    userId: user.userId,
+                    scope: scope,
+                    expired: expired
                 });
+                // Save the access token and check for errors
+                tokenModel.save(function (err) {
 
-                if (scope && scope.indexOf("offline_access") === 0) {
+                    if (err) {
+                        return callback(err);
+                    }
 
-                    refreshTokenModel.save(function (err) {
+                    var refreshToken = uid(256);
 
-                        if (err) { return callback(err); }
+                    var refreshTokenHash = tokenHash(refreshToken);
 
-                        // callback(null, token, refreshToken, {expires_in: expiresIn});
-                        loginEmbeded(params, expired, token, refreshToken, user);
-
+                    //Refresh Token Code
+                    var refreshTokenModel = new RefreshToken({
+                        refreshToken: refreshTokenHash,
+                        clientId: client.id,
+                        userId: user.userId
                     });
 
-                } else {
+                    if (scope && scope.indexOf("offline_access") === 0) {
 
-                    refreshToken = null;
+                        refreshTokenModel.save(function (err) {
 
-                    // callback(null, token, refreshToken, {expires_in: expiresIn});
-                    loginEmbeded(params, expired, token, refreshToken, user);
-                }
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            // callback(null, token, refreshToken, {expires_in: expiresIn});
+                            loginEmbeded(params, expired, token, refreshToken, user, organization);
+
+                        });
+
+                    } else {
+
+                        refreshToken = null;
+
+                        // callback(null, token, refreshToken, {expires_in: expiresIn});
+                        loginEmbeded(params, expired, token, refreshToken, user, organization);
+                    }
+
+                });
 
             });
 
