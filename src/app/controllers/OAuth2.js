@@ -233,6 +233,8 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
             users.forEach(function(user){
 
+                var permission = user.getCurrentPermission(organization._id.toString());
+
                 var obj = user.toJSON();
 
                 if(obj._id.toString() !== currentUser.userId){
