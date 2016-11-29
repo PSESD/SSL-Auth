@@ -1,6 +1,6 @@
 # Dockerfile for installing and running Nginx
 # Select ubuntu as the base image
-FROM ubuntu
+FROM ubuntu:14.04
 MAINTAINER M Bintang <halilintar8@yahoo.com>
 
 VOLUME ["/certs"]
@@ -13,7 +13,7 @@ ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev build-essential
+RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev build-essential nano
 #RUN curl -sL https://deb.nodesource.com/setup_0.10 | bash -
 #RUN apt-get install -y nodejs
 #RUN apt-get install -y npm
