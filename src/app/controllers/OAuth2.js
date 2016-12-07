@@ -237,7 +237,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
                 var obj = user.toJSON();
 
-                if(obj._id.toString() !== currentUser.userId){
+                if(obj.userId.toString() !== currentUser.userId){
 
                     delete obj.permissions;
 
