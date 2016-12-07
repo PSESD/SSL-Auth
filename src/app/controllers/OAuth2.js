@@ -233,13 +233,22 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
             users.forEach(function(user){
 
-                var permission = user.getCurrentPermission(organization._id.toString());
+                // var permission = user.getCurrentPermission(organization._id.toString());
 
                 var obj = user.toJSON();
 
-                if(obj.userId.toString() !== currentUser.userId){
+                if(obj.userId.toString() !== currentUser.userId.toString()){
 
                     delete obj.permissions;
+
+                }
+                else {
+
+                    obj.permissions.forEach(function(permission) {
+
+                        delete permission.students;
+
+                    });
 
                 }
 
