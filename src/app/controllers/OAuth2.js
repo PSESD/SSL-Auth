@@ -218,8 +218,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
         if(currentUser.permissions.length > 0) {
             currentUser.permissions.forEach(function(list_org) {
                 var compare_organization_id = list_org.organization;
-                console.log(compare_organization_id, organization_id, compare_organization_id == organization_id, compare_organization_id === organization_id, list_org.activate, list_org.activate === true);
-                if(list_org.organization === organization_id && list_org.activate === true)
+                if(compare_organization_id.equals(organization_id) && list_org.activate === true)
                 {
                     status = list_org.activate;
                     role = list_org.role;
@@ -301,7 +300,6 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
         //Validate the user
         User.findOne({email: username}, function (err, user) {
-
             if (err) {
                 return callback(errorLogin);
             }
@@ -313,7 +311,6 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
             // Make sure the password is correct
             user.verifyPassword(password, function (err, isMatch) {
-
                 if (err) {
                     return callback(errorLogin);
                 }
@@ -361,7 +358,6 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                     });
 
                     if (scope && scope.indexOf("offline_access") === 0) {
-                        console.log("0");
 
                         refreshTokenModel.save(function (err) {
 
@@ -375,7 +371,6 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                         });
 
                     } else {
-                        console.log("1");
                         refreshToken = null;
 
                         // callback(null, token, refreshToken, {expires_in: expiresIn});
