@@ -212,56 +212,82 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
      */
     function loginEmbeded(params, expiresIn, token, refreshToken, currentUser, organization){
 
+        var organization_id = organization._id;
+        var status = '';
+        var role = '';
+        if(currentUser.permissions.length > 0) {
+            currentUser.permissions.forEach(function(list_org) {
+                var compare_organization_id = list_org.organization;
+                console.log(compare_organization_id, organization_id, compare_organization_id == organization_id, compare_organization_id === organization_id, list_org.activate, list_org.activate === true);
+                if(list_org.organization === organization_id && list_org.activate === true)
+                {
+                    status = list_org.activate;
+                    role = list_org.role;
+                }
+            });
+        }
+
         var embeded = {
             expires_in: expiresIn,
             embeded: {
-                organization: organization,
+                organization: {
+                    id: organization_id,
+                    name: organization.name
+                },
                 users: {
-                    data: [],
-                    total: 0
+                    id: currentUser._id,
+                    email: currentUser.email,
+                    first_name: currentUser.first_name,
+                    middle_name: currentUser.middle_name,
+                    last_name: currentUser.last_name,
+                    status: status,
+                    role: role
                 }
             }
         };
 
-        var criteria = { permissions: { $elemMatch: { organization: organization._id, activate: true }}};
+        callback(null, token, refreshToken, embeded);
 
-        User.find(criteria, function (err, users) {
-
-            if (err)  {
-                return callback(null, token, refreshToken, embeded);
-            }
-
-            users.forEach(function(user){
-
-                // var permission = user.getCurrentPermission(organization._id.toString());
-
-                var obj = user.toJSON();
-
-                if(obj.userId.toString() !== currentUser.userId.toString()){
-
-                    delete obj.permissions;
-
-                }
-                else {
-
-                    obj.permissions.forEach(function(permission) {
-
-                        delete permission.students;
-
-                    });
-
-                }
-
-                embeded.embeded.users.data.push(obj);
-                embeded.embeded.users.total++;
-
-            });
-
-            callback(null, token, refreshToken, embeded);
-
-        });
+        // var criteria = { permissions: { $elemmatch: { organization: organization._id, activate: true }}};
+        //
+        // User.find(criteria, function (err, users) {
+        //
+        //     if (err)  {
+        //         return callback(null, token, refreshToken, embeded);
+        //     }
+        //
+        //     users.forEach(function(user){
+        //
+        //         // var permission = user.getCurrentPermission(organization._id.toString());
+        //
+        //         var obj = user.toJSON();
+        //
+        //         if(obj.userId.toString() !== currentUser.userId.toString()){
+        //
+        //             delete obj.permissions;
+        //
+        //         }
+        //         else {
+        //
+        //             obj.permissions.forEach(function(permission) {
+        //
+        //                 delete permission.students;
+        //
+        //             });
+        //
+        //         }
+        //
+        //         embeded.embeded.users.data.push(obj);
+        //         embeded.embeded.users.total++;
+        //
+        //     });
+        //
+        //     callback(null, token, refreshToken, embeded);
+        //
+        // });
 
     }
+
     Organization.findOne({ url: params.organizationUrl }, function(err, organization) {
 
         if (err) {
@@ -335,6 +361,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                     });
 
                     if (scope && scope.indexOf("offline_access") === 0) {
+                        console.log("0");
 
                         refreshTokenModel.save(function (err) {
 
@@ -348,7 +375,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                         });
 
                     } else {
-
+                        console.log("1");
                         refreshToken = null;
 
                         // callback(null, token, refreshToken, {expires_in: expiresIn});
