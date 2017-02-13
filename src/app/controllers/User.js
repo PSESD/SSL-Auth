@@ -80,7 +80,8 @@ exports.sendInvite = function (req, res) {
 
     var role = req.body.role || 'case-worker-restricted';
 
-    var url = req.headers['x-cbo-client-url'];
+
+    var url = req.headers.origin;
 
     var user = {
         email: req.body.email
@@ -244,7 +245,7 @@ exports.sendReInvite = function (req, res) {
 
     }
 
-    var url = req.headers['x-cbo-client-url'];
+    var url = req.headers.origin;
     var get_org_url = url.replace(/^https?\:\/\//i, "");
 
     Organization.findOne({url: get_org_url}, function(err, organization) {
@@ -418,7 +419,6 @@ exports.activate = function (req, res) {
     pathArray = redirectTo.split( '/' );
     url = pathArray[0];
     var get_org_url = url.replace(/^https?\:\/\//i, "");
-    get_org_url = 'helpinghand.cbo.upward.st';
 
     Organization.findOne({url: get_org_url}, function (err, organization) {
 
