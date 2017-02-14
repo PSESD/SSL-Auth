@@ -3,7 +3,7 @@
  */
 'use strict';
 
-process.env.NODE_ENV = 'test';
+// process.env.NODE_ENV = 'test';
 var expect = require('chai').expect;
 var request = require('supertest');
 var cheerio = require('cheerio');
@@ -12,9 +12,9 @@ var _funct = require('../lib/function');
 var _ = require('underscore');
 var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'https://api.cbo.upward.st';
-var config = require('config');
+// var config = require('config');
 var assert = require('assert');
-var RunscopeTrigger = require('../runscope');
+// var RunscopeTrigger = require('../runscope');
 
 /**
  * RUNSCOPE LIST TO TRIGGER
@@ -26,7 +26,7 @@ var triggers = [
     'https://api.runscope.com/radar/bdacae89-8685-4fa5-b32c-1ce66837ed49/trigger?runscope_environment=d1867e72-1d9a-4765-a7e0-0903ce28d1b7' //Helping Hand - API Restricted CaseWorker Tests
 ];
 
-var access_token = '6e77c6b7-7c39-4a03-af79-315317a851ae';
+// var access_token = '<use env variable>';
 
 /**
  *
