@@ -3,11 +3,12 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var Invite = require('../models/Invite');
 var utils = require('../../lib/utils');
+var cache = utils.cache();
+var md5 = utils.md5;
 var config = require('config');
 var mandrill = require('mandrill-api/mandrill');
-var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
 var crypto = require('crypto');
-var php = require('phpjs');
+var _funct = require('../../lib/function');
 var url = require('url');
 var csurf = require('csurf');
 var cookieParser = require('cookie-parser');
@@ -79,6 +80,9 @@ exports.sendInvite = function (req, res) {
 
     var role = req.body.role || 'case-worker-restricted';
 
+
+    var url = req.headers.origin;
+
     var user = {
         email: req.body.email
     };
@@ -88,7 +92,7 @@ exports.sendInvite = function (req, res) {
     }
 
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -100,7 +104,9 @@ exports.sendInvite = function (req, res) {
 
     }
 
-    Organization.findOne({url: curl}, function(err, organization) {
+    var get_org_url = url.replace(/^https?\:\/\//i, "");
+
+    Organization.findOne({url: get_org_url}, function(err, organization) {
 
         if (err) return res.sendError(err);
 
@@ -177,47 +183,26 @@ exports.sendInvite = function (req, res) {
 
                         var send_at = new Date();
 
-                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
-
-                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
-                            var message = {
-                                "html": html,
-                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
-                                "from_email": result.publish_from_email,
-                                "from_name": result.publish_from_name,
-                                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                                "headers": {
-                                    "Reply-To": "no-replay@studentsuccesslink.org"
-                                }
-
-                            };
-                            mandrill_client.messages.send({"message": message}, function (result) {
-
-                                if (result[0].status === 'sent') {
-
-                                    return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
-
-                                } else {
-
-                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
-
-                                }
-
-                            }, function (e) {
-                                // Mandrill returns the error as an object with name and message keys
-                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                                return res.sendError(res.__('email_unsuccess'));
-                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                            });
-
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            // A mandrill error occurred: Invalid_Key - Invalid API key
-                            return res.sendError(res.__('email_unsuccess'));
+                        var mailer = utils.mail();
+                        mailer.template('cbo-invite-user');
+                        mailer.bindParam({
+                            userId: user._id+'',
+                            link: activateUrl
+                        });
+                        mailer.to({email: user.email, name: user.last_name});
+                        mailer.header({
+                           'Reply-To': "no-replay@studentsuccesslink.org"
+                        });
+                        mailer.send({
+                            substitution_data: {
+                                organizationName: organization.name
+                            }
+                        }, function(err, info){
+                            console.log(err, info);
+                            if(!err){
+                                return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
+                            }
+                            return res.sendError(isTester ? testerInfo : info);
                         });
 
                     }); 
@@ -248,7 +233,7 @@ exports.sendReInvite = function (req, res) {
     }
 
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -260,7 +245,10 @@ exports.sendReInvite = function (req, res) {
 
     }
 
-    Organization.findOne({url: curl}, function(err, organization) {
+    var url = req.headers.origin;
+    var get_org_url = url.replace(/^https?\:\/\//i, "");
+
+    Organization.findOne({url: get_org_url}, function(err, organization) {
 
         if (err) return res.sendError(err);
 
@@ -348,47 +336,25 @@ exports.sendReInvite = function (req, res) {
 
                         var send_at = new Date();
 
-                        mandrill_client.templates.info({name: 'cbo_invite_user'}, function (result) {
-
-                            var html = php.str_replace(['{$userId}', '{$link}'], [user._id, activateUrl], result.code);
-                            var message = {
-                                "html": html,
-                                "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
-                                "from_email": result.publish_from_email,
-                                "from_name": result.publish_from_name,
-                                "to": [{email: user.email, name: user.last_name, type: "to"}],
-                                "headers": {
-                                    "Reply-To": "no-replay@studentsuccesslink.org"
-                                }
-
-                            };
-                            mandrill_client.messages.send({"message": message}, function (result) {
-
-                                if (result[0].status == 'sent') {
-
-                                    return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user);
-
-                                } else {
-
-                                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                                    return res.sendError(isTester ? testerInfo : result[0].reject_reason);
-
-                                }
-
-                            }, function (e) {
-                                // Mandrill returns the error as an object with name and message keys
-                                console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                                return res.sendError(res.__('email_unsuccess'));
-                                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                            });
-
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            // A mandrill error occurred: Invalid_Key - Invalid API key
-                            return res.sendError(res.__('email_unsuccess'));
+                        var mailer = utils.mail();
+                        mailer.template('cbo-invite-user');
+                        mailer.bindParam({
+                            userId: user._id+'',
+                            link: activateUrl
+                        });
+                        mailer.to({email: user.email, name: user.last_name});
+                        mailer.header({
+                            'Reply-To': "no-replay@studentsuccesslink.org"
+                        });
+                        mailer.send({
+                            substitution_data: {
+                                organizationName: organization.name
+                            }
+                        }, function(err, info){
+                            if(!err){
+                                return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
+                            }
+                            return res.sendError(isTester ? testerInfo : info);
                         });
 
                     });
@@ -422,15 +388,11 @@ exports.activate = function (req, res) {
 
         if(isNew){
 
-            var sessionData = {
+            req.session.data = {
                 email: email,
                 authCode: authCode,
                 redirectTo: redirectTo
             };
-
-            //console.log("SESSION DATA: ", sessionData);
-
-            req.session.data = sessionData;
 
             return res.redirect(config.get('auth.url') + '/api/user/accountupdate');
 
@@ -442,7 +404,7 @@ exports.activate = function (req, res) {
 
     };
 
-    var parse_url = php.parse_url(redirectTo), curl = null;
+    var parse_url = _funct.parse_url(redirectTo), curl = null;
 
     if (parse_url.host) {
 
@@ -454,7 +416,11 @@ exports.activate = function (req, res) {
 
     }
 
-    Organization.findOne({url: curl}, function (err, organization) {
+    pathArray = redirectTo.split( '/' );
+    url = pathArray[0];
+    var get_org_url = url.replace(/^https?\:\/\//i, "");
+
+    Organization.findOne({url: get_org_url}, function (err, organization) {
 
         if (err) { return callback(err); }
 
@@ -538,15 +504,22 @@ exports.activate = function (req, res) {
     });
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 exports.sendForgotPassword = function (req, res) {
 
     var email = req.body.email;
 
 
-    if (!req.body.redirect_url) return res.sendError(res.__('require_field', 'Redirect Url'));
+    if (!req.body.redirect_url) {
+        //return res.sendError(res.__('require_field', 'Redirect Url'));
+        return res.sendError(res.__('forgot_success'));
+    }
 
-    var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+    var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
     if (parse_url.host) {
 
@@ -562,26 +535,33 @@ exports.sendForgotPassword = function (req, res) {
 
     var forgotPassword = crypto.randomBytes(16).toString('base64');
 
-    var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword) + "&redirectTo=" + encodeURIComponent(req.body.redirect_url);
+    var forgotPasswordUrl = base + "/api/user/forgotpassword?email=" + encodeURIComponent(email) + "&_fg=" + encodeURIComponent(forgotPassword)
+        + "&redirectTo=" + encodeURIComponent(req.body.redirect_url)
+        + "&callbackUrl=" + encodeURIComponent(req.body.callback_url)
+        ;
 
     Organization.findOne({url: curl}, function(err, organization){
 
         if(err) {
-            return res.sendError(err);
+            //return res.sendError(res.__('field_incorrect', 'email'));
+            return res.sendError(res.__('forgot_success'));
         }
 
         if(!organization) {
-            return res.sendError(res.__('record_not_found', 'Organization'));
+            //return res.sendError(res.__('field_incorrect', 'email'));
+            return res.sendError(res.__('forgot_failed'));
         }
 
         User.findOne({email: email}, function (err, user) {
 
             if (err) {
-                return res.sendError(err);
+                //return res.sendError(res.__('field_incorrect', 'email'));
+                return res.sendError(res.__('forgot_failed'));
             }
 
             if(!user) {
-                return res.sendError(res.__('record_not_found', 'User'));
+                //return res.sendError(res.__('field_incorrect', 'email'));
+                return res.sendError(res.__('forgot_failed'));
             }
 
             user.forgotPassword = forgotPassword;
@@ -589,59 +569,29 @@ exports.sendForgotPassword = function (req, res) {
             user.save(function (err) {
 
                 if (err) {
-                    return res.sendError(err);
+                    return res.sendError(res.__('forgot_failed'));
                 }
 
-                var async = false;
+                var mailer = utils.mail();
+                mailer.template('cbo-forgot-password');
+                mailer.bindParam({
+                    userId: user._id+'',
+                    link: forgotPasswordUrl
+                });
+                mailer.to({email: user.email, name: user.last_name});
+                mailer.header({
+                    'Reply-To': "no-replay@studentsuccesslink.org"
+                });
+                mailer.send({
+                    substitution_data: {
+                        organizationName: organization.name
+                    }
+                }, function(err, info){
 
-                var ip_pool = "Main Pool";
-
-                var send_at = new Date();
-
-                mandrill_client.templates.info({ name: 'cbo_forgot_password'}, function(result) {
-
-                    var html = php.str_replace(['{$userId}', '{$link}'], [user._id, forgotPasswordUrl], result.code);
-
-                        var message = {
-                            "html": html,
-                            "subject": php.str_replace('{$organization.name}', organization.name, result.subject),
-                            "from_email": result.publish_from_email,
-                            "from_name": result.publish_from_name,
-                            "to": [{email: user.email, name: user.last_name, type: "to"}],
-                            "headers": {
-                                "Reply-To": "no-replay@studentsuccesslink.org"
-                            }
-
-                        };
-
-                        mandrill_client.messages.send({"message": message}, function (result) {
-
-                            if (result[0].status == 'sent') {
-
-                                return res.sendSuccess(res.__('email_success'));
-
-                            } else {
-
-                                utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-
-                                return res.sendError(result[0].reject_reason);
-
-                            }
-                        }, function (e) {
-                            // Mandrill returns the error as an object with name and message keys
-                            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                            return res.sendError(res.__('email_unsuccess'));
-                            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                        });
-
-
-                }, function(e) {
-                    // Mandrill returns the error as an object with name and message keys
-                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                    utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                    // A mandrill error occurred: Invalid_Key - Invalid API key
-                    return res.sendError(res.__('email_unsuccess'));
+                    if(!err){
+                        return res.sendSuccess(res.__('forgot_success'));
+                    }
+                    return res.sendError(res.__('forgot_failed'));
                 });
 
             });
@@ -661,21 +611,46 @@ exports.formForgotPassword = function (req, res) {
 
     var redirectTo = req.query.redirectTo;
 
+    var callbackUrl = req.query.callbackUrl;
+
     var callback = function (err) {
 
-        if (err) return errorNotFound(err, req, res);
+        if (err) {
+            return errorNotFound(err, req, res);
+        }
 
-        res.render('../app/views/forgotPassword', {
-            errors: [],
-            session: {
-                email: email,
-                redirectTo: redirectTo
-            },
-            csrfToken: req.csrfToken()
+        // res.render('../app/views/forgotPassword', {
+        //     errors: [],
+        //     session: {
+        //         email: email,
+        //         redirectTo: redirectTo
+        //     },
+        //     csrfToken: req.csrfToken()
+        // });
+
+        var redirectCallback = callbackUrl;
+
+        if(redirectCallback.indexOf('?') !== -1){
+            redirectCallback += '&';
+        } else {
+            redirectCallback += '?';
+        }
+
+        var tokens = utils.uid(24);
+
+        redirectCallback += "csrfToken=" + encodeURIComponent(tokens);
+        redirectCallback += "&redirectTo=" + encodeURIComponent(redirectTo);
+        redirectCallback += "&email=" + encodeURIComponent(email);
+
+        cache.set('email_password_' + md5(email), tokens, { ttl: 3600 }, function(){
+
+            res.redirect(redirectCallback);
+
         });
 
+
     };
-    var parse_url = php.parse_url(redirectTo), curl = null;
+    var parse_url = _funct.parse_url(redirectTo), curl = null;
 
     if (parse_url.host) {
 
@@ -698,7 +673,7 @@ exports.formForgotPassword = function (req, res) {
             if (err) { return callback(err); }
 
             // No user found with that username
-            if (!user) return callback(res.__('record_not_found', 'User'), false);
+            if (!user) return callback(res.__('field_incorrect', 'email'), false);
 
             // Make sure the password is correct
             user.verifyForgotPassword(code, function (err, isMatch) {
@@ -716,7 +691,9 @@ exports.formForgotPassword = function (req, res) {
                     $unset: {hashedForgotPassword: ""}
                 }, function (err, updated) {
 
-                    if (err) return res.sendError(err);
+                    if (err) {
+                        return res.sendError(res.__('forgot_failed'));
+                    }
 
                     callback(null, updated[0]);
 
@@ -850,7 +827,7 @@ exports.processAccountUpdate = function(req, res){
 
         };
 
-        var parse_url = php.parse_url(redirectTo), curl = null;
+        var parse_url = _funct.parse_url(redirectTo), curl = null;
 
         if (parse_url.host) {
 
@@ -980,7 +957,7 @@ exports.processChangePassword = function(req, res){
 
         };
 
-        var parse_url = php.parse_url(redirectTo), curl = null;
+        var parse_url = _funct.parse_url(redirectTo), curl = null;
 
         if (parse_url.host) {
 
@@ -1046,10 +1023,16 @@ exports.processChangePassword = function(req, res){
     }
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 exports.processForgotPassword = function(req, res){
 
     var password = req.body.password;
+
+    var _csrf = req.body._csrf;
 
     var confirmPassword = req.body.confirm_password;
 
@@ -1059,58 +1042,65 @@ exports.processForgotPassword = function(req, res){
 
     var errors = [];
 
-    function renderError(){
+    var key = 'email_password_' + md5(email);
 
-        var sessionData = {
-            email: email,
-            redirectTo: redirectTo
-        };
+    cache.get(key, function (err, token) {
 
-        res.render('../app/views/forgotPassword', {
-            errors: errors,
-            session: sessionData,
-            csrfToken: req.csrfToken()
-        });
+        if(err){
+            console.log(err);
+            return res.status(403).end('Unauthorized');
+        }
 
-    }
+        if(!token || ( token && token !== _csrf)){
+            console.log(token, ' ---> ', _csrf);
+            return res.status(403).end('Unauthorized');
+        }
 
-    var isError = (function(){
+        function renderError(){
 
-        if(''+password === ''){
+            var sessionData = {
+                email: email,
+                redirectTo: redirectTo
+            };
 
-            errors.push(res.__('require_field', "Password"));
+            var tokens = utils.uid(24);
 
-            return false;
+            cache.set(key, tokens, { ttl: 3600 }, function(){
+                res.sendError({
+                    errors: errors,
+                    session: sessionData,
+                    csrfToken: tokens
+                });
+            });
+
 
         }
 
-        if(password !== confirmPassword){
+        var isError = (function(){
 
-            errors.push(res.__('password_not_match'));
+            if(''+password === ''){
 
-            return false;
+                errors.push(res.__('require_field', "Password"));
 
-        }
-
-        var where = {
-
-            email: email
-
-        };
-
-        User.findOne(where, function(err, user){
-
-            if(err){
-
-                errors.push(err.message);
-
-                return renderError();
+                return false;
 
             }
 
-            user.password = password;
+            if(password !== confirmPassword){
 
-            user.save(function(err){
+                errors.push(res.__('password_not_match'));
+
+                return false;
+
+            }
+
+            var where = {
+
+                email: email
+
+            };
+
+            User.findOne(where, function(err, user){
 
                 if(err){
 
@@ -1120,20 +1110,37 @@ exports.processForgotPassword = function(req, res){
 
                 }
 
-                if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+                user.password = password;
 
-                return res.redirect(redirectTo);
+                user.save(function(err){
+
+                    if(err){
+
+                        errors.push(err.message);
+
+                        return renderError();
+
+                    }
+
+                    cache.del(key, function () {
+
+                        // return res.redirect(redirectTo);
+                        return res.sendSuccess(res.__('data_updated'));
+
+                    });
+
+                });
 
             });
 
-        });
+        })();
 
-    })();
+        if(errors.length > 0){
 
-    if(errors.length > 0){
+            renderError();
 
-        renderError();
+        }
 
-    }
+    });
 
 };

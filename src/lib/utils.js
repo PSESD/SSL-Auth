@@ -19,14 +19,13 @@ var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
-var php = require('phpjs');
+var _funct = require(__dirname + '/function');
+var mailer = require(__dirname + '/mailer');
 var parseString = require('xml2js').parseString;
 // Nodejs encryption with CTR
 var algorithm = 'aes-256-ctr',
     password = 'ssl-encrypted-827192';
-
-var mandrill = require('mandrill-api/mandrill');
-var mandrill_client = new mandrill.Mandrill(config.get('mandrill.api_key'));
+var HASH_LENGTH = 500;
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
@@ -65,7 +64,13 @@ var utils = {
         //    return '';
         //}
     },
-
+    /**
+     *
+     * @returns {mailer}
+     */
+    mail: function(){
+        return new mailer();
+    },
     /**
      *
      * @returns cache-manager
@@ -319,7 +324,7 @@ var utils = {
      */
     tokenHash: function (token) {
 
-        return crypto.pbkdf2Sync(token, saltStatic, 4096, 100, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(token, saltStatic, HASH_LENGTH, 50, 'sha256').toString('hex');
 
     },
     /**
@@ -329,7 +334,7 @@ var utils = {
      */
     secretHash: function (secret) {
 
-        return crypto.pbkdf2Sync(secret, saltStatic, 4096, 30, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(secret, saltStatic, HASH_LENGTH, 30, 'sha256').toString('hex');
 
     },
     /**
@@ -339,7 +344,7 @@ var utils = {
      */
     codeHash: function (code) {
 
-        return crypto.pbkdf2Sync(code, saltStatic, 4096, 60, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(code, saltStatic, HASH_LENGTH, 60, 'sha256').toString('hex');
 
     },
     /**
@@ -359,51 +364,34 @@ var utils = {
      *
      * @param body
      * @param subject
+     * @param done
      */
     mailDev: function (body, subject, done) {
         var cfg = config.get('devMail');
-        var mails = [];
         if (body instanceof Error) {
 
             body = body.stack.split("\n");
 
         }
 
-        mandrill_client.templates.info(cfg.options, function (result) {
-
-            var html = php.str_replace('{$html}', body, result.code);
-            var message = {
-                "html": html,
-                "subject": subject || result.subject,
-                "from_email": result.publish_from_email,
-                "from_name": result.publish_from_name,
-                "to": cfg.emails,
-                "headers": cfg.headers
-
-            };
-            mandrill_client.messages.send({"message": message}, function (result) {
-
-                if (result[0].status == 'sent') {
-                    utils.log('Email was sent ' + message.subject, 'info');
-                    if (done) done();
-                } else {
-
-                    utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
-                    if (done) done('A mandrill error occurred: ' + result[0].reject_reason);
-                }
-
-            }, function (e) {
-                // Mandrill returns the error as an object with name and message keys
-                utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-                if (done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+        var mail = this.mail();
+        if(cfg.options.name){
+            mail.template(cfg.options.name);
+            mail.bindParam({
+               html: body
             });
+        }
 
-        }, function (e) {
-            // Mandrill returns the error as an object with name and message keys
-            utils.log('A mandrill error occurred: ' + e.name + ' - ' + e.message, 'error');
-            if (done) done('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-            // A mandrill error occurred: Invalid_Key - Invalid API key
+        mail.to(cfg.emails);
+        mail.header(cfg.headers);
+        mail.send({ subject: subject }, function(err, info){
+            if(err){
+                utils.log('A mail error occurred: ' + JSON.stringify(err));
+                if (done) done('A mail error occurred: ' + JSON.stringify(err));
+                return;
+            }
+            utils.log('Email was sent ' + JSON.stringify(info), 'info');
+            if (done) done();
         });
     },
     /**
@@ -448,9 +436,12 @@ var utils = {
         }
 
     },
-
+    /**
+     *
+     * @returns {*}
+     */
     benchmark: function () {
-        var log = justlog({
+        return justlog({
             file: {
                 pattern: '{fulltime} [{level}] {msg}' // use custom pattern
             },
@@ -459,7 +450,6 @@ var utils = {
                 pattern: 'color' // use predefined pattern
             }
         });
-        return log;
     },
     /**
      *
@@ -479,7 +469,7 @@ var utils = {
 
         }
 
-        var parse_url = php.parse_url(clientUrl);
+        var parse_url = _funct.parse_url(clientUrl);
 
         if (parse_url.host) {
 

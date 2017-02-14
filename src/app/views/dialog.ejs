@@ -2,12 +2,12 @@
 <div class="row  login-container">
     <div class="login-form col-xs-12 col-md-offset-4 col-md-4">
         <div class="col-xs-12 col-md-12">
-            <div class="login-page-title text-center"><h1><%= __('general.ssl') %></h1></div>
+            <div class="login-page-title text-center"><h1><%= __('ssl') %></h1></div>
         </div>
         <div class="col-xs-12 col-md-12 card ">
             <div class="col-xs-12 col-md-12">
                 <div class="title">
-                    <h1><%= __('general.authorize') %></h1>
+                    <h1><%= __('authorize') %></h1>
                     <hr>
                 </div>
             </div>
@@ -15,21 +15,21 @@
                 <form class="form-horizontal form-signin ng-dirty ng-valid-parse ng-valid ng-valid-required" id="loginForm" name="loginForm" role="form" action="/api/oauth2/authorize" method="post">
                     <div class="form-group">
                         <div class="col-sm-12">
-                            <p class="form-control-static"><%= __('general.Dear', user.email) %>,</p>
-                            <p class="form-control-static"><b><%= client.name %></b> <%= __('general.request_access') %></p>
-                            <p class="form-control-static"><%= __('general.authorize_confirm') %></p>
+                            <p class="form-control-static"><%= __('Dear', user.email) %>,</p>
+                            <p class="form-control-static"><b><%= client.name %></b> <%= __('request_access') %></p>
+                            <p class="form-control-static"><%= __('authorize_confirm') %></p>
                         </div>
                     </div>
                     <div class="form-group">
                         <input name="transaction_id" type="hidden" value="<%= transactionID %>">
                         <div class="col-xs-12 col-md-12 text-center">
-                            <button type="submit" value="Allow" class="btn btn-default"><%= __('general.allow') %></button>
-                            <button type="submit" value="Deny" class="btn btn-default"><%= __('general.deny') %></button>
+                            <button type="submit" value="Allow" class="btn btn-default"><%= __('allow') %></button>
+                            <button type="submit" value="Deny" class="btn btn-default"><%= __('deny') %></button>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12 col-md-12">
-                            <div class="login-help-link"><%= __('general.help_dialog_link') %><a href="mailto:help@studentsuccesslink.org"> help@studentsuccesslink.org.</a></div>
+                            <div class="login-help-link"><%= __('help_dialog_link') %><a href="mailto:help@studentsuccesslink.org"> help@studentsuccesslink.org.</a></div>
                         </div>
                     </div>
                 </form>

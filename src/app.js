@@ -22,10 +22,7 @@ var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 var compress = require('compression');
-i18n.configure({
-    locales:['en'],
-    directory: __dirname + '/resource/lang'
-});
+
 app.use(compress());
 
 if (rollbarAccessToken) {
@@ -84,7 +81,7 @@ function Api() {
         cookie: '__lang',
 
         // where to store json files - defaults to './locales' relative to modules directory
-        directory: __dirname + '/app/locales',
+        directory: __dirname + '/resource/lang',
 
         // whether to write new locale information to disk - defaults to true
         updateFiles: false,
@@ -96,7 +93,7 @@ function Api() {
         extension: '.json',
 
         // setting prefix of json files name - default to none '' (in case you use different locale files naming scheme (webapp-en.json), rather then just en.json)
-        prefix: 'lang-',
+        // prefix: 'lang-',
 
         // enable object notation
         objectNotation: true
@@ -228,11 +225,19 @@ Api.prototype.registerRoute = function (cb) {
 Api.prototype.connectDb = function () {
 
 
-    var dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
+    var dbUri = this.config.get('db.mongo');
 
-    this.mongo.connect(dbUri);
+    if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
+        dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
+    }
 
-    this.mongo.connection.once('open', function (callback) {
+    if(global && global.Promise) {
+        this.mongo.Promise = global.Promise;
+    }
+
+    this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
+
+    this.mongo.connection.once('open', function () {
 
         console.log("[%s] DB URI: " + dbUri, app.get('env'));
 
@@ -256,6 +261,14 @@ Api.prototype.configureExpress = function (db) {
     app.set('log', require('./lib/utils').log);
 
     app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use(function (err, req, res, next) {
+        if (err.code !== 'EBADCSRFTOKEN') return next(err);
+
+        res.statusCode = 403;
+
+        return res.end('Session has expired or tampered with');
+    });
 
     app.use(cookieParser());
 
@@ -437,12 +450,25 @@ Api.prototype.configureExpress = function (db) {
             /**
              * Mongoose error duplicate
              */
-            if(err.code && (err.code === 11000 || err.code === 11001)){
+            if(typeof err === 'object' && err.code && (err.code === 11000 || err.code === 11001)){
 
                 err = {
                     code: err.code,
                     message: res.__('errors.' + err.code)
                 };
+
+            }
+
+            if(typeof err !== 'string'){
+
+                for(var o in err){
+
+                    if(o !== 'code' && o !== 'message'){
+
+                        delete err[o];
+
+                    }
+                }
 
             }
 

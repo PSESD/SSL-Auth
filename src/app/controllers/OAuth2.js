@@ -6,6 +6,7 @@ var User = require('../models/User');
 var Client = require('../models/Client');
 var Token = require('../models/Token');
 var Code = require('../models/Code');
+var Organization = require('../models/Organization');
 var RefreshToken = require('../models/RefreshToken');
 var uid = require('../../lib/utils').uid;
 var tokenHash = require('../../lib/utils').tokenHash;
@@ -198,74 +199,185 @@ server.exchange(oauth2orize.exchange.code(function (client, code, redirectUri, c
  */
 //server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, callback) {
 server.exchange(exchangePassword(function (client, username, password, scope, params, callback) {
+    var errorLogin = 'Wrong email or password';
 
-    //Validate the user
-    User.findOne({email: username}, function (err, user) {
+    /**
+     *
+     * @param params
+     * @param expiresIn
+     * @param token
+     * @param refreshToken
+     * @param currentUser
+     * @param organization
+     */
+    function loginEmbeded(params, expiresIn, token, refreshToken, currentUser, organization){
 
-        if (err) { return callback(err); }
-
-        // No user found with that username
-        if (!user) {
-            return callback(null, false);
+        var organization_id = organization._id;
+        var status = '';
+        var role = '';
+        if(currentUser.permissions.length > 0) {
+            currentUser.permissions.forEach(function(list_org) {
+                var compare_organization_id = list_org.organization;
+                if(compare_organization_id.equals(organization_id) && list_org.activate === true)
+                {
+                    status = list_org.activate;
+                    role = list_org.role;
+                }
+            });
         }
 
-        // Make sure the password is correct
-        user.verifyPassword(password, function (err, isMatch) {
+        var embeded = {
+            expires_in: expiresIn,
+            embeded: {
+                organization: {
+                    id: organization_id,
+                    name: organization.name
+                },
+                users: {
+                    id: currentUser._id,
+                    email: currentUser.email,
+                    first_name: currentUser.first_name,
+                    middle_name: currentUser.middle_name,
+                    last_name: currentUser.last_name,
+                    status: status,
+                    role: role
+                }
+            }
+        };
 
-            if (err) { return callback(err); }
+        callback(null, token, refreshToken, embeded);
 
-            // Password did not match
-            if (!isMatch) {
-                return callback('Password did not match', false);
+        // var criteria = { permissions: { $elemmatch: { organization: organization._id, activate: true }}};
+        //
+        // User.find(criteria, function (err, users) {
+        //
+        //     if (err)  {
+        //         return callback(null, token, refreshToken, embeded);
+        //     }
+        //
+        //     users.forEach(function(user){
+        //
+        //         // var permission = user.getCurrentPermission(organization._id.toString());
+        //
+        //         var obj = user.toJSON();
+        //
+        //         if(obj.userId.toString() !== currentUser.userId.toString()){
+        //
+        //             delete obj.permissions;
+        //
+        //         }
+        //         else {
+        //
+        //             obj.permissions.forEach(function(permission) {
+        //
+        //                 delete permission.students;
+        //
+        //             });
+        //
+        //         }
+        //
+        //         embeded.embeded.users.data.push(obj);
+        //         embeded.embeded.users.total++;
+        //
+        //     });
+        //
+        //     callback(null, token, refreshToken, embeded);
+        //
+        // });
+
+    }
+
+    Organization.findOne({ url: params.organizationUrl }, function(err, organization) {
+
+        if (err) {
+            return callback(errorLogin);
+        }
+
+        // No user found with that username
+        if (!organization) {
+            return callback(errorLogin, false);
+        }
+
+        //Validate the user
+        User.findOne({email: username}, function (err, user) {
+            if (err) {
+                return callback(errorLogin);
             }
 
-            var token = uid(256);
+            // No user found with that username
+            if (!user) {
+                return callback(errorLogin, false);
+            }
 
-            var expired = calculateExp();
+            // Make sure the password is correct
+            user.verifyPassword(password, function (err, isMatch) {
+                if (err) {
+                    return callback(errorLogin);
+                }
 
-            // Create a new access token
-            var tokenModel = new Token({
-                token: tokenHash(token),
-                ip: params.clientIp,
-                clientId: client.id,
-                userId: user.userId,
-                scope: scope,
-                expired: expired
-            });
+                // Password did not match
+                if (!isMatch) {
+                    return callback(errorLogin, false);
+                }
 
-            // Save the access token and check for errors
-            tokenModel.save(function (err) {
+                var permission = user.getCurrentPermission(organization._id.toString());
 
-                if (err) { return callback(err); }
+                if (!permission.role || !permission.activate) {
+                    return callback(errorLogin, false);
+                }
 
-                var refreshToken = uid(256);
+                var token = uid(256);
 
-                var refreshTokenHash = tokenHash(refreshToken);
+                var expired = calculateExp();
 
-                //Refresh Token Code
-                var refreshTokenModel = new RefreshToken({
-                    refreshToken: refreshTokenHash,
+                // Create a new access token
+                var tokenModel = new Token({
+                    token: tokenHash(token),
+                    ip: params.clientIp,
                     clientId: client.id,
-                    userId: user.userId
+                    userId: user.userId,
+                    scope: scope,
+                    expired: expired
                 });
+                // Save the access token and check for errors
+                tokenModel.save(function (err) {
 
-                if (scope && scope.indexOf("offline_access") === 0) {
+                    if (err) {
+                        return callback(err);
+                    }
 
-                    refreshTokenModel.save(function (err) {
+                    var refreshToken = uid(256);
 
-                        if (err) { return callback(err); }
+                    var refreshTokenHash = tokenHash(refreshToken);
 
-                        callback(null, token, refreshToken, {expires_in: expiresIn});
-
+                    //Refresh Token Code
+                    var refreshTokenModel = new RefreshToken({
+                        refreshToken: refreshTokenHash,
+                        clientId: client.id,
+                        userId: user.userId
                     });
 
-                } else {
+                    if (scope && scope.indexOf("offline_access") === 0) {
 
-                    refreshToken = null;
+                        refreshTokenModel.save(function (err) {
 
-                    callback(null, token, refreshToken, {expires_in: expiresIn});
+                            if (err) {
+                                return callback(err);
+                            }
 
-                }
+                            // callback(null, token, refreshToken, {expires_in: expiresIn});
+                            loginEmbeded(params, expired, token, refreshToken, user, organization);
+
+                        });
+
+                    } else {
+                        refreshToken = null;
+
+                        // callback(null, token, refreshToken, {expires_in: expiresIn});
+                        loginEmbeded(params, expired, token, refreshToken, user, organization);
+                    }
+
+                });
 
             });
 

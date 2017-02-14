@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# curl script
+
+cd /home/ubuntu/CBO-Portal-Auth/src && npm update && node ./script.js build

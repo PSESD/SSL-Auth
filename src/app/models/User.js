@@ -328,7 +328,8 @@ UserSchema.methods.getCurrentPermission = function(organizationId){
             role: undefined,
             organization: undefined,
             students: [],
-            permissions: []
+            permissions: [],
+            activate: false
         };
     }
     return this._currentPermission[this.orgId];
@@ -532,7 +533,7 @@ UserSchema.method('toJSON', function(){
     delete user.salt;
     delete user.hashedPassword;
     delete user.allPermissions;
-    delete user.permissions;
+    // delete user.permissions;
     delete user.allStudents;
     delete user.organizationId;
     delete user.hashedForgotPasswordExpire;

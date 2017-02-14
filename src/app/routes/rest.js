@@ -66,7 +66,7 @@ Rest.prototype.handleRoutes = function () {
 
     this.router.get('/user/forgotpassword', this.Api.csrfProtection, this.userController.formForgotPassword);
 
-    this.router.post('/user/forgotpassword', this.Api.parseForm, this.Api.csrfProtection, this.userController.processForgotPassword);
+    this.router.post('/user/forgotpassword', this.Api.parseForm, this.userController.processForgotPassword);
 
     // Create endpoint handlers for /clients
     this.router.route('/clients')

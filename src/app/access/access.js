@@ -4,7 +4,7 @@
  */
 var User = require('./../models/User');
 var Organization = require('./../models/Organization');
-var php = require('phpjs');
+var _funct = require('./../../lib/function');
 var _ = require('underscore');
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -181,7 +181,7 @@ Access.hasAccess = function(req, res, next){
 
         }
 
-        var parse_url = php.parse_url(clientUrl);
+        var parse_url = _funct.parse_url(clientUrl);
 
         if (parse_url.host) {
 
