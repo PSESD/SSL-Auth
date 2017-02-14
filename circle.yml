@@ -1,32 +1,21 @@
-general:
-  branches:
-    only:
-      - develop # list of branches to build
-      - staging # list of branches to build
-      - production # list of branches to build
 machine:
   node:
     version: 0.10.45
-  post:
-    - npm update -g
-
-checkout:
-  post:
-    - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
-    - sudo chmod u+x ./bin/$CIRCLE_BRANCH/build
-    - ./bin/$CIRCLE_BRANCH/build
 
 dependencies:
-  pre:
-    - sudo apt-get install curl
-
-test:
   override:
-    - cd /home/ubuntu/CBO-Portal-Auth/src && npm update && npm run test
-    - if [[ -e test-results.xml ]]; then cp test-results.xml $CIRCLE_TEST_REPORTS/test-results.xml; fi
+    - cd ./src && npm install
 
 deployment:
-  develop:
-      branch: develop
-      commands:
-        - ./bin/$CIRCLE_BRANCH/deploy
+  development:
+    branch: development
+    heroku:
+      appname: srx-services-ssl-auth-dev
+  test:
+    branch: test
+    heroku:
+      appname: srx-services-ssl-auth-test
+  production:
+    branch: production
+    heroku:
+      appname: srx-services-ssl-auth
