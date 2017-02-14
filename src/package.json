@@ -74,11 +74,11 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "NODE_ENV=test mocha --reporter mocha-circleci-reporter ./tests/test.js -t300000000"
+    "test": "mocha --reporter mocha-circleci-reporter ./tests/test.js -t300000000"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:PSESD/CBO-Portal-Auth.git"
+    "url": "git@github.com:PSESD/SSL-Auth.git"
   },
   "author": "upwardstech",
   "license": "MIT"

@@ -6,6 +6,11 @@ dependencies:
   override:
     - cd ./src && npm install
 
+ 
+test:
+  override:
+    - cd ./src && npm update && npm run test
+
 deployment:
   development:
     branch: development

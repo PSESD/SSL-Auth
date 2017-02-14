@@ -66,6 +66,7 @@ describe('All-Test', function () {
 
     });
 
+    /*
     describe('Runscope-Test', function () {
 
         it('Hearbeat', function (done) {
@@ -101,7 +102,7 @@ describe('All-Test', function () {
         });
 
     });
-
+    */
 
     after(function (done) {
         done();
