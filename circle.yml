@@ -9,7 +9,7 @@ dependencies:
  
 test:
   override:
-    - cd ./src && npm update && npm run test
+    - cd ./src && npm update && npm test
 
 deployment:
   development:

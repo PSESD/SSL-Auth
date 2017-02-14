@@ -37,3 +37,4 @@ config
 src/config
 .vscode
 src/test-results.xml
+*-debug.*
