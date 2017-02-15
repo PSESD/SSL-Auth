@@ -431,7 +431,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     var refreshTokenHash = tokenHash(refreshToken);
 
     RefreshToken.findOne({refreshToken: refreshTokenHash}, function (err, token) {
-        
+
         if (err) { return callback(err); }
 
         if (!token) return callback(null, false);
@@ -475,7 +475,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 // the application's responsibility to authenticate the user and render a dialog
 // to obtain their approval (displaying details about the client requesting
 // authorization).  We accomplish that here by routing through `ensureLoggedIn()`
-// first, and rendering the `dialog` view. 
+// first, and rendering the `dialog` view.
 
 exports.authorization = [
 
@@ -551,4 +551,3 @@ exports.token = [
     }
 
 ];
-

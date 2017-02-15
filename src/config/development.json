@@ -9,11 +9,12 @@
   /**
    * Cross Domain Setting
    */
-  "cross": {
-    "enable": true,
-    "allow_origin" : null, // default: "*",
-    "allow_headers" : null // default: Origin, X-Requested-With, Content-Type, Accept
-  },
+ "cross": {
+        "enable": true,
+        "allow_origin": "*",
+        "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url, x-client-api",
+        "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
+    },
   "cache": {
         "enable": true,
         "adapter": "memory",

@@ -1,0 +1,32 @@
+{
+      "host": "localhost",
+      "token": {
+        "expires_in": 3600
+      },
+      "db": {
+        "mongo": {
+          "host": "localhost",
+          "name": "cbo"
+        }
+      },
+      "session": {
+        "secret" : "cbo-2015",
+        "saveUninitialized": true,
+        "resave": true
+      },
+      /**
+       * Cross Domain Setting
+       */
+      "cross": {
+        "enable": true,
+        "allow_origin" : null, // default: "*",
+        "allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
+      },
+      "salt": "<salt>",
+      /**
+       * Logger
+       */
+      "rollbar": {
+        "access_token" : "e0f67e505472424ca9728934a41fc416"
+      }
+    }
