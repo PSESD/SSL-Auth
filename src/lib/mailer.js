@@ -1,7 +1,7 @@
 /**
  * Created by zaenal on 13/05/16.
  */
-var config = require('config');
+var config = require(__dirname + '/config').config();
 var nodemailer = require('nodemailer');
 var sparkPostTransport = require('nodemailer-sparkpost-transport');
 var mandrillTransport = require('nodemailer-mandrill-transport');

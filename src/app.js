@@ -17,10 +17,15 @@ var rollbar = require('rollbar');
 var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 3000;
-var config = require('config');
+
+if (process.env.NODE_ENV === "local-env") {
+    require('dotenv').config()  //get process.env sensitive values from local.env
+}   //else get values from heroku
+
+var config = require('./lib/config').config();
 var hal = require('hal');
 
-var rollbarAccessToken = config.get('rollbar.access_token');
+var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 var compress = require('compression');
 
 app.use(compress());
@@ -224,18 +229,17 @@ Api.prototype.registerRoute = function (cb) {
  */
 Api.prototype.connectDb = function () {
 
-
-    var dbUri = this.config.get('db.mongo');
-
-    if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
-        dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
+    var dbUri = "";
+    
+    if(this.config.has('DB_HOST') && this.config.has('DB_NAME')){
+        dbUri = 'mongodb://' + this.config.get('DB_HOST') + '/' + this.config.get('DB_NAME');
     }
 
     if(global && global.Promise) {
         this.mongo.Promise = global.Promise;
     }
 
-    this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
+    this.mongo.connect(dbUri, this.config.get('DB_MONGO_OPTIONS') || {});
 
     this.mongo.connection.once('open', function () {
 
@@ -291,7 +295,7 @@ Api.prototype.configureExpress = function (db) {
 
     // Use express session support since OAuth2orize requires it
     app.use(session({
-        secret: self.config.get('session.secret'),
+        secret: self.config.get('SESSION_SECRET'),
         saveUninitialized: self.config.get('session.saveUninitialized'),
         resave: self.config.get('session.resave')
     }));

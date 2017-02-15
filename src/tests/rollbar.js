@@ -7,13 +7,13 @@ var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
 var rollbar = require('rollbar');
-var config = require('config');
+var config = require('../lib/config').config();
 
 describe( 'Rollbar', function () {
 
 
     before( function (done) {
-        rollbar.init(config.get('rollbar.access_token'));
+        rollbar.init(config.get('ROLLBAR_ACCESS_TOKEN'));
         done();
     } );
 

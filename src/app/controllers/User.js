@@ -5,7 +5,7 @@ var Invite = require('../models/Invite');
 var utils = require('../../lib/utils');
 var cache = utils.cache();
 var md5 = utils.md5;
-var config = require('config');
+var config = require('../../lib/config').config();
 var mandrill = require('mandrill-api/mandrill');
 var crypto = require('crypto');
 var _funct = require('../../lib/function');
@@ -119,7 +119,7 @@ exports.sendInvite = function (req, res) {
 
             if (err) return res.sendError(err);
 
-            var base = config.get('auth.url');
+            var base = config.get('AUTH_URL');
 
             var authCode = crypto.randomBytes(16).toString('base64');
 
@@ -265,7 +265,7 @@ exports.sendReInvite = function (req, res) {
 
             if (err) return res.sendError(err);
 
-            var base = config.get('auth.url');
+            var base = config.get('AUTH_URL');
 
             var authCode = crypto.randomBytes(16).toString('base64');
 
@@ -394,7 +394,7 @@ exports.activate = function (req, res) {
                 redirectTo: redirectTo
             };
 
-            return res.redirect(config.get('auth.url') + '/api/user/accountupdate');
+            return res.redirect(config.get('AUTH_URL') + '/api/user/accountupdate');
 
         }
 
@@ -531,7 +531,7 @@ exports.sendForgotPassword = function (req, res) {
 
     }
 
-    var base = config.get('auth.url');
+    var base = config.get('AUTH_URL');
 
     var forgotPassword = crypto.randomBytes(16).toString('base64');
 
