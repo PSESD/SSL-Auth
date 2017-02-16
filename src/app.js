@@ -24,7 +24,6 @@ if (process.env.NODE_ENV === "local-env") {
 
 var config = require('./lib/config').config();
 var hal = require('hal');
-
 var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 var compress = require('compression');
 

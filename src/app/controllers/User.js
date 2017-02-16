@@ -80,8 +80,9 @@ exports.sendInvite = function (req, res) {
 
     var role = req.body.role || 'case-worker-restricted';
 
-
-    var url = req.headers.origin;
+    var headersJsonString = JSON.stringify(req.headers);
+    var headers = JSON.parse(headersJsonString)
+    var url = headers['x-cbo-client-url'];
 
     var user = {
         email: req.body.email

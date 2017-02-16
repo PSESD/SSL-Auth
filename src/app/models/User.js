@@ -496,6 +496,9 @@ UserSchema.virtual('allStudentsByOrganization').get(function(){
  * @param cb
  */
 UserSchema.methods.verifyPassword = function(password, cb) {
+  var encrypted = this.encryptPassword(password)
+  var hashed = this.hashedPassword
+  
   if(!this.salt){
     cb(null, false);
   } else {
