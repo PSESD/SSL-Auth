@@ -19,11 +19,6 @@
         "enable": true,
         "adapter": "memory",
         "backup": "redis",
-        "redis": {
-            "port": "6379",
-            "db": 0,
-            "ttl": 86400
-        },
         "memory": {
             "max": 100,
             "ttl": 60
