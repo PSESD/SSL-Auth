@@ -200,10 +200,12 @@ var utils = {
 
                     var redisStore = require('cache-manager-redis');
                     options = {
-                        store: redisStore,
+                         store: redisStore,
+                        db: config.get('REDIS_DB'),
                         host: config.get('REDIS_HOST'),
-                        port: cache.redis.port,
-                        ttl: cache.redis.ttl
+                        port: config.get('REDIS_PORT'),
+                        auth_pass: config.get('REDIS_PASSWORD'),
+                        ttl: config.get('REDIS_TTL')
                     };
 
                     return cacheManager.caching(options);
