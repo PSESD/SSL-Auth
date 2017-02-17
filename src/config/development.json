@@ -9,21 +9,16 @@
   /**
    * Cross Domain Setting
    */
- "cross": {
+   "cross": {
         "enable": true,
         "allow_origin": "*",
-        "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url, x-client-api",
+        "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url",
         "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
     },
   "cache": {
         "enable": true,
         "adapter": "memory",
         "backup": "redis",
-        "redis": {
-            "port": "6379",
-            "db": 0,
-            "ttl": 86400
-        },
         "memory": {
             "max": 100,
             "ttl": 60
