@@ -498,7 +498,7 @@ Api.prototype.configureExpress = function (db) {
 
             res.header("Access-Control-Allow-Origin", cross.allow_origin || "*");
 
-            res.header("Access-Control-Allow-Headers", cross.allow_headers || "Authorization, Origin, X-Requested-With, Content-Type, Accept");
+            res.header("Access-Control-Allow-Headers", cross.allow_headers || "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url");
 
             res.header("Access-Control-Allow-Methods", cross.allow_method || "POST, GET, PUT, OPTIONS, DELETE");
 

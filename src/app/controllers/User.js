@@ -105,7 +105,7 @@ exports.sendInvite = function (req, res) {
 
     }
 
-    var get_org_url = url.replace(/^https?\:\/\//i, "");
+    var get_org_url = curl.replace(/^https?\:\/\//i, "");
 
     Organization.findOne({url: get_org_url}, function(err, organization) {
 
@@ -194,6 +194,7 @@ exports.sendInvite = function (req, res) {
                         mailer.header({
                            'Reply-To': "no-replay@studentsuccesslink.org"
                         });
+                        // mailer.from = 'test@' + process.env.SPARKPOST_SANDBOX_DOMAIN;
                         mailer.send({
                             substitution_data: {
                                 organizationName: organization.name
@@ -247,7 +248,7 @@ exports.sendReInvite = function (req, res) {
     }
 
     var url = req.headers.origin;
-    var get_org_url = url.replace(/^https?\:\/\//i, "");
+    var get_org_url = curl.replace(/^https?\:\/\//i, "");
 
     Organization.findOne({url: get_org_url}, function(err, organization) {
 
@@ -347,6 +348,9 @@ exports.sendReInvite = function (req, res) {
                         mailer.header({
                             'Reply-To': "no-replay@studentsuccesslink.org"
                         });
+                        var from = 'test@' + process.env.SPARKPOST_SANDBOX_DOMAIN;
+                        mailer.from.from = from;
+                        mailer.from.email = from;
                         mailer.send({
                             substitution_data: {
                                 organizationName: organization.name
@@ -419,7 +423,7 @@ exports.activate = function (req, res) {
 
     pathArray = redirectTo.split( '/' );
     url = pathArray[0];
-    var get_org_url = url.replace(/^https?\:\/\//i, "");
+    var get_org_url = curl.replace(/^https?\:\/\//i, "");
 
     Organization.findOne({url: get_org_url}, function (err, organization) {
 
