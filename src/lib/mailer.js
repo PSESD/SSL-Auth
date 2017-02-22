@@ -6,6 +6,7 @@ var config = require(__dirname + '/config').config();
 var nodemailer = require('nodemailer');
 var sparkPostTransport = require('nodemailer-sparkpost-transport');
 var mandrillTransport = require('nodemailer-mandrill-transport');
+var mailgunTransport = require('nodemailer-mailgun-transport');
 var _ = require('underscore');
 /**
  *
@@ -13,7 +14,7 @@ var _ = require('underscore');
  */
 function Mailer(){
     // this.current = config.get('mailer.default');
-    this.current = 'sparkpost';
+    this.current = 'mailgun';
     /*
     if(!config.has('mailer.' + this.current)){
         throw new Error('We can\'t find any config mailer "' + this.current + '"');
@@ -358,6 +359,10 @@ Mailer.prototype.mandrill = function(options, done){
 
     sender(mandrillTransport(opts), mailOptions, done);
 };
+
+Mailer.prototype.mailgun = function(options, done){
+    done();
+};
 /**
  *
  * @param mailOptions
@@ -365,7 +370,7 @@ Mailer.prototype.mandrill = function(options, done){
  */
 Mailer.prototype.send = function(mailOptions, done){
     var me = this;
-    me.sparkpost(mailOptions, done);
+    me.mailgun(mailOptions, done);
     /*
     switch(me.getCurrent()){
         case 'sparkpost':

@@ -194,7 +194,6 @@ exports.sendInvite = function (req, res) {
                         mailer.header({
                            'Reply-To': "no-replay@studentsuccesslink.org"
                         });
-                        // mailer.from = 'test@' + process.env.SPARKPOST_SANDBOX_DOMAIN;
                         mailer.send({
                             substitution_data: {
                                 organizationName: organization.name
@@ -348,9 +347,6 @@ exports.sendReInvite = function (req, res) {
                         mailer.header({
                             'Reply-To': "no-replay@studentsuccesslink.org"
                         });
-                        var from = 'test@' + process.env.SPARKPOST_SANDBOX_DOMAIN;
-                        mailer.from.from = from;
-                        mailer.from.email = from;
                         mailer.send({
                             substitution_data: {
                                 organizationName: organization.name
