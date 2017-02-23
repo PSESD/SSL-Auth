@@ -361,7 +361,14 @@ Mailer.prototype.mandrill = function(options, done){
 };
 
 Mailer.prototype.mailgun = function(options, done){
-    done();
+    var auth = {
+        auth: {
+            api_key: config.get('MAILGUN_API_KEY'),
+            domain: config.get('MAILGUN_DOMAIN')
+        }
+    }
+
+    sender(mailgunTransport(auth), options, done);
 };
 /**
  *

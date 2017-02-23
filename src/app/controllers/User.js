@@ -184,21 +184,21 @@ exports.sendInvite = function (req, res) {
 
                         var send_at = new Date();
 
-                        var mailer = utils.mail();
-                        mailer.template('cbo-invite-user');
-                        mailer.bindParam({
-                            userId: user._id+'',
-                            link: activateUrl
-                        });
-                        mailer.to({email: user.email, name: user.last_name});
-                        mailer.header({
-                           'Reply-To': "no-replay@studentsuccesslink.org"
-                        });
-                        mailer.send({
+                        var mailOptions = {
+                            from: 'no-reply@studentsuccesslink.org',
+                            to: user.email,
+                            subject: 'Student Success Link invitation',
+                            text : 'Your Membership ID is ' + user._id + '\r\n\r\nClick this link to activate your account: ' + activateUrl,
+                            html : '<html><body><p>Your Membership ID is ' + user._id + '<br><br>Click this link to activate your account: ' + activateUrl + '</p></body></html>'
+                        };
+                        /*
                             substitution_data: {
                                 organizationName: organization.name
                             }
-                        }, function(err, info){
+                        */
+
+                        var mailer = utils.mail();
+                        mailer.send(mailOptions, function(err, info){
                             console.log(err, info);
                             if(!err){
                                 return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
@@ -337,21 +337,16 @@ exports.sendReInvite = function (req, res) {
 
                         var send_at = new Date();
 
+                        var mailOptions = {
+                            from: 'no-reply@studentsuccesslink.org',
+                            to: user.email,
+                            subject: 'Student Success Link invitation',
+                            text : 'Your Membership ID is ' + user._id + '\r\n\r\nClick this link to activate your account: ' + activateUrl,
+                            html : '<html><body><p>Your Membership ID is ' + user._id + '<br><br>Click this link to activate your account: ' + activateUrl + '</p></body></html>'
+                        };
+
                         var mailer = utils.mail();
-                        mailer.template('cbo-invite-user');
-                        mailer.bindParam({
-                            userId: user._id+'',
-                            link: activateUrl
-                        });
-                        mailer.to({email: user.email, name: user.last_name});
-                        mailer.header({
-                            'Reply-To': "no-replay@studentsuccesslink.org"
-                        });
-                        mailer.send({
-                            substitution_data: {
-                                organizationName: organization.name
-                            }
-                        }, function(err, info){
+                        mailer.send(mailOptions, function(err, info){
                             if(!err){
                                 return res.sendSuccess(res.__('email_success'), isTester ? testerInfo : testerInfo.user );
                             }
@@ -573,21 +568,16 @@ exports.sendForgotPassword = function (req, res) {
                     return res.sendError(res.__('forgot_failed'));
                 }
 
+                var mailOptions = {
+                    from: 'no-reply@studentsuccesslink.org',
+                    to: user.email,
+                    subject: 'Student Success Link forgot password',
+                    text : 'Your Membership ID is ' + user._id + '\r\n\r\nClick this link to change your password: ' + forgotPasswordUrl,
+                    html : '<html><body><p>Your Membership ID is ' + user._id + '<br><br>Click this link to change your password: ' + forgotPasswordUrl + '</p></body></html>'
+                };
+
                 var mailer = utils.mail();
-                mailer.template('cbo-forgot-password');
-                mailer.bindParam({
-                    userId: user._id+'',
-                    link: forgotPasswordUrl
-                });
-                mailer.to({email: user.email, name: user.last_name});
-                mailer.header({
-                    'Reply-To': "no-replay@studentsuccesslink.org"
-                });
-                mailer.send({
-                    substitution_data: {
-                        organizationName: organization.name
-                    }
-                }, function(err, info){
+                mailer.send(mailOptions, function(err, info){
 
                     if(!err){
                         return res.sendSuccess(res.__('forgot_success'));
