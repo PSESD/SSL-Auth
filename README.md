@@ -2,6 +2,8 @@
 # Secure Data Portal for community-based organizations (CBO's) [![Code Climate](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/gpa.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/feed) [![Test Coverage](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/coverage.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/coverage) [![Issue Count](https://codeclimate.com/repos/565edd74a7512d251d001692/badges/164f3c9621ded8bdf249/issue_count.svg)](https://codeclimate.com/repos/565edd74a7512d251d001692/feed) 
 
 ## Overview
+Handles user authorization and management for Student Success Link.
+
 The authorization sequence begins when your application redirects a browser to a CBO api URL; the URL includes query parameters that indicate the type of access being requested. As in other scenarios, CBO api server handles user authentication, session selection, and user consent. The result is an authorization code, which api returns to your application in a query string.
 
 After receiving the authorization code, your application can exchange the code (along with a client ID and client secret) for an access token and, in some cases, a refresh token.
@@ -12,7 +14,7 @@ The URL used when authenticating a user is`http://<domain>:<port>/api/oauth2/aut
 
 ## Requirements
 
-You need to have installed Node.js and MongoDB
+You need to have installed Node.js and MongoDB.
 
 ## Installation
 
@@ -23,105 +25,25 @@ To install dependencies enter project folder and run following command:
 
 Install the client library using git:
 
-    $ git clone https://github.com/PSESD/CBO-Portal-Auth.git
-    $ cd CBO-Portal-Auth
+    $ git clone https://github.com/PSESD/SSL-Auth.git
+    $ cd SSL-Auth
     $ npm install
 
 
 ## Getting started
 
-The following examples configuration in JSON format.
 
-**Install in your app `src` directory, and add/edit the default config file.**
+Create a file in `/src` named `.env` with the following values:
 
-    $ mkdir src/config
-    $ vi src/config/development.json
-
-    {
-      "host": "<domain>",
-      "token": {
-        "expires_in": 3600
-      },
-      "db": {
-    	"mongo": {
-    	  "host": "<mongodb host>",
-    	  "name": "<mongodb name>"
-    	}
-      },
-      "session": {
-    	"secret" : "<secret>",
-    	"saveUninitialized": true,
-    	"resave": true
-      },
-      /**
-       * Cross Domain Setting
-       */
-      "cross": {
-    	"enable": true,
-    	"allow_origin" : null, // default: "*",
-    	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
-      },
-      "salt": "<salt>",
-      /**
-       * Logger
-       */
-      "rollbar": {
-    	"access_token" : "<rollbar token>"
-      }
-    }
-
-**Edit config overrides for production deployment:**
-
-    $ vi src/config/production.json
-
-    {
-          "host": "<domain>",
-          "token": {
-            "expires_in": 3600
-          },
-          "db": {
-        	"mongo": {
-        	  "host": "<mongodb host>",
-        	  "name": "<mongodb name>"
-        	}
-          },
-          "session": {
-        	"secret" : "<secret>",
-        	"saveUninitialized": true,
-        	"resave": true
-          },
-          /**
-           * Cross Domain Setting
-           */
-          "cross": {
-        	"enable": true,
-        	"allow_origin" : null, // default: "*",
-        	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
-          },
-          "salt": "<salt>",
-          /**
-           * Logger
-           */
-          "rollbar": {
-        	"access_token" : "<rollbar token>"
-          }
-        }
-
-**Use configs in your code:**
-
-    var config = require('./lib/utils').config();
-    ...
-    var dbConfig = config.get('db.mongo.host');
-    db.connect(dbConfig, ...);
-
-    if (config.has('salt')) {
-      var salt = config.get('salt');
-      ...
-    }
-
-`config.get()` will throw an exception for undefined keys to help catch typos and missing values.
-Use `config.has()` to test if a configuration value is defined.
-
+    AUTH_URL=http://url-of-srx-services-ssl-auth //ie, http://localhost:3000, do not include the "/api"
+    DB_HOST=mongoDbName:password@url.com:port
+    DB_MONGO_OPTIONS= //not necessary
+    DB_NAME=mongoDBName
+    MAILGUN_API_KEY=mailgun-key
+    MAILGUN_DOMAIN=whatever.mailgun.org
+    ROLLBAR_ACCESS_TOKEN=token-for-rollbar-account
+    SALT=should-match-value-in-API
+    SESSION_SECRET=should-match-value-in-API
 
 **Start your app server:**
 
@@ -164,6 +86,8 @@ provide specs to your contribution.
 * Run `npm test` to start server with env `test`.
 
 ## Tools used
+
+[mailgun](https://www.mailgun.com) - used to send emails (such as forgot password and new user links).
 
 [httpie](https://github.com/jkbr/httpie) - command line HTTP client
 
