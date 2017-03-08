@@ -287,39 +287,29 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
     }
 
-    Organization.findOne({ url: params.organizationUrl }, function(err, organization) {
-
+    //Validate the user
+    User.findOne({email: username}, function (err, user) {
         if (err) {
             return callback(errorLogin);
         }
 
         // No user found with that username
-        if (!organization) {
+        if (!user) {
             return callback(errorLogin, false);
         }
 
-        //Validate the user
-        User.findOne({email: username}, function (err, user) {
+        // Make sure the password is correct
+        user.verifyPassword(password, function (err, isMatch) {
             if (err) {
                 return callback(errorLogin);
             }
 
-            // No user found with that username
-            if (!user) {
+            // Password did not match
+            if (!isMatch) {
                 return callback(errorLogin, false);
             }
 
-            // Make sure the password is correct
-            user.verifyPassword(password, function (err, isMatch) {
-                if (err) {
-                    return callback(errorLogin);
-                }
-
-                // Password did not match
-                if (!isMatch) {
-                    return callback(errorLogin, false);
-                }
-
+            Organization.findOne({_id: user.permissions[0].organization}, function(err, organization) {
                 var permission = user.getCurrentPermission(organization._id.toString());
 
                 if (!permission.role || !permission.activate) {
