@@ -287,6 +287,8 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
 
     }
 
+    Organization.findOne({url: params.organizationUrl}, function(err, organization) {
+
     //Validate the user
     User.findOne({email: username}, function (err, user) {
         if (err) {
@@ -309,7 +311,7 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
                 return callback(errorLogin, false);
             }
 
-            Organization.findOne({_id: user.permissions[0].organization}, function(err, organization) {
+            // Organization.findOne({_id: user.permissions[0].organization}, function(err, organization) {
                 var permission = user.getCurrentPermission(organization._id.toString());
 
                 if (!permission.role || !permission.activate) {
