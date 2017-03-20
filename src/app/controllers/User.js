@@ -679,7 +679,7 @@ exports.formForgotPassword = function (req, res) {
                 }
 
                 User.where({_id: user._id}).update({
-                    $unset: {hashedForgotPassword: ""}
+                    hashedForgotPassword: ""
                 }, function (err, updated) {
 
                     if (err) {

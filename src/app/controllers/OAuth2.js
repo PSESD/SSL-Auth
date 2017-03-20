@@ -288,9 +288,12 @@ server.exchange(exchangePassword(function (client, username, password, scope, pa
     }
 
     Organization.findOne({url: params.organizationUrl}, function(err, organization) {
+        if (!organization) {
+            return callback(errorLogin, false);
+        }
 
-    //Validate the user
-    User.findOne({email: username}, function (err, user) {
+        //Validate the user
+        User.findOne({email: username}, function (err, user) {
         if (err) {
             return callback(errorLogin);
         }
