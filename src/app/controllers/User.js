@@ -373,6 +373,7 @@ exports.activate = function (req, res) {
     var authCode = req.query.authCode;
 
     var redirectTo = req.query.redirectTo;
+    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
     var isNew = (req.query.__n == '1');
 
@@ -397,8 +398,6 @@ exports.activate = function (req, res) {
                 if (err) return res.sendError(err);
                 Invite.remove({_id: invite._id}, function (err) {
                     if (err) return res.sendError(err);
-                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
-
                     return res.redirect(redirectTo);
                 });
             });
