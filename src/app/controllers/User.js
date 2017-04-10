@@ -442,7 +442,7 @@ exports.activate = function (req, res) {
             }
 
             if(indexOf in user.permissions && user.permissions[indexOf].activate === true) {
-                return callback(res.__('activation_exists'), false);
+                return res.redirect(redirectTo);
             }
 
             // Make sure the authCode is correct
