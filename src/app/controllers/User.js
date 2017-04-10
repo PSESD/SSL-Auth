@@ -95,6 +95,10 @@ exports.sendInvite = function (req, res) {
 
     var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
+    if (parse_url.path == "localhost") {
+        parse_url.path = "dev.studentsuccesslink.org";
+    }
+
     if (parse_url.host) {
 
         curl = parse_url.host;
@@ -374,6 +378,10 @@ exports.activate = function (req, res) {
 
     var redirectTo = req.query.redirectTo;
 
+    if (redirectTo == "localhost") {
+        redirectTo = "dev.studentsuccesslink.org";
+    }
+
     var isNew = (req.query.__n == '1');
 
     var callback = function (err, user) {
@@ -472,19 +480,7 @@ exports.activate = function (req, res) {
 
                             if (err) return res.sendError(err);
 
-                            updateUser.saveWithRole(user, organization._id.toString(), { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
-
-                                if (err) return res.sendError(err);
-
-                                Invite.remove({_id: invite._id}, function (err) {
-
-                                    if (err) return res.sendError(err);
-
-                                    callback(null, updated[0]);
-
-                                });
-
-                            });
+                            callback(null, updateUser);
 
                         });
 
@@ -856,22 +852,22 @@ exports.processAccountUpdate = function(req, res){
 
                 user.last_name = last_name;
 
-                user.save(function (err) {
+                Invite.findOne({authCode: authCode}, function(err, invite){
+                    if (err || !invite) {
+                        return res.sendError("oops, something went wrong")
+                    } else {
+                        user.saveWithRole(user, organization._id.toString(), { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
+                            if (err) return res.sendError(err);
+                                Invite.remove({_id: invite._id}, function (err) {
+                                    if (err) return res.sendError(err);
+                                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
-                    if (err) {
-
-                        errors.push(err.message);
-
-                        return renderError();
-
-                    }
-
-                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
-
-                    return res.redirect(redirectTo);
-
+                                    return res.redirect(redirectTo);
+                                });
+                            }
+                        );
+                   }
                 });
-
             });
         });
 
