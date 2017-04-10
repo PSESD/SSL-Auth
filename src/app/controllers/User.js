@@ -430,8 +430,6 @@ exports.activate = function (req, res) {
             // No user found with that username
             if (!user) return callback(res.__('record_not_found', 'User'), false);
 
-            //console.log(user.organizationId, organization._id.toString(), user.organizationId.indexOf(organization._id.toString()));
-
             var indexOf = user.organizationId.indexOf(organization._id.toString());
 
             if(indexOf === -1) {
@@ -442,15 +440,15 @@ exports.activate = function (req, res) {
                 return callback(res.__('activation_exists'), false);
             }
 
-            // Make sure the password is correct
+            // Make sure the authCode is correct
             user.verifyAuthCode(authCode, function (err, isMatch) {
 
                 if (err) { return callback(err); }
 
-                // Password did not match
+                // AuthCode did not match
                 if (!isMatch) {
 
-                    return callback(res.__('invalid_token @ 453'), false);
+                    return callback(res.__('invalid_token'), false);
 
                 }
 
@@ -458,17 +456,9 @@ exports.activate = function (req, res) {
 
                     if (err) { return callback(err); }
 
-                    if(!invite) return callback(res.__('invalid_token @ 461'), false);
+                    if(!invite) return callback(res.__('invalid_token'), false);
 
-                    // Success
-                    User.where({_id: user._id}).update({
-                        $unset: {hashedAuthCode: ""}
-                        //$push: { permissions: { organization: organization._id, permissions: [], students: [], role: invite.role, activate: true, activateDate: new Date(), activateStatus: 'Active' }},
-                    }, function (err, updated) {
-
-                        if (err) return res.sendError(err);
-
-                        User.findOne({_id: user._id}, function(err, updateUser) {
+                    User.findOne({_id: user._id}, function(err, updateUser) {
 
                             if (err) return res.sendError(err);
 
@@ -476,10 +466,7 @@ exports.activate = function (req, res) {
 
                         });
 
-                    });
-
                 });
-
 
             });
 
@@ -770,8 +757,6 @@ exports.processAccountUpdate = function(req, res){
             redirectTo: redirectTo
         };
 
-        //console.log("SESSION DATA: ", sessionData);
-
         req.session.data = sessionData;
 
         res.render('../app/views/accountUpdate', {
@@ -843,6 +828,8 @@ exports.processAccountUpdate = function(req, res){
                 if (middle_name) user.middle_name = middle_name;
 
                 user.last_name = last_name;
+
+                user.hashedAuthCode = "";
 
                 Invite.findOne({authCode: authCode}, function(err, invite){
                     if (err || !invite) {
