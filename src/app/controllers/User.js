@@ -394,10 +394,22 @@ exports.activate = function (req, res) {
 
         }
 
-        if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+       Invite.findOne({authCode: authCode}, function(err, invite){
+            if (err || !invite) {
+                return res.sendError("oops, something went wrong")
+            } else {
+                user.saveWithRole(user, organization._id.toString(), { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
+                    if (err) return res.sendError(err);
+                        Invite.remove({_id: invite._id}, function (err) {
+                            if (err) return res.sendError(err);
+                            if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
-        return res.redirect(redirectTo);
-
+                            return res.redirect(redirectTo);
+                        });
+                    }
+                );
+            }
+        });
     };
 
     var parse_url = _funct.parse_url(redirectTo), curl = null;
