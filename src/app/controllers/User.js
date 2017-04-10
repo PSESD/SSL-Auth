@@ -376,7 +376,7 @@ exports.activate = function (req, res) {
 
     var isNew = (req.query.__n == '1');
 
-    var callback = function (err, user) {
+    var callback = function (err, user, invite, orgId) {
 
         if (err) {
             return errorNotFound(err, req, res);
@@ -392,24 +392,17 @@ exports.activate = function (req, res) {
 
             return res.redirect(config.get('AUTH_URL') + '/api/user/accountupdate');
 
-        }
-
-       Invite.findOne({authCode: authCode}, function(err, invite){
-            if (err || !invite) {
-                return res.sendError("oops, something went wrong")
-            } else {
-                user.saveWithRole(user, organization._id.toString(), { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
+        } else {
+            user.saveWithRole(user, orgId, { role: invite.role, activate: true, activateDate: Date.now(), activateStatus: 'Active' }, function (err) {
+                if (err) return res.sendError(err);
+                Invite.remove({_id: invite._id}, function (err) {
                     if (err) return res.sendError(err);
-                        Invite.remove({_id: invite._id}, function (err) {
-                            if (err) return res.sendError(err);
-                            if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
+                    if (redirectTo.indexOf('https://') === -1) redirectTo = 'https://' + redirectTo;
 
-                            return res.redirect(redirectTo);
-                        });
-                    }
-                );
-            }
-        });
+                    return res.redirect(redirectTo);
+                });
+            });
+        }     
     };
 
     var parse_url = _funct.parse_url(redirectTo), curl = null;
@@ -474,7 +467,7 @@ exports.activate = function (req, res) {
 
                             if (err) return res.sendError(err);
 
-                            callback(null, updateUser);
+                            callback(null, updateUser, invite, organization._id.toString());
 
                         });
 
