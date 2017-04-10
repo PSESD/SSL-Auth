@@ -95,10 +95,6 @@ exports.sendInvite = function (req, res) {
 
     var parse_url = _funct.parse_url(req.body.redirect_url), curl = null;
 
-    if (parse_url.path == "localhost") {
-        parse_url.path = "dev.studentsuccesslink.org";
-    }
-
     if (parse_url.host) {
 
         curl = parse_url.host;
@@ -378,10 +374,6 @@ exports.activate = function (req, res) {
 
     var redirectTo = req.query.redirectTo;
 
-    if (redirectTo == "localhost") {
-        redirectTo = "dev.studentsuccesslink.org";
-    }
-
     var isNew = (req.query.__n == '1');
 
     var callback = function (err, user) {
@@ -458,7 +450,7 @@ exports.activate = function (req, res) {
                 // Password did not match
                 if (!isMatch) {
 
-                    return callback(res.__('invalid_token'), false);
+                    return callback(res.__('invalid_token @ 453'), false);
 
                 }
 
@@ -466,7 +458,7 @@ exports.activate = function (req, res) {
 
                     if (err) { return callback(err); }
 
-                    if(!invite) return callback(res.__('invalid_token'), false);
+                    if(!invite) return callback(res.__('invalid_token @ 461'), false);
 
                     // Success
                     User.where({_id: user._id}).update({
